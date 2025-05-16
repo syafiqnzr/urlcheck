@@ -1,0 +1,144 @@
+{% if is_admin %}
+    {% extends "header_admin.html" %}
+{% else %}
+    {% extends "header.html" %}
+{% endif %}
+
+{% block content %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URLCHECK</title>
+
+    <style>
+
+        /* Reset some default margins */
+        body, h1, p, form {
+            margin: 0;
+            padding: 0;
+        }
+         
+         /* Main content container */
+         .content {
+            width: 90%;
+            max-width: 600px;
+            background-color: #ffffff;
+            margin: 40px auto;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px 20px;
+            box-sizing: border-box;
+            margin-top: 50px;
+        }
+
+        .content h1 {
+            color: #1e3c72;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .content p {
+            text-align: center;
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        form label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        form input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #1e3c72;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        form input[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background-color: #1e3c72;
+            color: #ffffff;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #16345d;
+        }
+
+        /* Flash messages */
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+        }
+
+        .flash-messages li {
+            color: red;
+
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* Responsive - make it more mobile friendly */
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px 15px;
+                margin-top: 30px;
+            }
+
+            .content h1 {
+                font-size: 24px;
+            }
+
+            form input[type="submit"] {
+                padding: 12px;
+                font-size: 15px;
+            }
+        }
+
+    </style>
+        
+<head>
+    <title>URL Scanner - Home</title>
+</head>
+<body>
+    <h1>URL ScannerRR</h1>
+    <!-- Show login/register or logout depending on session -->
+    {% if session.username %}
+        <p>Welcome, {{ session.username }}</p>   
+    {% endif %}
+    <form method="post" action="/result">
+        <label for="url">Enter URL to scan:</label>
+        <input type="text" name="url" id="url" size="60" required>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flash-messages">
+            {% for message in messages %}
+              <li style="color: red;">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}      
+        <input type="submit" value="Scan URL">
+    </form>
+</body>
+</html>
+{% endblock %}

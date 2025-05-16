@@ -1,0 +1,615 @@
+{% extends "header_admin.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        /* General Styles */
+     
+         /* General Styles */
+     
+       
+   
+   
+       /* Card Styles */
+       .card {
+           background-color: #ffffff;
+           border: 1px solid #ddd;
+           border-radius: 8px;
+           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+           margin-bottom: 20px;
+       }
+   
+       .card-header {
+           background-color: #f1f1f1;
+           padding: 15px;
+           font-size: 1.25rem;
+           font-weight: bold;
+           border-bottom: 1px solid #ddd;
+           border-radius: 8px 8px 0 0;
+           color: #495057;
+       }
+   
+       .card-body {
+           padding: 20px;
+       }
+   
+       /* Form Styles */
+       form {
+           display: flex;
+           flex-direction: column;
+           gap: 10px;
+       }
+   
+       .form-label {
+           font-weight: bold;
+           color: #495057;
+           margin-bottom: 5px;
+       }
+   
+       .form-control {
+           padding: 10px;
+           font-size: 1rem;
+           border: 1px solid #ddd;
+           border-radius: 4px;
+           outline: none;
+           transition: border-color 0.2s ease;
+       }
+   
+       .form-control:focus {
+           border-color: #007bff;
+       }
+   
+       /* Button Styles */
+       .btn {
+           display: inline-block;
+           padding: 10px 20px;
+           font-size: 1rem;
+           color: #fff;
+           text-align: center;
+           text-decoration: none;
+           border: none;
+           border-radius: 4px;
+           cursor: pointer;
+           transition: background-color 0.3s ease, transform 0.2s ease;
+       }
+   
+       .btn-primary {
+           background-color: #007bff;
+       }
+   
+       .btn-primary:hover {
+           background-color: #0056b3;
+       }
+   
+       .btn-success {
+           background-color: #28a745;
+       }
+   
+       .btn-success:hover {
+           background-color: #1e7e34;
+       }
+   
+       .btn:hover {
+           transform: scale(1.05);
+       }
+   
+       /* Alert Styles */
+       .alert {
+           padding: 15px;
+           margin-bottom: 20px;
+           border: 1px solid transparent;
+           border-radius: 4px;
+           text-align: left;
+       }
+   
+       .alert-dismissible {
+           position: relative;
+       }
+   
+       .alert .btn-close {
+           position: absolute;
+           top: 10px;
+           right: 10px;
+           background: none;
+           border: none;
+           font-size: 1.2rem;
+           cursor: pointer;
+           color: #000;
+       }
+   
+       .alert-success {
+           background-color: #d4edda;
+           border-color: #c3e6cb;
+           color: #155724;
+       }
+   
+       .alert-error {
+           background-color: #f8d7da;
+           border-color: #f5c6cb;
+           color: #721c24;
+       }
+   
+       /* Uploaded Dataset Details */
+       .uploaded-dataset {
+           padding: 15px;
+           background-color: #e9ecef;
+           border: 1px solid #ddd;
+           border-radius: 4px;
+       }
+   
+   
+       /* Card Styles */
+       .card {
+           background-color: #ffffff;
+           border: 1px solid #ddd;
+           border-radius: 8px;
+           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+           margin-bottom: 20px;
+       }
+   
+       .card-header {
+           background-color: #f1f1f1;
+           padding: 15px;
+           font-size: 1.25rem;
+           font-weight: bold;
+           border-bottom: 1px solid #ddd;
+           border-radius: 8px 8px 0 0;
+           color: #495057;
+       }
+   
+       .card-body {
+           padding: 20px;
+       }
+   
+       /* Form Styles */
+       form {
+           display: flex;
+           flex-direction: column;
+           gap: 10px;
+       }
+   
+       .form-label {
+           font-weight: bold;
+           color: #495057;
+           margin-bottom: 5px;
+       }
+   
+       .form-control {
+           padding: 10px;
+           font-size: 1rem;
+           border: 1px solid #ddd;
+           border-radius: 4px;
+           outline: none;
+           transition: border-color 0.2s ease;
+       }
+   
+       .form-control:focus {
+           border-color: #007bff;
+       }
+   
+       /* Button Styles */
+       .btn {
+           display: inline-block;
+           padding: 10px 20px;
+           font-size: 1rem;
+           color: #fff;
+           text-align: center;
+           text-decoration: none;
+           border: none;
+           border-radius: 4px;
+           cursor: pointer;
+           transition: background-color 0.3s ease, transform 0.2s ease;
+       }
+   
+       .btn-primary {
+           background-color: #007bff;
+       }
+   
+       .btn-primary:hover {
+           background-color: #0056b3;
+       }
+   
+       .btn-success {
+           background-color: #28a745;
+       }
+   
+       .btn-success:hover {
+           background-color: #1e7e34;
+       }
+   
+       .btn:hover {
+           transform: scale(1.05);
+       }
+   
+       /* Alert Styles */
+       .alert {
+           padding: 15px;
+           margin-bottom: 20px;
+           border: 1px solid transparent;
+           border-radius: 4px;
+           text-align: left;
+       }
+   
+       .alert-dismissible {
+           position: relative;
+       }
+   
+       .alert .btn-close {
+           position: absolute;
+           top: 10px;
+           right: 10px;
+           background: none;
+           border: none;
+           font-size: 1.2rem;
+           cursor: pointer;
+           color: #000;
+       }
+   
+       .alert-success {
+           background-color: #d4edda;
+           border-color: #c3e6cb;
+           color: #155724;
+       }
+   
+       .alert-error {
+           background-color: #f8d7da;
+           border-color: #f5c6cb;
+           color: #721c24;
+       }
+   
+       /* Uploaded Dataset Details */
+       .uploaded-dataset {
+           padding: 15px;
+           background-color: #e9ecef;
+           border: 1px solid #ddd;
+           border-radius: 4px;
+       }
+           body, h1, p, form {
+margin: 0;
+padding: 0;
+}
+
+/* Main content container */
+.content {
+width: 90%;
+max-width: 1200px;
+background-color: #ffffff;
+margin: 40px auto;
+border-radius: 12px;
+box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+padding: 30px 20px;
+box-sizing: border-box;
+margin-top: 50px;
+}
+
+.content h1 {
+color: #1e3c72;
+text-align: center;
+margin-bottom: 20px;
+font-size: 28px;
+}
+
+.content p {
+text-align: center;
+color: #555;
+font-size: 18px;
+margin-bottom: 20px;
+}
+.div1 {
+color: #1e3c72;
+text-align: center;
+margin-bottom: 20px;
+font-size: 28px;
+}
+form label {
+display: block;
+font-weight: bold;
+margin-bottom: 10px;
+color: #333;
+font-size: 16px;
+}
+
+form input[type="text"] {
+width: 100%;
+padding: 12px;
+font-size: 16px;
+border: 1px solid #1e3c72;
+border-radius: 8px;
+margin-bottom: 10px;
+box-sizing: border-box;
+}
+
+form input[type="submit"] {
+width: 100%;
+padding: 14px;
+background-color: #1e3c72;
+color: #ffffff;
+font-size: 16px;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+margin-top: 10px;
+transition: background-color 0.3s ease;
+}
+
+form input[type="submit"]:hover {
+background-color: #16345d;
+}
+
+/* Flash messages */
+.flash-messages {
+list-style: none;
+padding: 0;
+}
+
+.flash-messages li {
+color: red;
+
+font-size: 12px;
+text-align: center;
+}
+
+div1 {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+margin-top: 20px;
+}
+
+.profile-container {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+margin-top: 20px;
+}
+
+.image-container {
+margin-bottom: 15px;
+}
+
+.profile-picture {
+border-radius: 50%;
+object-fit: cover;
+border: 2px solid #007BFF;
+}
+
+#profile_picture {
+display: block;
+margin: 10px auto;
+}
+
+/* Responsive - make it more mobile friendly */
+@media (max-width: 600px) {
+.content {
+   padding: 20px 15px;
+   margin-top: 30px;
+}
+
+.content h1 {
+   font-size: 24px;
+}
+
+form input[type="submit"] {
+   padding: 12px;
+   font-size: 15px;
+}
+}
+       /* existing styles unchanged */
+       /* ... (keep all existing styles) ... */
+       /* Add styles for file list */
+       .file-list {
+           margin-top: 20px;
+       }
+       .file-list h3 {
+           color: #1e3c72;
+           margin-bottom: 10px;
+       }
+       .file-list ul {
+           list-style: none;
+           padding: 0;
+       }
+       .file-list li {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 6px 10px;
+           border: 1px solid #ddd;
+           border-radius: 6px;
+           margin-bottom: 6px;
+           background-color: #f9f9f9;
+       }
+       .file-list li form {
+           margin: 0;
+       }
+       .file-list button.delete-btn {
+           background-color: #dc3545;
+           border: none;
+           color: white;
+           padding: 6px 12px;
+           border-radius: 4px;
+           cursor: pointer;
+           font-size: 0.9rem;
+           transition: background-color 0.3s ease;
+       }
+       .file-list button.delete-btn:hover {
+           background-color: #b02a37;
+       }
+    </style>
+    <style>
+        /* Custom CSS for Dataset Files h3 */
+        .dataset-files-header {
+            color: #1e3c72;
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-decoration: underline;
+            /* Add any other desired styles here */
+        }
+        /* Custom CSS for dataset files list */
+        .dataset-files-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .dataset-files-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            background-color: #f9f9f9;
+            transition: background-color 0.3s ease;
+        }
+        .dataset-files-list li:hover {
+            background-color: #e9ecef;
+        }
+        .dataset-files-list li span {
+            font-size: 1rem;
+            color: #333;
+            word-break: break-all;
+        }
+        .dataset-files-list li form {
+            margin: 0;
+        }
+        .dataset-files-list button.delete-btn {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+        .dataset-files-list button.delete-btn:hover {
+            background-color: #b02a37;
+        }
+    </style>
+</head>
+<body>
+    
+   
+        <h1 class="text-center">Training Model</h1>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="card-header">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <!-- Upload Dataset Card -->
+            <div class="card" style="flex: 1;">
+                <div class="card-header">
+                    <h3>Upload Dataset</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('upload_dataset') }}" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="dataset" class="form-label">Choose CSV File</label>
+                            <input type="file" class="form-control" id="dataset" name="dataset" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload Dataset</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Dataset Files Card -->
+            {% if is_admin and dataset_files %}
+            <div class="card" style="flex: 1;">
+                <div class="card-header">
+                    <h3 class=>Dataset Files</h3>
+                </div>
+                <div class="card-body dataset-files-list">
+                    <ul>
+                        {% for file in dataset_files %}
+                        <li>
+                            <span>{{ file }}</span>
+                            <form action="{{ url_for('delete_dataset_file', filename=file) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this file?');">
+                                <button type="submit" class="delete-btn">Delete</button>
+                            </form>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Show Uploaded Dataset Details -->
+        {% if dataset_uploaded %}
+        <div class="card my-4">
+            <div class="card-header">
+                <h3>Uploaded Dataset Details</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Uploaded File:</strong> {{ dataset_uploaded }}</p>
+                <p>The dataset has been successfully uploaded and is ready for processing.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <!-- Regenerate Training Model Card -->
+            <div class="card" style="flex: 1;">
+                <div class="card-header">
+                    <h3>Regenerate Training Model</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('regenerate_model') }}" method="post">
+                        <button type="submit" class="btn btn-success">Regenerate Model</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Training Model Accuracy History Card -->
+            {% if trainingmodel_records %}
+            <div class="card" style="flex: 1;">
+                <div class="card-header">
+                    <h3>Training Model Accuracy History</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Accuracy (%)</th>
+                                <th>Timestamp</th>
+                                <th>Sender</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in trainingmodel_records %}
+                            <tr>
+                                <td>{{ record.accuracy }}</td>
+                                <td>{{ record.timestamp }}</td>
+                                <td>{{ record.sender }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% if is_admin %}
+    {% extends "header_admin.html" %}
+{% else %}
+    {% extends "header_login.html" %}
+{% endif %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <style>
+        .error { color: red; margin-bottom: 10px; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .modal button {
+            margin: 5px;
+        }
+        /* Main content container */
+ .content {
+    width: 90%;
+    max-width: 500px;
+    background-color: #ffffff;
+    margin: 40px auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    box-sizing: border-box;
+    margin-top: 50px;
+}
+
+.content h1 {
+    color: #1e3c72;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.content p {
+    text-align: center;
+    color: #555;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+    </style>
+</head>
+<body>
+    <h1>User Login</h1>
+    {% if session.username %}
+        <p>Welcome, {{ session.username }}</p>   
+    {% endif %}
+
+    {% with messages = get_flashed_messages(category_filter=["error"]) %}
+      {% if messages %}
+        <div class="error">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br><br>
+
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
+
+        <input type="submit" value="Login">
+    </form>
+
+    <br><a href="/register">No account? Register here</a>
+
+{% with messages = get_flashed_messages(category_filter=["token_expired"]) %}
+  {% if messages %}
+    {% for message in messages %}
+        {% set parts = message.split('::') %}
+        <div id="tokenModal" class="modal" style="display:block;">
+          <div class="modal-content">
+            <h3>Your account has expired.</h3>
+            <p>.........................</p>
+            <button onclick="window.location.href='/login'">Back</button>
+            <button onclick="window.location.href='/renew_token?username={{ parts[1] }}'">Renew Token</button>
+            <button onclick="window.location.href='/{{ parts[3] }}'">scan without account</button>
+
+          </div>
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+
+</body>
+</html>
+
+
+{% endblock %}

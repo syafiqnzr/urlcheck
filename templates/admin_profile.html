@@ -1,0 +1,201 @@
+{% extends "header_admin.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <style>
+        body, h1, p, form {
+    margin: 0;
+    padding: 0;
+}
+ 
+ /* Main content container */
+ .content {
+    width: 90%;
+    max-width: 500px;
+    background-color: #ffffff;
+    margin: 40px auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    box-sizing: border-box;
+    margin-top: 50px;
+}
+
+.content h1 {
+    color: #1e3c72;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.content p {
+    text-align: center;
+    color: #555;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+.div1 {
+    color: #1e3c72;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 16px;
+}
+
+form input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #1e3c72;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+form input[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    background-color: #1e3c72;
+    color: #ffffff;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+form input[type="submit"]:hover {
+    background-color: #16345d;
+}
+
+/* Flash messages */
+.flash-messages {
+    list-style: none;
+    padding: 0;
+}
+
+.flash-messages li {
+    color: red;
+
+    font-size: 12px;
+    text-align: center;
+}
+
+div1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.image-container {
+    margin-bottom: 15px;
+}
+
+.profile-picture {
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #007BFF;
+}
+
+#profile_picture {
+    display: block;
+    margin: 10px auto;
+}
+
+/* Responsive - make it more mobile friendly */
+@media (max-width: 600px) {
+    .content {
+        padding: 20px 15px;
+        margin-top: 30px;
+    }
+
+    .content h1 {
+        font-size: 24px;
+    }
+
+    form input[type="submit"] {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+        
+    </style>
+</head>
+<body>
+    <h1>Admin Profile</h1>
+
+    <form action="{{ url_for('admin_profile') }}" method="POST" enctype="multipart/form-data">
+      <div class="profile-container">
+     <!-- Display Profile Picture -->
+     <div class="image-container">
+      {% if profile_picture %}
+          <img src="data:image/jpeg;base64,{{ profile_picture | b64encode }}" class="profile-picture" alt="Profile Picture" width="150" height="150">
+      {% else %}
+          <img src="{{ url_for('static', filename='default_profile.png') }}" class="profile-picture" alt="Default Profile Picture" width="150" height="150">
+      {% endif %}
+     </div>
+  
+    <!-- Upload Profile Picture -->
+    <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+    <br>
+    <table>
+      <tr>
+        <td><label for="username">Username</label></td>
+        <td>
+          <span id="username_display">{{ username }}</span>
+          <input type="text" id="username_input" name="username" value="{{ username }}" style="display:none;" required>
+          <button type="button" onclick="enableEdit()">Edit</button>
+        </td>
+      </tr>
+    </table>
+    
+    <script>
+      function enableEdit() {
+        document.getElementById("username_display").style.display = "none";
+        document.getElementById("username_input").style.display = "inline";
+        document.getElementById("username_input").focus();
+      }
+    </script>
+    
+    <br>
+  
+        <button type="submit">Save Changes</button>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </form>
+  
+</body>
+</html>
+
+{% endblock %}
+

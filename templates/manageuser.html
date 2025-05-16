@@ -1,0 +1,171 @@
+{% extends "header_admin.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+   
+    <style>
+
+/* Reset some default margins */
+body, h1, p, form {
+    margin: 0;
+    padding: 0;
+}
+ 
+ /* Main content container */
+ .content {
+    width: 90%;
+    max-width: 1000px;
+    background-color: #ffffff;
+    margin: 40px auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    box-sizing: border-box;
+    margin-top: 50px;
+}
+
+.content h1 {
+    color: #1e3c72;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.content p {
+    text-align: center;
+    color: #555;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 16px;
+}
+
+form input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #1e3c72;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+form input[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    background-color: #1e3c72;
+    color: #ffffff;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+form input[type="submit"]:hover {
+    background-color: #16345d;
+}
+
+/* Flash messages */
+.flash-messages {
+    list-style: none;
+    padding: 0;
+}
+
+.flash-messages li {
+    color: red;
+
+    font-size: 12px;
+    text-align: center;
+}
+
+
+
+/* Responsive - make it more mobile friendly */
+@media (max-width: 600px) {
+    .content {
+        padding: 20px 15px;
+        margin-top: 30px;
+    }
+
+    .content h1 {
+        font-size: 24px;
+    }
+
+    form input[type="submit"] {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+
+
+</style>
+    
+</head>
+<body>
+  <!-- Pricing Plan Section -->
+  <div class="container">
+    <div class="pricing-card">
+      <div class="card-left">
+        <h1>Manage User</h1>
+        <table border="1" cellpadding="10" cellspacing="0" style="width:100%; margin-top: 20px; border-collapse: collapse; margin-left: auto; margin-right: auto; text-align: center;">
+          <thead>
+            <tr style="background-color: #1e3c72; color: white; text-align: center;">
+              <th>ID</th>
+              <th>Profile Picture</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Token Number</th>
+              <th>Start Date</th>
+              <th>Expiry Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr style="text-align: center;">
+              <td>{{ user.id }}</td>
+              <td>
+                {% if user.profile_picture %}
+                  <img src="data:image/jpeg;base64,{{ user.profile_picture | b64encode }}" class="profile-picture" alt="Profile Picture" width="50" height="50" style="border-radius: 50%;" />
+                {% else %}
+                  <span>No Image</span>
+                {% endif %}
+              </td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.token_number if user.token_number else '' }}</td>
+              <td>{{ user.start_date.strftime('%d-%m-%Y') if user.start_date else '' }}</td>
+              <td>{{ user.expiry_date.strftime('%d-%m-%Y') if user.expiry_date else '' }}</td>
+              <td>
+                <a href="{{ url_for('edit_user', user_id=user.id) }}" style="color: #1e3c72; text-decoration: none; margin-right: 10px;">Edit</a>
+                <a href="{{ url_for('delete_user', user_id=user.id) }}" style="color: red; text-decoration: none;" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="8" style="text-align: center;">No users found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+    </div>
+  </div>
+</body>
+</html>
+{% endblock %}

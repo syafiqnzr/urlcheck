@@ -1,0 +1,187 @@
+{% if is_admin %}
+    {% extends "header_admin.html" %}
+{% else %}
+    {% extends "header.html" %}
+{% endif %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan Result</title>
+    <style>
+
+        /* Reset some default margins */
+body, h1, p, form {
+    margin: 0;
+    padding: 0;
+}
+
+/* Main content container */
+.container {
+    width: 90%;
+    max-width: 500px;
+    background-color: #ffffff;
+    margin: 40px auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    box-sizing: border-box;
+}
+
+/* Title styling */
+h1 {
+    color: #003366; /* Dark blue color */
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+/* URL input styling */
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #cccccc; /* Light gray border */
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+/* Result label styling */
+.result-label {
+    text-align: center;
+    color: #555;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* Safe badge styling */
+.safe-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #4CAF50; /* Green color for safe */
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* Note styling */
+.note {
+    text-align: center;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Button group styling */
+.button-group {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.button-group a, .button-group input[type="submit"] {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Styling for 'Scan another URL' button */
+.button-group a {
+    background-color: #1e3c72; /* Dark blue */
+    color: white;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+/* Button hover effect */
+.button-group a:hover {
+    background-color: #16345d; /* Darker blue for hover */
+}
+
+/* Styling for 'View detail Analysis' button */
+.button-group input[type="submit"] {
+    background-color: #e7e7e7; /* Light gray */
+    color: #333;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Button hover effect */
+.button-group input[type="submit"]:hover {
+    background-color: #d4d4d4; /* Darker gray for hover */
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px 15px;
+        margin-top: 30px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    input[type="submit"], .button-group a {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+
+        
+        
+        
+        
+        /* Responsive - make it more mobile friendly */
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px 15px;
+                margin-top: 30px;
+            }
+        
+            .content h1 {
+                font-size: 24px;
+            }
+        
+            form input[type="submit"] {
+                padding: 12px;
+                font-size: 15px;
+            }
+        }
+        
+        </style>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Result</h1>
+
+        <input type="text" value="{{ url }}" readonly>
+
+        <p class="result-label">Result: <span class="safe-badge">{{ prediction }}</span></p>
+        <p class="note"><strong>Note:</strong> {{ note }}</p>
+
+        <div class="button-group">
+            <a href="/">Scan another URL</a>
+
+            {% if session %}
+            <form method="post" action="/details" style="display: inline;">
+                <input type="hidden" name="url" value="{{ url }}">
+                <input type="submit" value="View detail Analysis">
+            </form>
+            {% endif %}
+        </div>
+
+        {% if not session %}
+        <em>Login to view detailed analysis.</em>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "header_login.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head><title>Renew Token</title></head>
+<body>
+    <h2>Renew Your Token</h2>
+    {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+    <form method="POST">
+        <input type="hidden" name="username" value="{{ username }}">
+        <label>New Token:</label><input type="text" name="token" required><br>
+        <button type="submit">Renew</button>
+    </form>
+    <br>
+    <button><a href="https://shopee.com.my/">Buy Token Here</a></button>
+</body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,224 @@
+{% if is_admin %}
+    {% extends "header_admin.html" %}
+{% else %}
+    {% extends "header.html" %}
+{% endif %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URLCHECK</title>
+</head>
+    <style>
+ 
+ /* Main content container */
+ .content {
+    width: 90%;
+    max-width: 20000px;
+    background-color: #ffffff;
+    margin: 40px auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    box-sizing: border-box;
+    margin-top: 50px;
+}
+
+.content h1 {
+    color: #1e3c72;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.content p {
+    text-align: center;
+    color: #555;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 16px;
+}
+
+form input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #1e3c72;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+form input[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    background-color: #1e3c72;
+    color: #ffffff;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+form input[type="submit"]:hover {
+    background-color: #16345d;
+}
+
+/* Flash messages */
+.flash-messages {
+    list-style: none;
+    padding: 0;
+}
+
+.flash-messages li {
+    color: red;
+
+    font-size: 12px;
+    text-align: center;
+}
+
+/* Container to center the content */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: #ffffff;
+            border-radius: 10px;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto; /* Allow flexible column width */
+            font-size: 12px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            word-wrap: break-word; /* Allow long text to wrap */
+        }
+        th {
+            background-color: #f5f5f5;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            vertical-align: top;
+        }
+
+        /* Responsive for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 15px;
+            }
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr {
+                display: none; /* Hide the header on small screens */
+            }
+            td {
+                position: relative;
+                padding-left: 50%;
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+            td:before {
+                position: absolute;
+                top: 12px;
+                left: 15px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+            }
+            td:nth-of-type(1):before { content: "URL Part"; }
+            td:nth-of-type(2):before { content: "URL Fragment"; }
+            td:nth-of-type(3):before { content: "Reason"; }
+            td:nth-of-type(4):before { content: "Sender"; }
+        }
+
+
+/* Responsive - make it more mobile friendly */
+@media (max-width: 600px) {
+    .content {
+        padding: 20px 15px;
+        margin-top: 30px;
+    }
+
+    .content h1 {
+        font-size: 24px;
+    }
+
+    form input[type="submit"] {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <h1>Latest URL Scan Summary</h1>
+    <h2>Scan Details for: {{ scan_url }}</h2>
+
+    {% if scan %}
+        <p><strong>Domain:</strong> {{ scan.domain }}</p>
+        <p><strong>IP Address:</strong> {{ scan.ip_address }}</p>
+        <p><strong>Protocol:</strong> {{ scan.protocol }}</p>
+        <p><strong>Created:</strong> {{ scan.creation_date }}</p>
+        <p><strong>Updated:</strong> {{ scan.updated_date }}</p>
+        <p><strong>Expiry:</strong> {{ scan.expiry_date }}</p>
+        <p><strong>Registrar:</strong> {{ scan.registrar }}</p>
+        <p><strong>URL Length:</strong> {{ scan.url_length }}</p>
+        <p><strong>Age:</strong> {{ scan.age }}</p>
+        <p><strong>Classification:</strong> {{ scan.classification }}</p>
+        <p><strong>Sender:</strong> {{ scan.sender }}</p>
+    {% else %}
+        <p>No scan result available.</p>
+    {% endif %}
+
+    <hr>
+
+    <h3>Breakdown by URL Part</h3>
+    <p>{{ scan_url }}</p>
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Part</th>
+                <th>URL fragment</th>
+                <th>Reason</th>
+                <th>Mitigation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in features %}
+            <tr>
+                <td>{{ item.part }}</td>
+                <td>{{ item.fragment_value }}</td>
+                <td>{{ item.reason }}</td>
+                <td>{{ item.mitigation }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
+{% endblock %}

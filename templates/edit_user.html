@@ -1,0 +1,117 @@
+{% extends "header_admin.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit User</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 480px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e3c72;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        form label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 16px;
+        }
+        form input[type="text"],
+        form input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #1e3c72;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        form input[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background-color: #1e3c72;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        form input[type="submit"]:hover {
+            background-color: #16345d;
+        }
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 15px;
+        }
+        .flash-messages li {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+        }
+        a.back-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #1e3c72;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a.back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit User</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flash-messages">
+              {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('edit_user', user_id=user.id) }}">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}" required />
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required />
+
+            <label for="token_number">Token Number</label>
+            <input type="text" id="token_number" name="token_number" value="{{ user.token if user.token else '' }}" />
+
+            <label for="start_date">Start Date</label>
+            <input type="text" id="start_date" name="start_date" value="{{ user.start_date.strftime('%d-%m-%Y') if user.start_date else '' }}" readonly />
+
+            <label for="expiry_date">Expiry Date</label>
+            <input type="text" id="expiry_date" name="expiry_date" value="{{ user.expiry_date.strftime('%d-%m-%Y') if user.expiry_date else '' }}" readonly />
+
+            <input type="submit" value="Update User" />
+        </form>
+        <a href="{{ url_for('manage_user') }}" class="back-link">Back to Manage Users</a>
+    </div>
+</body>
+</html>
+{% endblock %}

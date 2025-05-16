@@ -1,0 +1,231 @@
+{% extends "header_admin.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generate Token</title>
+    
+</head>
+<style>
+    body, h1, p, form {
+margin: 0;
+padding: 0;
+}
+
+/* Main content container */
+.content {
+width: 90%;
+max-width: 1200px;
+background-color: #ffffff;
+margin: 40px auto;
+border-radius: 12px;
+box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+padding: 30px 20px;
+box-sizing: border-box;
+margin-top: 50px;
+}
+
+.content h1 {
+color: #1e3c72;
+text-align: center;
+margin-bottom: 20px;
+font-size: 28px;
+}
+
+.content p {
+text-align: center;
+color: #555;
+font-size: 18px;
+margin-bottom: 20px;
+}
+.div1 {
+color: #1e3c72;
+text-align: center;
+margin-bottom: 20px;
+font-size: 28px;
+}
+form label {
+display: block;
+font-weight: bold;
+margin-bottom: 10px;
+color: #333;
+font-size: 16px;
+}
+
+form input[type="text"] {
+width: 100%;
+padding: 12px;
+font-size: 16px;
+border: 1px solid #1e3c72;
+border-radius: 8px;
+margin-bottom: 10px;
+box-sizing: border-box;
+}
+
+form input[type="submit"] {
+width: 100%;
+padding: 14px;
+background-color: #1e3c72;
+color: #ffffff;
+font-size: 16px;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+margin-top: 10px;
+transition: background-color 0.3s ease;
+}
+
+form input[type="submit"]:hover {
+background-color: #16345d;
+}
+
+/* Flash messages */
+.flash-messages {
+list-style: none;
+padding: 0;
+}
+
+.flash-messages li {
+color: red;
+
+font-size: 12px;
+text-align: center;
+}
+
+.div1 {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+margin-top: 20px;
+}
+
+.profile-container {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+margin-top: 20px;
+}
+
+.image-container {
+margin-bottom: 15px;
+}
+
+.profile-picture {
+border-radius: 50%;
+object-fit: cover;
+border: 2px solid #007BFF;
+}
+
+#profile_picture {
+display: block;
+margin: 10px auto;
+}
+
+/* Responsive - make it more mobile friendly */
+@media (max-width: 600px) {
+.content {
+    padding: 20px 15px;
+    margin-top: 30px;
+}
+
+.content h1 {
+    font-size: 24px;
+}
+
+form input[type="submit"] {
+    padding: 12px;
+    font-size: 15px;
+}
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+}
+
+table, th, td {
+  border: 1px solid #1e3c72;
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #1e3c72;
+  color: white;
+}
+    
+</style>
+<body>
+
+    <h1>Generate New Token</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="{{ 'success' if category == 'success' else 'error' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('generate_token') }}">
+        <input type="submit" value="Generate Token" />
+    </form>
+
+    {% if messages %}
+    <div class="content">
+        <h2>Generated Token:</h2>
+        {% for category, message in messages %}
+            {% if category == 'success' %}
+                <p style="color: green; font-weight: bold; text-align: center;">{{ message }}</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="content">
+        <h2>All Tokens</h2>
+<table>
+            <thead>
+                <tr>
+                    <th>Token Number</th>
+                    <th>Start Date</th>
+                    <th>Expiry Date</th>
+                    <th>Timestamp</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for token in tokens %}
+                <tr>
+                    <td>{{ token.token_number }}</td>
+                    <td>{{ token.start_date.strftime('%d-%m-%Y %H:%M:%S') if token.start_date else '' }}</td>
+                    <td>{{ token.expiry_date.strftime('%d-%m-%Y %H:%M:%S') if token.expiry_date else '' }}</td>
+                    <td>{{ token.timestamp.strftime('%d-%m-%Y %H:%M:%S') if token.timestamp else '' }}</td>
+                    {% if not token.start_date or not token.expiry_date %}
+                        <td class="status-inactive">Inactive</td>
+                    {% elif token.expiry_date > now %}
+                        <td class="status-active">Active</td>
+                    {% else %}
+                        <td class="status-expired">Expired</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
+
+{% endblock %}
