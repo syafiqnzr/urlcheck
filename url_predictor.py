@@ -1,30 +1,36 @@
+import os
 import pickle
 
-# Path to the trained model
-trainingmodel_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Training Model'
-vectorizer_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Features Extraction'
+# Lokasi fail model dan vectorizer
+model_file = r'C:\xampp\htdocs\urlcheck\urlcheck\Training Model\logistic_regression_model.pkl'
+vectorizer_file = r'C:\xampp\htdocs\urlcheck\urlcheck\Features Extraction\tfidf_vectorizer.pkl'
 
-# Load the trained model
-with open(trainingmodel_path, 'rb') as file:
-    trainedmodel = pickle.load(file)
+# URL yang ingin diuji
+test_url = "https://www.instagram.com/warongpachak?igsh=OGQ5ZDc2ODk2ZA"
 
-# Load the fitted TF-IDF vectorizer
-with open(vectorizer_path, 'rb') as file:
-    vectorizer = pickle.load(file)
+# Muatkan vectorizer
+with open(vectorizer_file, 'rb') as vf:
+    vectorizer = pickle.load(vf)
 
-def predict_url(url):
-    """
-    Predict if the given URL is malicious or benign using the trained model.
-    Args:
-        url (str): The URL to classify.
-    Returns:
-        prediction (str): The prediction result.
-    """
-    url_features = vectorizer.transform([url])
-    prediction = trainedmodel.predict(url_features)
-    return prediction[0]
+# Muatkan model logistic regression
+with open(model_file, 'rb') as mf:
+    model = pickle.load(mf)
 
-if __name__ == "__main__":
-    test_url = input("Enter the URL to check: ")
-    result = predict_url(test_url)
-    print(f"Prediction result: {result}")
+# Ubah URL kepada format vektor
+url_vector = vectorizer.transform([test_url])
+
+# Buat prediction
+prediction = model.predict(url_vector)[0]
+
+# Tukar result kepada label dan beri nota
+if prediction == 0:
+    result = "Malicious"
+    note = "Warning: This URL may lead to a fake or harmful website designed to steal your personal information."
+else:
+    result = "Safe"
+    note = "This URL appears to be safe and does not show signs of harmful content."
+
+# Papar keputusan
+print("URL:", test_url)
+print("Prediction:", result)
+print("Note:", note)

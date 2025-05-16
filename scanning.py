@@ -26,7 +26,7 @@ with open(vectorizer_path, 'rb') as file:
 
 # List of suspicious keywords and injection commands
 SUSPICIOUS_KEYWORDS = ["bank", "secure", "account", "verify", "update", "free", "gift", "prize", "paypal", "signin", "confirm", "password", "alert", "malicious","camera"]
-SUSPICIOUS_DOMAIN = ["cfd", "top", "click"]
+SUSPICIOUS_DOMAIN = ["cfd", "top", "click", "malicious"]
 INJECTION_COMMANDS = ["SELECT", "DROP", "INSERT", "DELETE", "UPDATE", "UNION", "--", "#", "/*", "*/", "OR 1=1"]
 
 def contains_suspicious_keywords(text, keywords):
@@ -64,7 +64,7 @@ def get_domain_age(url):
             return domain, "Unknown", "Could not determine domain age"
     
     except Exception as e:
-        return domain, "Unknown", f"Error: {str(e)}"
+        return domain, "Unknown", "Error retrieving data"
 
 
 def get_domain_registrar(url):
@@ -83,7 +83,7 @@ def get_domain_registrar(url):
         return domain, registrar
     
     except Exception as e:
-        return domain, f"Error: {str(e)}"
+        return domain, "Error retrieving data"
 
 def get_domain_details(url):
     """Extracts domain from URL and retrieves WHOIS details (Creation, Updated, Expiry Dates)."""
@@ -228,16 +228,16 @@ def classify_url(url):
     # **Determine the final classification**
     if any(value == 1 for value in breakdown_results.values()):
         if breakdown_results['Scheme'] == 0:
-             final_result = "Safe"
-             note = "The URL contains threats but is marked Safe due to HTTPS usage."
+             final_result = "Suspicious"
+             note = "Caution: This link may lead to a phishing website that uses HTTPS to seem secure while attempting to steal your personal information."
         else:
             final_result = "Suspicious"
-            note = "The URL is classified as Malicious due to detected threats."
+            note = "This link resembles a phishing website and could be used to steal your sensitive information."
 
-    elif ml_prediction == 1 and breakdown_results['Scheme'] == 3:
+    elif ml_prediction == 1 and breakdown_results['Scheme'] == 1:
         final_result = "Safe"
         #note = "The link is safe but may be suspicious due to HTTP usage and ML model detection."
-        note = "This link may not be fully secure. It uses an older connection method and contains potentially risky content."
+        note = "Careful: AI prediction detected that this URL matches known behaviors of malicious or deceptive websites. Avoid clicking or entering sensitive information."
 
     elif ml_prediction == 1:
         if breakdown_results['Scheme'] == 0:
@@ -327,6 +327,12 @@ def run_full_scan(original_url):
 if __name__ == "__main__":
     # Step 1: user input URL
     original_url = input("\nEnter URL to scan: ").strip()  # Store the original URL before modification
+
+    # New validation: check if input contains a dot '.'
+    if '.' not in original_url:
+        print("This url does not exist")
+        exit()
+
     url = original_url
     
     # Step 2: Detect the correct protocol before proceeding
@@ -363,13 +369,14 @@ if __name__ == "__main__":
     try:
         domain_info = whois.whois(domain)
         if domain_info.domain_name is None:
-            # error handling after user input invalid domain
-            print("Invalid URL: No valid domain found. Scanning cannot proceed.")
-            exit()
+            # warning after user input invalid domain, but continue scanning
+            print("Warning: No valid domain found. Scanning will proceed anyway.")
     except Exception:
-        # error handling after user input URL does not exist
-        print("The URL does not exist")
-        exit()
+        # warning after user input URL does not exist, but continue scanning
+        print("Warning: The URL does not exist. Scanning will proceed anyway.")
+    
+    
+    
     
     # Step 4: Validate final URL format before scanning
     if not re.match(r"^(https?|ftp):\/\/[\S]+", url):
@@ -378,9 +385,29 @@ if __name__ == "__main__":
         exit()
     
     # Get domain details
-    domain, creation_date, age = get_domain_age(url)
-    domain, registrar = get_domain_registrar(url)
-    domain, creation_date, updated_date, expiry_date = get_domain_details(url)
+    try:
+        domain, creation_date, age = get_domain_age(url)
+    except Exception as e:
+        creation_date = "Unknown"
+        age = f"Error: {str(e)}"
+        domain = domain if 'domain' in locals() else "Unknown"
+
+    try:
+        domain, registrar = get_domain_registrar(url)
+    except Exception as e:
+        registrar = f"Error: {str(e)}"
+        domain = domain if 'domain' in locals() else "Unknown"
+
+    try:
+        domain, creation_date, updated_date, expiry_date = get_domain_details(url)
+    except Exception as e:
+        registrar = "Error retrieving data"
+        age = "Error retrieving data"
+        creation_date = "Error retrieving data"
+        updated_date = "Error retrieving data"
+        expiry_date = "Error retrieving data"
+        domain = domain if 'domain' in locals() else "Unknown"
+
     url_length = get_url_length(url)
     
     # Classify the URL
@@ -388,10 +415,11 @@ if __name__ == "__main__":
     
     # Explicit ML prediction output
     url_vector = vectorizer.transform([original_url])
-    ml_prediction = trainedmodel.predict(url_vector)[0]  # 0 (Safe) or 1 (Malicious)
+    ml_prediction_raw = trainedmodel.predict(url_vector)[0]  # 0 or 1
+    ml_prediction = "Safe" if ml_prediction_raw == 1 else "Suspecious"
     
     # Result (Display in resut.html)
-    print(f"\nMachine Learning Model Output: {'[Suspicious]' if ml_prediction == 1 else '[Safe]'}")
+    print(f"\nMachine Learning Model Output: [{ml_prediction}]")
     print(f"Final Classification: [{final_result}]")
     print(f"Note: {note}")
     
@@ -412,8 +440,6 @@ if __name__ == "__main__":
     for part, result in breakdown_results.items():
         if result == 1:
              status = "Suspicious detected"
-        elif result == 3:
-            status = "Suspicious"
         else:
              status = "Safe"
         print(f"\n{part}: {status}")
