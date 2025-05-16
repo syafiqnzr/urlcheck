@@ -6,9 +6,9 @@ from sklearn.model_selection import train_test_split
 import pickle
 
 # Define the folder paths
-dataset_path = r'C:\xampp\htdocs\urlcheck\Dataset'
-trainingmodel_path = r'C:\xampp\htdocs\urlcheck\Training Model'
-vectorizer_path = r'C:\xampp\htdocs\urlcheck\Features Extraction'
+dataset_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Dataset'
+trainingmodel_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Training Model'
+vectorizer_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Features Extraction'
 
 # Automatically detect all CSV files in the folder
 csv_files = [os.path.join(dataset_path, file) for file in os.listdir(dataset_path) if file.endswith('.csv')]

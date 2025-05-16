@@ -13,8 +13,8 @@ import cgitb
 cgitb.enable()  # For debugging
 
 # Path to the trained model
-trainingmodel_path = r'C:\xampp\htdocs\urlcheck\Training Model\logistic_regression_model.pkl'
-vectorizer_path = r'C:\xampp\htdocs\urlcheck\Features Extraction\tfidf_vectorizer.pkl'
+trainingmodel_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Training Model\logistic_regression_model.pkl'
+vectorizer_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Features Extraction\tfidf_vectorizer.pkl'
 
 # Load the trained model
 with open(trainingmodel_path, 'rb') as file:

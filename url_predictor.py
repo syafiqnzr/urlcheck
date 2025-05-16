@@ -1,8 +1,8 @@
 import pickle
 
 # Path to the trained model
-trainingmodel_path = r'C:\\xampp\\htdocs\\contoh22\\Training Model\\logistic_regression_model.pkl'
-vectorizer_path = r'C:\\xampp\\htdocs\\contoh22\\Features Extraction\\tfidf_vectorizer.pkl'
+trainingmodel_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Training Model'
+vectorizer_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Features Extraction'
 
 # Load the trained model
 with open(trainingmodel_path, 'rb') as file:

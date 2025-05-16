@@ -27,9 +27,9 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for session tracking
 
 # Paths
-dataset_path = r'C:\xampp\htdocs\urlcheck\Dataset'
-trainingmodel_path = r'C:\xampp\htdocs\urlcheck\Training Model'
-urcheck_script = r'C:\xampp\htdocs\urlcheck\urlcheck.py'
+dataset_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Dataset'
+trainingmodel_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Training Model'
+urcheck_script = r'C:\xampp\htdocs\urlcheck\urlcheck\urlcheck.py'
 
 # Ensure necessary folders exist
 os.makedirs(dataset_path, exist_ok=True)
