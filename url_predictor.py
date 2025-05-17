@@ -6,7 +6,7 @@ model_file = r'C:\xampp\htdocs\urlcheck\urlcheck\Training Model\logistic_regress
 vectorizer_file = r'C:\xampp\htdocs\urlcheck\urlcheck\Features Extraction\tfidf_vectorizer.pkl'
 
 # URL yang ingin diuji
-test_url = "https://www.instagram.com/warongpachak?igsh=OGQ5ZDc2ODk2ZA"
+test_url = "https://faceb00k.com"
 
 # Muatkan vectorizer
 with open(vectorizer_file, 'rb') as vf:
@@ -23,7 +23,7 @@ url_vector = vectorizer.transform([test_url])
 prediction = model.predict(url_vector)[0]
 
 # Tukar result kepada label dan beri nota
-if prediction == 0:
+if prediction == 1:
     result = "Malicious"
     note = "Warning: This URL may lead to a fake or harmful website designed to steal your personal information."
 else:

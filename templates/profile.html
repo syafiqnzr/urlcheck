@@ -9,138 +9,246 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <style>
-        body, h1, p, form {
-    margin: 0;
-    padding: 0;
-}
- 
- /* Main content container */
- .content {
-    width: 90%;
-    max-width: 500px;
-    background-color: #ffffff;
-    margin: 40px auto;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    padding: 30px 20px;
-    box-sizing: border-box;
-    margin-top: 50px;
-}
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7f9;
+        margin: 0;
+        padding: 0;
+    }
 
-.content h1 {
-    color: #1e3c72;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 28px;
-}
-
-.content p {
-    text-align: center;
-    color: #555;
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-.div1 {
-    color: #1e3c72;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 28px;
-}
-form label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-    font-size: 16px;
-}
-
-form input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #1e3c72;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
-
-form input[type="submit"] {
-    width: 100%;
-    padding: 14px;
-    background-color: #1e3c72;
-    color: #ffffff;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-form input[type="submit"]:hover {
-    background-color: #16345d;
-}
-
-/* Flash messages */
-.flash-messages {
-    list-style: none;
-    padding: 0;
-}
-
-.flash-messages li {
-    color: red;
-
-    font-size: 12px;
-    text-align: center;
-}
-
-div1 {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.image-container {
-    margin-bottom: 15px;
-}
-
-.profile-picture {
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #007BFF;
-}
-
-#profile_picture {
-    display: block;
-    margin: 10px auto;
-}
-
-/* Responsive - make it more mobile friendly */
-@media (max-width: 600px) {
     .content {
-        padding: 20px 15px;
-        margin-top: 30px;
+        width: 60%;
+        max-width: 600px;
+        background-color: #ffffff;
+        margin: 60px auto;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        padding: 40px 30px;
     }
 
     .content h1 {
-        font-size: 24px;
+        color: #1e3c72;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 26px;
     }
 
-    form input[type="submit"] {
-        padding: 12px;
-        font-size: 15px;
+    .profile-container {
+        text-align: center;
+        margin-bottom: 30px;
     }
+
+    .profile-picture {
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 3px solid #1e3c72;
+        margin-bottom: 15px;
+    }
+
+#profile_picture {
+        margin: 20px auto 30px auto;
+        display: block;
+        padding: 8px 12px;
+        font-size: 15px;
+        border: 1px solid #1e3c72;
+        border-radius: 6px;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+#profile_picture:hover {
+        background-color: #e6e6e6;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    table td {
+        padding: 9px 8px;
+        vertical-align: baseline;
+        font-size: 16px;
+        color: #333;
+    }
+
+    label {
+        font-weight: 600;
+        color: #1e3c72;
+    }
+
+    input[type="text"] {
+        width: 90%;
+        padding: 8px 10px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    button[type="button"], button[type="submit"] {
+        background-color: #1e3c72;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 15px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #16345d;
+    }
+
+    .edit-btn {
+        background-color: #e0e0e0;
+        color: #333;
+        padding: 6px 12px;
+        margin-left: 10px;
+        border-radius: 5px;
+        font-size: 13px;
+    }
+
+    .edit-btn:hover {
+        background-color: #d0d0d0;
+    }
+
+    .flash-messages {
+        position: fixed;
+        top: 85px;
+        right: 10px;
+        z-index: 9999;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .flash-messages li {
+        background-color: #25c64a;
+        color: white;
+        padding: 12px 20px;
+        margin-top: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        font-size: 14px;
+        opacity: 0;
+        transform: translateX(100%);
+        animation: slideInOut 5s forwards;
+        min-width: 250px;
+    }
+
+    @keyframes slideInOut {
+        0% { opacity: 0; transform: translateX(100%); }
+        10% { opacity: 1; transform: translateX(0); }
+        90% { opacity: 1; transform: translateX(0); }
+        100% { opacity: 0; transform: translateX(100%); }
+    }
+
+    @media (max-width: 600px) {
+        .content {
+            padding: 25px 20px;
+        }
+
+        table td {
+            display: block;
+            width: 100%;
+        }
+
+        input[type="text"] {
+            width: 100%;
+        }
+    }
+    
+
+.form-group.row {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* spacing between label and content */
 }
+
+    .form-label {
+  min-width: 150px;
+  font-weight: bold;
+  color: #1e3c72;
+}
+
+.form-info {
+  flex: 1;
+  font-size: 16px;
+  padding: 8px;
+  background-color: #f0f0f0;
+  border-radius: 6px;
+  color: #333;
+}
+
+.form-input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #1e3c72;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.edit-button {
+  margin-left: 10px;
+  padding: 8px 14px;
+  background-color: #1e3c72;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+  background-color: #16345d;
+}
+.form-actions {
+    display: flex;
+    justify-content: center; /* center the Save button */
+    gap: 12px; /* space between buttons if there are multiple */
+    margin-top: 30px;
+}
+
+.save-button {
+    background-color: #1e3c72;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+    background-color: #16345d;
+}
+
+.edit-button {
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+    background-color: #d0d0d0;
+}
+
+
+</style>
         
     </style>
 </head>
@@ -158,43 +266,59 @@ div1 {
     {% endif %}
    </div>
 
-  <!-- Upload Profile Picture -->
-  <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+   {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flash-messages" id="flash-messages">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% endwith %}
 
-  <table>
-    <tr>
-      <td><label for="username">Username</label></td>
-      <td>
-        <span id="username_display">{{ username }}</span>
-        <input type="text" id="username_input" name="username" value="{{ username }}" style="display:none;" required>
-        <button type="button" onclick="enableEdit()">Edit</button>
-      </td>
-    </tr>
-    <tr>
-      <td><label for="token_number">Token Number</label></td>
-      <td><p id="token_number">{{ token_number }}</p></td>
-    </tr>
-    <tr>
-      <td><label for="start_date">Start Date</label></td>
-      <td><p id="start_date">{{ start_date }}</p></td>
-    </tr>
-    <tr>
-      <td><label for="expiry_date">Expiry Date</label></td>
-      <td><p id="expiry_date">{{ expiry_date }}</p></td>
-    </tr>
-  </table>
+  <!-- Upload Profile Picture -->
+<input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+
+<div class="form-group row">
+  <label for="username" class="form-label">Username</label>
+  <div class="form-info">
+    <span id="username_display">{{ username }}</span>
+    <input type="text" id="username_input" name="username" value="{{ username }}" class="form-input" style="display:none;" required>
+  </div>
+  <button type="button" class="edit-button" onclick="enableEdit()">Edit</button>
+</div>
+
+<div class="form-group row">
+  <label class="form-label">Token Number</label>
+  <p class="form-info">{{ token_number }}</p>
+</div>
+
+<div class="form-group row">
+  <label class="form-label">Start Date</label>
+  <p class="form-info">{{ start_date }}</p>
+</div>
+
+<div class="form-group row">
+  <label class="form-label">Expiry Date</label>
+  <p class="form-info">{{ expiry_date }}</p>
+</div>
+
+
   
   <script>
     function enableEdit() {
-      document.getElementById("username_display").style.display = "none";
-      document.getElementById("username_input").style.display = "inline";
-      document.getElementById("username_input").focus();
-    }
-  </script>
-  
-  
+    const display = document.getElementById("username_display");
+    const input = document.getElementById("username_input");
+    display.style.display = "none";
+    input.style.display = "inline-block";
+    input.focus();
+}
+</script>
 
-      <button type="submit">Save Changes</button>
+      <div class="form-actions">
+    <button type="submit" class="save-button">Save Changes</button>
+</div>
+
   </form>
 
 </body>

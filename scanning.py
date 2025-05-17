@@ -162,7 +162,7 @@ def analyze_url_parts(url):
     # Scheme (Protocol)
     breakdown_results['Scheme'] = (
     0 if parsed_url.scheme == "https" else 
-    3 if parsed_url.scheme == "http" else 
+    1 if parsed_url.scheme == "http" else 
     1  # Unusual protocol (e.g., ftp, file)
 )
 
@@ -225,42 +225,46 @@ def classify_url(url):
     # URL Breakdown Analysis
     breakdown_results, reasons, mitigation = analyze_url_parts(url)
 
+    scheme = breakdown_results.get('Scheme', 0)
+    host = breakdown_results.get('Host', 0)
+    path = breakdown_results.get('Path', 0)
+    port = breakdown_results.get('Port', 0)
+    query = breakdown_results.get('Query', 0)
+    fragment = breakdown_results.get('Fragment', 0)
+
+    suspicious_parts_exist = any(
+        value == 1 for key, value in breakdown_results.items() if key != 'Scheme'
+    )
+
     # **Determine the final classification**
-    if any(value == 1 for value in breakdown_results.values()):
-        if breakdown_results['Scheme'] == 0:
-             final_result = "Suspicious"
-             note = "Caution: This link may lead to a phishing website that uses HTTPS to seem secure while attempting to steal your personal information."
-        else:
-            final_result = "Suspicious"
-            note = "This link resembles a phishing website and could be used to steal your sensitive information."
-
-    elif ml_prediction == 1 and breakdown_results['Scheme'] == 1:
-        final_result = "Safe"
-        #note = "The link is safe but may be suspicious due to HTTP usage and ML model detection."
-        note = "Careful: AI prediction detected that this URL matches known behaviors of malicious or deceptive websites. Avoid clicking or entering sensitive information."
-
-    elif ml_prediction == 1:
-        if breakdown_results['Scheme'] == 0:
-            final_result = "Safe"
-            #note = "The link is safe but may be suspicious due to the ML model detection. Marked Safe due to HTTPS usage."
-            note = "This site uses secure HTTPS, but it contains patterns similar to risky websites."
-
-
-        else:
-            final_result = "Safe"
-            #note = "The link is safe but may be suspicious due to the ML model detection."
-            note = "This link may appear safe but contains patterns that are often seen in unsafe sites."
-
-
-
-    elif breakdown_results['Scheme'] == 3:
-        final_result = "Safe"
-        note = "The link is safe but may be suspicious due to HTTP usage."
-    else:
+    if ml_prediction == 0 and scheme == 0 and not suspicious_parts_exist:
         final_result = "Safe"
         note = "The URL is Safe. No detected threats."
+    elif ml_prediction == 0 and scheme == 1 and not suspicious_parts_exist:
+        final_result = "Safe"
+        note = "The URL uses http protocol but No detected threats."
+    elif ml_prediction == 1 and scheme == 0 and not suspicious_parts_exist:
+        final_result = "Safe"
+        note = "No threats detected. But AI prediction found signs that this link is similar to fake or deceptive websites. Please be careful."
+    elif ml_prediction == 0 and suspicious_parts_exist and scheme == 0:
+        final_result = "Suspicious"
+        note = "Caution: The URL contains suspicious keyword."
+    elif ml_prediction == 1 and suspicious_parts_exist and scheme == 0:
+        final_result = "Suspicious"
+        note = "Caution: The URL contains suspicious keyword and AI prediction found signs that this link is similar to fake or deceptive websites."
+    elif ml_prediction == 0 and suspicious_parts_exist and scheme == 1:
+        final_result = "Suspicious"
+        note = "Caution: The URL contains suspicious keyword and uses a not secure protocol."
+    elif ml_prediction == 1 and suspicious_parts_exist and scheme == 1:
+        final_result = "Suspicious"
+        note = "Caution: The URL contains suspicious keyword and AI prediction found signs that this link is similar to fake or deceptive websites."
+    elif ml_prediction == 1 and scheme == 1 and not suspicious_parts_exist:
+        final_result = "Suspicious"
+        note = "Caution: The URL uses a not secure protocol and AI prediction found signs that this link is similar to fake or deceptive websites."
+    else:
+        final_result = "Unknown"
+        note = "Unable to classify the URL clearly."
 
-    
 
     ip_address = None
     try:
@@ -306,7 +310,7 @@ def run_full_scan(original_url):
     result = {
         'url': url,
         'final_result': final_result,
-        'ml_prediction': '[Suspicious]' if ml_prediction == 1 else '[Safe]',
+        'ml_prediction': ml_prediction,
         'note': note,
         'domain': domain,
         'ip_address': ip_address,
@@ -369,14 +373,18 @@ if __name__ == "__main__":
     try:
         domain_info = whois.whois(domain)
         if domain_info.domain_name is None:
-            # warning after user input invalid domain, but continue scanning
-            print("Warning: No valid domain found. Scanning will proceed anyway.")
+            print("The url does not exist or invalid Domain")
+            exit()
     except Exception:
-        # warning after user input URL does not exist, but continue scanning
-        print("Warning: The URL does not exist. Scanning will proceed anyway.")
+        print("The url does not exist or invalid Domain")
+        exit()
     
-    
-    
+    # Additional check: try to resolve IP to confirm domain is active
+    try:
+        ip_address = socket.gethostbyname(domain)
+    except Exception:
+        print("The url does not exist or invalid Domain")
+        exit()
     
     # Step 4: Validate final URL format before scanning
     if not re.match(r"^(https?|ftp):\/\/[\S]+", url):
@@ -414,10 +422,16 @@ if __name__ == "__main__":
     final_result, note, breakdown_results, reasons, mitigation, domain, ip_address = classify_url(url)
     
     # Explicit ML prediction output
-    url_vector = vectorizer.transform([original_url])
-    ml_prediction_raw = trainedmodel.predict(url_vector)[0]  # 0 or 1
-    ml_prediction = "Safe" if ml_prediction_raw == 1 else "Suspecious"
-    
+    url_vector = vectorizer.transform([url])
+    prediction = trainedmodel.predict(url_vector)[0]
+
+    if prediction == 1:
+        ml_prediction = "Malicious"
+        ml_note = "Warning: This URL may lead to a fake or harmful website designed to steal your personal information."
+    else:
+        ml_prediction = "Safe"
+        ml_note = "This URL appears to be safe and does not show signs of harmful content."
+
     # Result (Display in resut.html)
     print(f"\nMachine Learning Model Output: [{ml_prediction}]")
     print(f"Final Classification: [{final_result}]")

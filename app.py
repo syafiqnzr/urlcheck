@@ -10,6 +10,7 @@ from scanning import classify_url, get_domain_age, get_domain_details, get_domai
 from urllib.parse import urlparse, unquote
 import whois
 import os
+import socket
 from werkzeug.utils import secure_filename
 from flask import url_for
 import subprocess
@@ -103,65 +104,77 @@ def result():
             is_admin = True
 
     original_url = request.form['url'].strip()
+
+    # Validate URL contains a dot
+    if '.' not in original_url:
+        flash("This URL does not exist or is invalid.", "error")
+        return redirect(url_for('index'))
+
     parsed_url = urlparse(original_url)
     domain = parsed_url.netloc if parsed_url.netloc else parsed_url.path
 
-    # Add protocol if not present
+    # Detect or confirm protocol
     if not parsed_url.scheme:
         protocol = detect_protocol(domain)
         if protocol == "Unknown":
             protocol = "https"
-        url = f"{protocol}://{domain}"
+        url = f"{protocol}://{original_url}"
     else:
-        url = original_url
-        protocol = parsed_url.scheme
+        # Validate given protocol against detected protocol
+        detected_protocol = detect_protocol(domain)
+        if detected_protocol != parsed_url.scheme and detected_protocol != "Unknown":
+            url = f"{detected_protocol}://{domain}"
+            protocol = detected_protocol
+        else:
+            url = original_url
+            protocol = parsed_url.scheme
 
-    # WHOIS check (error handling)
+    # WHOIS domain validation
     try:
         domain_info = whois.whois(domain)
         if domain_info.domain_name is None:
-            flash("❌ Invalid URL: No valid domain found.")
+            flash("Invalid URL: No valid domain found.", "error")
             return redirect(url_for('index'))
     except Exception:
-        flash("❌ The URL does not exist.")
+        flash("The URL does not exist or is invalid.", "error")
         return redirect(url_for('index'))
 
-    # Run scan and classification
+    # Additional IP resolution check
+    try:
+        ip_address = socket.gethostbyname(domain)
+    except Exception:
+        flash("The URL does not exist or is invalid.", "error")
+        return redirect(url_for('index'))
+
+    # Run classification and analysis
     final_result, note, breakdown, reasons, mitigation, domain, ip_address = classify_url(url)
     _, creation_date, age = get_domain_age(url)
     _, registrar = get_domain_registrar(url)
     _, _, updated_date, expiry_date = get_domain_details(url)
     url_length = get_url_length(url)
 
-    # ML prediction
+    # ML prediction label
     url_vector = vectorizer.transform([url])
     raw_prediction = trainedmodel.predict(url_vector)[0]
-    # Map numeric prediction to string label
-    if raw_prediction == 0:
-        ml_prediction = 'Safe'
-    else:
-        ml_prediction = 'Suspicious'
+    ml_prediction = 'Safe' if raw_prediction == 0 else 'Suspicious'
 
-    # Determine sender
-    sender = session['username'] if 'username' in session else 'guest'
+    sender = session.get('username', 'guest')
 
     cursor = db.cursor(dictionary=True)
 
-    # Save summary to scan_results
+    # Save scan summary
     insert_summary_query = """
     INSERT INTO scan_results (
         url, domain, ip_address, protocol, creation_date, updated_date,
         expiry_date, age, registrar, url_length, classification, ml_prediction, note, sender
     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
-
-    # yang tulisan biru tu semua, dari python punya declare
     cursor.execute(insert_summary_query, (
         url, domain, ip_address, protocol, str(creation_date), str(updated_date),
         str(expiry_date), age, registrar, url_length, final_result, ml_prediction, note, sender
     ))
 
-    # Save breakdown to url_breakdown
+    # Save breakdown details
     insert_breakdown_query = """
         INSERT INTO url_breakdown (scan_url, part, fragment_value, score, reason, mitigation, sender)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -171,10 +184,9 @@ def result():
         reason_text = reasons.get(part, "")
         fix = mitigation.get(part, "")
 
-        # Get URL fragment value for each part
         fragment_value = "-"
         if part == "Scheme":
-            fragment_value = protocol.upper() if protocol.upper() else "-"
+            fragment_value = protocol.upper() if protocol else "-"
         elif part == "Host":
             fragment_value = domain if domain else "-"
         elif part == "Path":
@@ -195,13 +207,10 @@ def result():
 
     return render_template("result.html",
                            ml_prediction=ml_prediction,
-                           score=score,
-                           reason_text=reason_text,
-                           fix=fix,
-                           fragment_value=fragment_value,
                            prediction=final_result,
                            note=note,
                            url=url,
+                           original_url=original_url,
                            is_admin=is_admin)
 
 @app.route('/details', methods=['POST'])
@@ -217,52 +226,50 @@ def details():
             is_admin = True
 
     user = session.get('user')
+    url = request.form.get('url')
     cursor = db.cursor(dictionary=True)
 
-     # Get the latest scan result
+    # Get scan result for the given URL
     cursor.execute("""
         SELECT url, domain, ip_address, protocol, creation_date, updated_date,
-               expiry_date, age, registrar, url_length, classification, sender
+               expiry_date, age, registrar, url_length, classification, note, sender
         FROM scan_results
+        WHERE url = %s
         ORDER BY id DESC
         LIMIT 1
-    """)
+    """, (url,))
     scan_result = cursor.fetchone()
 
+    if not scan_result:
+        flash("No scan result found for the specified URL.", "warning")
+        return redirect(url_for('index'))
 
-    # Get the latest scan_url with 6 URL parts
+    # Get the latest timestamp for the url_breakdown entries for this URL
     cursor.execute("""
-        SELECT scan_url
-        FROM url_breakdown
-        GROUP BY scan_url, timestamp
-        ORDER BY timestamp DESC
-        LIMIT 1
-    """)
-    latest = cursor.fetchone()
-    scan_url = latest['scan_url'] if latest else None
-
-    # Fetch 6 parts for that scan_url
-    features = []
-    sender = ''
-    if scan_url:
-       cursor.execute("""
-    SELECT ub.part, ub.fragment_value, ub.score, ub.reason, ub.mitigation, ub.sender
-    FROM url_breakdown ub
-    JOIN (
         SELECT timestamp
         FROM url_breakdown
         WHERE scan_url = %s
         GROUP BY timestamp
-        HAVING COUNT(DISTINCT part) >= 6
         ORDER BY timestamp DESC
         LIMIT 1
-    ) latest ON ub.timestamp = latest.timestamp AND ub.scan_url = %s
-    ORDER BY FIELD(ub.part, 'Scheme', 'Host', 'Path', 'Port', 'Query', 'Fragment')
-""", (scan_url, scan_url))
+    """, (url,))
+    latest = cursor.fetchone()
+    if not latest:
+        flash("No breakdown details found for the specified URL.", "warning")
+        return redirect(url_for('index'))
+
+    latest_timestamp = latest['timestamp']
+
+    # Fetch breakdown features for that timestamp and URL
+    cursor.execute("""
+        SELECT part, fragment_value, score, reason, mitigation, sender
+        FROM url_breakdown
+        WHERE scan_url = %s AND timestamp = %s
+        ORDER BY FIELD(part, 'Scheme', 'Host', 'Path', 'Port', 'Query', 'Fragment')
+    """, (url, latest_timestamp))
     features = cursor.fetchall()
 
-    if features:
-            sender = features[0]['sender']
+    sender = features[0]['sender'] if features else ''
 
     cursor.close()
 
@@ -270,7 +277,7 @@ def details():
         'detail_result.html',
         user=user,
         scan=scan_result,
-        scan_url=scan_url,
+        scan_url=url,
         sender=sender,
         features=features,
         is_admin=is_admin

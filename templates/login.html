@@ -35,16 +35,21 @@
             margin: 5px;
         }
         /* Main content container */
- .content {
+.content {
     width: 90%;
-    max-width: 500px;
+    max-width: 420px;
     background-color: #ffffff;
-    margin: 40px auto;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    padding: 30px 20px;
+    margin: 60px auto;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    padding: 40px 30px;
     box-sizing: border-box;
-    margin-top: 50px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: transform 0.3s ease;
+}
+
+.content:hover {
+    transform: scale(1.01);
 }
 
 .content h1 {
@@ -56,16 +61,89 @@
 
 .content p {
     text-align: center;
-    color: #555;
-    font-size: 18px;
+    color: #444;
+    font-size: 16px;
     margin-bottom: 20px;
 }
+
+/* Flash error message */
+.error {
+    color: red;
+    background-color: #ffe6e6;
+    padding: 10px;
+    border: 1px solid #ffcccc;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+/* Login Form Styles */
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-form input:focus {
+    border-color: #1e3c72;
+    box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.2);
+    outline: none;
+}
+
+.login-form button {
+    padding: 12px;
+    background-color: #1e3c72;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.login-form button:hover {
+    background-color: #16345d;
+    transform: scale(1.02);
+}
+
+.register-link {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.register-link a {
+    text-decoration: none;
+    color: #1e3c72;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.register-link a:hover {
+    color: #12294b;
+}
+
     </style>
 </head>
 <body>
     <h1>User Login</h1>
+
     {% if session.username %}
-        <p>Welcome, {{ session.username }}</p>   
+        <p>Welcome, {{ session.username }}</p>
     {% endif %}
 
     {% with messages = get_flashed_messages(category_filter=["error"]) %}
@@ -78,35 +156,32 @@
       {% endif %}
     {% endwith %}
 
-    <form method="post">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
+    <form method="post" class="login-form">
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
 
-        <input type="submit" value="Login">
+        <button type="submit">Login</button>
     </form>
 
-    <br><a href="/register">No account? Register here</a>
+    <div class="register-link">
+        <a href="/register">No account? Register here</a>
+    </div>
+    
+<script>
+    const loginForm = document.querySelector('.login-form');
+    const submitBtn = loginForm?.querySelector('button');
 
-{% with messages = get_flashed_messages(category_filter=["token_expired"]) %}
-  {% if messages %}
-    {% for message in messages %}
-        {% set parts = message.split('::') %}
-        <div id="tokenModal" class="modal" style="display:block;">
-          <div class="modal-content">
-            <h3>Your account has expired.</h3>
-            <p>.........................</p>
-            <button onclick="window.location.href='/login'">Back</button>
-            <button onclick="window.location.href='/renew_token?username={{ parts[1] }}'">Renew Token</button>
-            <button onclick="window.location.href='/{{ parts[3] }}'">scan without account</button>
+    loginForm?.addEventListener('submit', () => {
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+        }
+    });
+</script>
 
-          </div>
-        </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
 
 
 </body>
