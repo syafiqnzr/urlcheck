@@ -1,0 +1,130 @@
+{% extends "header_login.html" %}
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTP Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .content {
+    width: 90%;
+    max-width: 500px;
+    background-color: #ffffff;
+    margin: 40px auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    box-sizing: border-box;
+    margin-top: 50px;
+    margin-bottom: 80px; /* <-- adds space below the container */
+}
+
+.content:hover {
+    transform: scale(1.01);
+    transition: transform 0.3s ease;
+}
+
+        h1 {
+            text-align: center;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+            align-self: flex-start;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            letter-spacing: 10px;
+        }
+
+        input[type="text"]:focus {
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.15);
+            outline: none;
+        }
+
+        button {
+            background-color: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 0;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #16325c;
+        }
+
+        .error {
+            color: red;
+            background-color: #ffe6e6;
+            padding: 10px;
+            border: 1px solid #ffcccc;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+        <h1>OTP Verification</h1>
+
+        {% with messages = get_flashed_messages(category_filter=["error", "success"]) %}
+          {% if messages %}
+            <div class="error">
+              {% for message in messages %}
+                <p>{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="otp-form">
+            <label for="otp">Enter the 6-digit OTP sent to your email:</label>
+<input type="text" name="otp" id="otp" maxlength="6" pattern="\d{6}" required autofocus>
+
+            <button type="submit">Verify OTP</button>
+        </form>
+    
+</body>
+</html>
+
+{% endblock %}

@@ -428,14 +428,43 @@ def login():
     return render_template('login.html', is_admin=is_admin)  
 
 
+def generate_otp(length=6):
+    import random
+    return ''.join([str(random.randint(0, 9)) for _ in range(length)])
+
+
+def send_otp_email(receiver_email, otp):
+    import smtplib
+    from email.message import EmailMessage
+
+    sender_email = "syafiqnzr01@gmail.com"  # Replace with your email
+    app_password = "difx hply pfbb unpq"  # NOT your Gmail password
+
+    message = EmailMessage()
+    message['Subject'] = 'Your OTP Code'
+    message['From'] = sender_email
+    message['To'] = receiver_email
+    message.set_content(f'Your One-Time Password (OTP) is: {otp}')
+
+    try:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(sender_email, app_password)
+            smtp.send_message(message)
+    except Exception as e:
+        print(f"Failed to send OTP email: {e}")
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
-        token = request.form['token']
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        token = request.form.get('token', '').strip()
+
+        if not username or not email or not password or not confirm_password or not token:
+            return render_template('register.html', error="All fields are required")
 
         if password != confirm_password:
             return render_template('register.html', error="Passwords do not match")
@@ -445,18 +474,28 @@ def register():
         token_data = cursor.fetchone()
 
         if token_data:
-            hashed_password = generate_password_hash(password)
-            cursor.execute("INSERT INTO users (username, email, password, token) VALUES (%s, %s, %s, %s)",
-                           (username, email, hashed_password, token))
-            db.commit()
-
-            start_date = datetime.now()
-            expiry_date = start_date + timedelta(minutes=60)
-            cursor.execute("UPDATE token SET start_date = %s, expiry_date = %s WHERE token_number = %s",
-                           (start_date, expiry_date, token))
-            db.commit()
-
-            return redirect('/login')
+            # Store registration data and generate OTP
+            otp = generate_otp()
+            import hashlib
+            otp_hash = hashlib.sha256(otp.encode()).hexdigest()
+            from datetime import datetime
+            session['registration_data'] = {
+                'username': username,
+                'email': email,
+                'password': generate_password_hash(password),
+                'token': token,
+                'otp': otp,
+                'otp_hash': otp_hash,
+                'otp_verified': False,
+            'otp_created_time': datetime.now().isoformat(),
+                'otp_attempts': 0
+            }
+            try:
+                send_otp_email(email, otp)
+            except Exception as e:
+                return render_template('register.html', error=f"Failed to send OTP email: {e}")
+            flash("OTP sent to your email. Please check and enter it below.")
+            return redirect(url_for('otp'))
         else:
             return render_template('register.html', error="Invalid or used token")
 
@@ -1039,6 +1078,204 @@ def logout():
     return redirect(url_for('index'))
 
 
+
+import hashlib
+from datetime import datetime, timedelta
+
+@app.route('/otp', methods=['GET', 'POST'])
+def otp():
+    registration_data = session.get('registration_data')
+    if not registration_data or registration_data.get('otp_verified', False):
+        return redirect(url_for('register'))
+
+    # Check OTP expiration
+    otp_created_time = registration_data.get('otp_created_time')
+    if otp_created_time:
+        from datetime import datetime
+        otp_created_time_dt = datetime.fromisoformat(otp_created_time)
+        otp_age = datetime.now() - otp_created_time_dt
+        if otp_age > timedelta(minutes=5):
+            session.pop('registration_data', None)
+            flash("OTP expired. Please register again.", "error")
+            return redirect(url_for('register'))
+
+    # Initialize or get OTP attempt count
+    otp_attempts = registration_data.get('otp_attempts', 0)
+
+    if request.method == 'POST':
+        entered_otp = request.form.get('otp', '').strip()
+
+        if not entered_otp:
+            flash("Please enter the OTP.", "error")
+            return render_template('otp.html')
+
+        # Hash entered OTP for comparison
+        entered_otp_hash = hashlib.sha256(entered_otp.encode()).hexdigest()
+        stored_otp_hash = registration_data.get('otp_hash')
+
+        if otp_attempts >= 3:
+            session.pop('registration_data', None)
+            flash("Too many invalid attempts. Please register again.", "error")
+            return redirect(url_for('register'))
+
+        if entered_otp_hash == stored_otp_hash:
+            # OTP verified, save user to DB
+            cursor = db.cursor(dictionary=True)
+            try:
+                cursor.execute("INSERT INTO users (username, email, password, token) VALUES (%s, %s, %s, %s)",
+                               (registration_data['username'], registration_data['email'], registration_data['password'], registration_data['token']))
+                db.commit()
+
+                start_date = datetime.now()
+                expiry_date = start_date + timedelta(minutes=60)
+                cursor.execute("UPDATE token SET start_date = %s, expiry_date = %s WHERE token_number = %s",
+                               (start_date, expiry_date, registration_data['token']))
+                db.commit()
+            except Exception as e:
+                db.rollback()
+                flash(f"Failed to complete registration: {e}", "error")
+                return render_template('otp.html')
+            finally:
+                cursor.close()
+
+            # Mark OTP as verified in session
+            registration_data['otp_verified'] = True
+            session['registration_data'] = registration_data
+
+            session.pop('registration_data', None)
+            flash("Registration complete. Please log in.", "success")
+            return redirect(url_for('login'))
+        else:
+            otp_attempts += 1
+            registration_data['otp_attempts'] = otp_attempts
+            session['registration_data'] = registration_data
+            flash(f"Invalid OTP. Attempts left: {3 - otp_attempts}", "error")
+            return render_template('otp.html')
+
+    return render_template('otp.html')
+
+import hashlib
+from datetime import datetime, timedelta
+from flask import session, flash, redirect
+
+# Route to send OTP for password reset
+@app.route('/send_reset_otp', methods=['POST'])
+def send_reset_otp():
+    email = request.form.get('email', '').strip()
+    if not email:
+        flash("Email is required to send OTP.", "error")
+        return redirect(url_for('confirmation'))
+
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+    user = cursor.fetchone()
+    cursor.close()
+
+    if not user:
+        flash("Email not found in our records.", "error")
+        return redirect(url_for('confirmation'))
+
+    otp = generate_otp()
+    otp_hash = hashlib.sha256(otp.encode()).hexdigest()
+    otp_created_time = datetime.now().isoformat()
+
+    session['password_reset'] = {
+        'email': email,
+        'otp_hash': otp_hash,
+        'otp_created_time': otp_created_time,
+        'otp_attempts': 0
+    }
+
+    try:
+        send_otp_email(email, otp)
+        flash("OTP sent to your email. Please check and enter it below.", "info")
+    except Exception as e:
+        flash(f"Failed to send OTP email: {e}", "error")
+
+    return redirect(url_for('confirmation'))
+
+# Confirmation page to input email and OTP
+@app.route('/confirmation', methods=['GET', 'POST'])
+def confirmation():
+    if request.method == 'POST':
+        entered_email = request.form.get('email', '').strip()
+        entered_otp = request.form.get('otp', '').strip()
+
+        if not entered_email or not entered_otp:
+            flash("Email and OTP are required.", "error")
+            return render_template('confirmation.html')
+
+        password_reset = session.get('password_reset')
+        if not password_reset or password_reset.get('email') != entered_email:
+            flash("Please request a new OTP for this email.", "error")
+            return redirect(url_for('confirmation'))
+
+        # Check OTP expiration (5 minutes)
+        otp_created_time = password_reset.get('otp_created_time')
+        if otp_created_time:
+            otp_created_time_dt = datetime.fromisoformat(otp_created_time)
+            if datetime.now() - otp_created_time_dt > timedelta(minutes=5):
+                session.pop('password_reset', None)
+                flash("OTP expired. Please request a new one.", "error")
+                return redirect(url_for('confirmation'))
+
+        otp_attempts = password_reset.get('otp_attempts', 0)
+        if otp_attempts >= 3:
+            session.pop('password_reset', None)
+            flash("Too many invalid attempts. Please request a new OTP.", "error")
+            return redirect(url_for('confirmation'))
+
+        entered_otp_hash = hashlib.sha256(entered_otp.encode()).hexdigest()
+        if entered_otp_hash == password_reset.get('otp_hash'):
+            # OTP verified, proceed to forgot password page
+            return redirect(url_for('forgotpassword'))
+        else:
+            otp_attempts += 1
+            password_reset['otp_attempts'] = otp_attempts
+            session['password_reset'] = password_reset
+            flash(f"Invalid OTP. Attempts left: {3 - otp_attempts}", "error")
+            return render_template('confirmation.html')
+
+    return render_template('confirmation.html')
+
+# Forgot password page to input new password
+@app.route('/forgotpassword', methods=['GET', 'POST'])
+def forgotpassword():
+    password_reset = session.get('password_reset')
+    if not password_reset or 'email' not in password_reset:
+        flash("Unauthorized access. Please verify your email and OTP first.", "error")
+        return redirect(url_for('confirmation'))
+
+    if request.method == 'POST':
+        new_password = request.form.get('new_password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        if not new_password or not confirm_password:
+            flash("Both password fields are required.", "error")
+            return render_template('forgotpassword.html')
+
+        if new_password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return render_template('forgotpassword.html')
+
+        hashed_password = generate_password_hash(new_password)
+        email = password_reset['email']
+
+        cursor = db.cursor()
+        try:
+            cursor.execute("UPDATE users SET password = %s WHERE email = %s", (hashed_password, email))
+            db.commit()
+            flash("Password updated successfully. Please log in.", "success")
+            session.pop('password_reset', None)
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.rollback()
+            flash(f"Failed to update password: {e}", "error")
+            return render_template('forgotpassword.html')
+        finally:
+            cursor.close()
+
+    return render_template('forgotpassword.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

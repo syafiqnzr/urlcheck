@@ -1,4 +1,4 @@
-{% extends "header_login.html" %}
+{% extends "header_register.html" %}
 {% block content %}
 
 <!DOCTYPE html>
@@ -14,20 +14,27 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            padding-bottom: 150px;
         }
 
-        .content {
-            width: 90%;
-            max-width: 600px;
-            background-color: #ffffff;
-            margin: 40px auto;
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            padding: 30px 20px;
-            box-sizing: border-box;
-            margin-top: 50px;
-            position: center;
-        }
+.content {
+    width: 90%;
+    max-width: 600px;
+    background-color: #ffffff;
+    margin: 40px auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    box-sizing: border-box;
+    margin-top: 50px;
+    margin-bottom: 80px; /* <-- adds space below the container */
+}
+
+.content:hover {
+    transform: scale(1.01);
+    transition: transform 0.3s ease;
+}
+
 
         h1 {
             text-align: center;
@@ -80,16 +87,17 @@
         }
 
         .password-criteria {
-            font-size: 12px;
+            font-size: 10px;
             list-style: none;
             padding-left: 0;
+            padding-top: 40px;
             margin: 0;
             max-width: 180px;
             line-height: 1.7;
         }
 
         .password-criteria li {
-            margin-top: 7px;
+            margin-top: 0%;
             color: red;
         }
 
@@ -149,7 +157,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    
         <h1>Register</h1>
 
         {% with messages = get_flashed_messages(category_filter=["error"]) %}
@@ -196,8 +204,7 @@
         <div class="login-link">
             <a href="/login">Already have an account? Login</a>
         </div>
-    </div>
-
+  
     <script>
         function validatePassword() {
             const password = document.getElementById("password").value;
@@ -235,7 +242,17 @@
             }
             return true;
         }
+        const registerForm = document.querySelector('.register-form');
+        const submitBtn = document.getElementById('submitBtn');
+
+        registerForm?.addEventListener('submit', () => {
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Registering...';
+            }
+        });
     </script>
+    
 </body>
 </html>
 
