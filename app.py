@@ -1188,7 +1188,7 @@ def send_reset_otp():
 
     try:
         send_otp_email(email, otp)
-        flash("OTP sent to your email. Please check and enter it below.", "info")
+        flash("OTP sent to your email. Please check and enter it below.")
     except Exception as e:
         flash(f"Failed to send OTP email: {e}", "error")
 
@@ -1198,17 +1198,17 @@ def send_reset_otp():
 @app.route('/confirmation', methods=['GET', 'POST'])
 def confirmation():
     if request.method == 'POST':
-        entered_email = request.form.get('email', '').strip()
-        entered_otp = request.form.get('otp', '').strip()
-
-        if not entered_email or not entered_otp:
-            flash("Email and OTP are required.", "error")
-            return render_template('confirmation.html')
-
         password_reset = session.get('password_reset')
-        if not password_reset or password_reset.get('email') != entered_email:
+        if not password_reset or 'email' not in password_reset:
             flash("Please request a new OTP for this email.", "error")
             return redirect(url_for('confirmation'))
+
+        email_confirm = password_reset['email']
+        entered_otp = request.form.get('otp', '').strip()
+
+        if not entered_otp:
+            flash("OTP is required.", "error")
+            return render_template('confirmation.html')
 
         # Check OTP expiration (5 minutes)
         otp_created_time = password_reset.get('otp_created_time')
