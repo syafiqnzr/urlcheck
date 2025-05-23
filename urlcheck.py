@@ -4,6 +4,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import pickle
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 
 # Define the folder paths
 dataset_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Dataset'
@@ -51,11 +54,49 @@ vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(url_list)
 y = labels
 
+# Display basic information about the TF-IDF features
+print("\nTF-IDF Vectorizer Output:")
+print(f"- Number of URLs vectorized: {X.shape[0]}")
+print(f"- Number of features generated: {X.shape[1]}")
+print(f"- Sample features: {vectorizer.get_feature_names_out()[:10]}")
+
+# Display class distribution
+print("\nLabel Distribution:")
+print(f"- Safe URLs: {sum(y == 0)}")
+print(f"- Malicious URLs: {sum(y == 1)}")
+
 # Split into training and testing dataset (80:20 ratio)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+print("\nTraining and testing data prepared:")
+print(f"- Training samples: {X_train.shape[0]}")
+print(f"- Testing samples: {X_test.shape[0]}")
+
+# Train the logistic regression model
 logit = LogisticRegression()
 logit.fit(X_train, y_train)
+
+
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report
+
+# Predict and evaluate
+y_pred = logit.predict(X_test)
+
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Safe', 'Malicious'])
+disp.plot(cmap='Blues')
+plt.title('Confusion Matrix')
+plt.show()
+
+# Classification report
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, target_names=['Safe', 'Malicious']))
+
+
+
+print("\nModel training completed successfully.")
+
 
 # Accuracy of Our Model
 accuracy = logit.score(X_test, y_test) * 100

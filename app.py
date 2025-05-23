@@ -612,14 +612,40 @@ def export_csv():
         rows = cursor.fetchall()
         cursor.close()
 
-        csv_path = r'C:\xampp\htdocs\urlcheck\Dataset\dataset_baru.csv'
+        # Remove duplicate URLs, keep first occurrence
+        seen_urls = set()
+        unique_rows = []
+        for row in rows:
+            if row['url'] not in seen_urls:
+                unique_rows.append(row)
+                seen_urls.add(row['url'])
+
+        # Directory to save CSV files
+        dataset_dir = dataset_path
+
+        # Find existing files matching pattern "urlcheck_dataset X.csv"
+        existing_files = [f for f in os.listdir(dataset_dir) if f.startswith('urlcheck_dataset') and f.endswith('.csv')]
+
+        # Extract numbers from existing filenames
+        numbers = []
+        for filename in existing_files:
+            parts = filename.replace('.csv', '').split(' ')
+            if len(parts) == 2 and parts[1].isdigit():
+                numbers.append(int(parts[1]))
+
+        # Determine next number
+        next_number = max(numbers) + 1 if numbers else 1
+
+        # New filename
+        new_filename = f'urlcheck_dataset {next_number}.csv'
+        csv_path = os.path.join(dataset_dir, new_filename)
 
         with open(csv_path, mode='w', newline='', encoding='utf-8') as csvfile:
             fieldnames = ['url', 'type']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             writer.writeheader()
-            for row in rows:
+            for row in unique_rows:
                 writer.writerow({'url': row['url'], 'type': row['classification']})
 
         flash(f'CSV file has been saved successfully at {csv_path}', 'success')
@@ -1058,7 +1084,7 @@ def renew_token():
 
         if new_token:
             start_date = datetime.now()
-            expiry_date = start_date + relativedelta(months=3)
+            expiry_date = start_date + timedelta(minutes=1)
 
             cursor.execute("UPDATE users SET token = %s WHERE username = %s", (token_input, username))
             cursor.execute("UPDATE token SET start_date = %s, expiry_date = %s WHERE token_number = %s",
