@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>URLCHECK</title>
-  <style>
+   <style>
 /* Base Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,7 +12,7 @@ body {
     padding: 0;
     background-color: #f4f4f9;
     color: #333;
-    line-height: 1.6;
+    line-height: 2;
 }
 
 /* Header */
@@ -20,7 +20,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(90deg, #1e5372, #2a6698);
+    background: linear-gradient(90deg, #1e3c72, #2a5298);
     padding: 15px 20px;
     color: white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -83,17 +83,19 @@ body {
     .nav-links {
         display: none;
         flex-direction: column;
-        width: 100%;
-        background-color: #2a8698;
-        position: absolute;
+        height: 245px;
+        background-color: #1e3c72;
+        position: fixed;
         top: 65px;
-        left: 0;
+        right: 0;
+        width: 200px;
         z-index: 999;
+        border-bottom-left-radius: 20px
     }
 
     .nav-links a {
         padding: 12px;
-        border-top: 1px solid #1e5d72;
+        border-top: 1px solid #1e3c72;
     }
 
     .menu-toggle {
@@ -257,6 +259,7 @@ body {
     </div>
     {% endblock %}
 </div>
+<p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 
 <script>
 function toggleMenu() {

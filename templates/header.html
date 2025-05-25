@@ -4,15 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>URLCHECK</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
   <style>
 /* Base Styles */
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f9;
     color: #333;
-    line-height: 1.6;
+    line-height: 2;
 }
 
 /* Header */
@@ -180,6 +183,8 @@ body {
 .signout-button:hover {
     background-color: #f2f2f2;
 }
+
+
   </style>
   <script>
     function toggleDropdown() {
@@ -200,6 +205,25 @@ body {
       }
     }
     </script>
+  <style>
+/*.footer-credit {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #ffffff;
+      color: black;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Times New Roman', serif;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }*/
+    /*.p10{
+        font-size: 1px;
+    }*/
+  </style>
 </head>
 <body>
 
@@ -256,6 +280,7 @@ body {
 </div>
 
 <div class="content">
+    
     {% block content %}
     <div>
         <h1>{{ page_title }}</h1>
@@ -263,6 +288,7 @@ body {
     </div>
     {% endblock %}
 </div>
+<p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 
 <script>
 function toggleMenu() {
@@ -270,6 +296,9 @@ function toggleMenu() {
     navLinks.classList.toggle('active');
 }
 </script>
+
+  
+
 
 </body>
 </html>

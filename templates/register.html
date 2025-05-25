@@ -158,7 +158,7 @@
 </head>
 <body>
     
-        <h1>Register</h1>
+        <h1>Create Account</h1>
 
         {% with messages = get_flashed_messages(category_filter=["error"]) %}
           {% if messages %}
@@ -171,7 +171,7 @@
         {% endwith %}
 
         <form method="POST" class="register-form" onsubmit="return validateForm()">
-            <label for="username">Username:</label>
+            <label for="username">Create Username:</label>
             <input type="text" name="username" id="username" required>
 
             <label for="email">Email:</label>

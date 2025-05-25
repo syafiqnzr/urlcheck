@@ -12,12 +12,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>URLCHECK</title>
+    <title>PURLCHECK</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
+ 
     <style>
         body, h1, p, form {
             margin: 0;
             padding: 0;
+            
         }
 
         /* Main content container */
@@ -49,7 +52,7 @@
     font-size: 13px;
     font-weight: 600;
     line-height: 1.5;
-    margin: 0 auto 20px auto; /* Horizontally center and keep bottom margin */
+    margin: 0 auto 25px auto; /* Horizontally center and keep bottom margin */
     width: 380px; /* Shrinks the width to fit the content */
 }
 
@@ -57,8 +60,8 @@
 
         form label {
             display: block;
-            font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 7px;
+            font-family: 'Calibri';
             color: #333;
             font-size: 16px;
         }
@@ -227,7 +230,7 @@
     </style>
 </head>
 <body>
-    <h1>Scan Now!!</h1>
+    <h1>Scan Now !!</h1>
     <!-- Show login/register or logout depending on session -->
     
     <p2>Check if a link is safe to open with URLCHECK. Avoid suspicious websites and getting scammed online.</p2>

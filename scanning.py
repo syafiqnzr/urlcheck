@@ -219,7 +219,7 @@ def classify_url(url):
     domain = parsed_url.netloc if parsed_url.netloc else parsed_url.path
 
     # ML Model Prediction
-    url_vector = vectorizer.transform([url])  # Use 'url' instead of 'original_url'
+    url_vector = vectorizer.transform([original_url])  # Use 'url' instead of 'original_url'
     ml_prediction = trainedmodel.predict(url_vector)[0]  # 0 (Safe) or 1 (Malicious)
 
     # URL Breakdown Analysis
@@ -434,6 +434,7 @@ if __name__ == "__main__":
 
     # Result (Display in resut.html)
     print(f"\nMachine Learning Model Output: [{ml_prediction}]")
+    print(f"\nMachine Learning Note: [{ml_note}]")
     print(f"Final Classification: [{final_result}]")
     print(f"Note: {note}")
     

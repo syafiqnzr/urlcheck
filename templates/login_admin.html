@@ -6,9 +6,55 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Login</title>
-    <style>
+     <style>
 
-        .error { color: red; margin-bottom: 10px; }
+        body, h1, p, form {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content container */
+        .content {
+            width: 90%;
+            max-width: 600px;
+            background-color: #ffffff;
+            margin: 40px auto;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px 20px;
+            box-sizing: border-box;
+            margin-top: 50px;
+
+        }
+
+        .content h1 {
+            color: #1e3c72;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+    .content p2 {
+    display: block; /* Makes sure it's treated like a block-level element */
+    text-align: center;
+    color: #000000;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 0 auto 20px auto; /* Horizontally center and keep bottom margin */
+    width: 380px; /* Shrinks the width to fit the content */
+    }
+
+
+        label {
+            display: block;
+            font-weight: 500;;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
 
         .modal {
             display: none;
@@ -32,16 +78,21 @@
             margin: 5px;
         }
         /* Main content container */
- .content {
+.content {
     width: 90%;
-    max-width: 500px;
+    max-width: 420px;
     background-color: #ffffff;
-    margin: 40px auto;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    padding: 30px 20px;
+    margin: 60px auto;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    padding: 40px 30px;
     box-sizing: border-box;
-    margin-top: 50px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: transform 0.3s ease;
+}
+
+.content:hover {
+    transform: scale(1.01);
 }
 
 .content h1 {
@@ -53,10 +104,187 @@
 
 .content p {
     text-align: center;
-    color: #555;
-    font-size: 18px;
+    color: #444;
+    font-size: 16px;
     margin-bottom: 20px;
 }
+
+
+
+/* Login Form Styles */
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-form input:focus {
+    border-color: #1e3c72;
+    box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.2);
+    outline: none;
+}
+
+.login-form button {
+    padding: 12px;
+    background-color: #1e3c72;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.login-form button:hover {
+    background-color: #16345d;
+    transform: scale(1.02);
+}
+
+.register-link {
+    margin-top: 20px;
+    max-width: 1000px;
+    text-align: center;
+}
+
+.register-link a {
+    
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #1e3c72;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    font-size: 14px;
+}
+
+.register-link a:hover {
+    color: #12294b;
+}
+
+.forgot-link {
+    margin-top: -19px;
+    margin-bottom: 18px;
+    text-align: right;
+}
+
+.forgot-link a {
+    
+    text-decoration: none;
+    color: #1e3c72;
+    font-weight: 600;
+    transition: color 0.3s ease;
+    font-size: 12px;
+}
+
+.forgot-link a:hover {
+    color: #12294b;
+}
+
+        /* Flash messaes container */
+        .flash-messages {
+            position: fixed;
+            top: 85px;
+            right: -2px;
+            z-index: 9999;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .flash-messages li {
+            background-color: #f43636; /* Red background */
+            color: white;
+            padding: 15px 25px;
+            margin-top: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            font-size: 14px;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideInOut 5s forwards;
+            cursor: pointer;
+            min-width: 250px;
+        }
+
+        /* Animation for slide in from right and fade out */
+        @keyframes slideInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            10% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            90% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+
+        /* Responsive - make it more mobile friendly */
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px 15px;
+                margin-top: 30px;
+            }
+
+            .content h1 {
+                font-size: 24px;
+            }
+
+            form input[type="submit"] {
+                padding: 12px;
+                font-size: 15px;
+            }
+
+            .flash-messages li {
+                min-width: 200px;
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+
+            #loading-container {
+                width: 180px;
+                height: 110px;
+                padding: 12px;
+            }
+
+            #loading-spinner {
+                width: 40px;
+                height: 40px;
+                margin-bottom: 8px;
+            }
+
+            #loading-message {
+                font-size: 14px;
+            }
+        }
+
     </style>
     <script>
         // JavaScript function to show alert if a message exists
@@ -65,6 +293,29 @@
                 alert(message);
             }
         }
+        // Remove flash message on click
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-messages li');
+            flashMessages.forEach(function(msg) {
+                msg.addEventListener('click', function() {
+                    msg.style.animation = 'slideOut 0.5s forwards';
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 500);
+                });
+            });
+
+            // Show loading overlay on form submit and prevent multiple submits
+            const form = document.getElementById('scan-form');
+            form.addEventListener('submit', function(event) {
+                // Show loading overlay
+                document.getElementById('loading-overlay').style.display = 'flex';
+
+                // Disable submit button to prevent multiple submits
+                const submitButton = form.querySelector('input[type="submit"]');
+                submitButton.disabled = true;
+            });
+        });
     </script>
 </head>
 <body>
