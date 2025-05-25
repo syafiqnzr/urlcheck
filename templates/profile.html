@@ -1,7 +1,6 @@
 {% extends "header.html" %}
 
 {% block content %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,264 +8,370 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <style>
-    
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f4f7f9;
-        margin: 0;
-        padding: 0;
-    }
+        /* Reset and base styles */
+        body, h1, h2, p, div {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
-    .content {
-        width: 60%;
-        max-width: 600px;
-        background-color: #ffffff;
-        margin: 60px auto;
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        padding: 40px 30px;
-    }
-
-    .content h1 {
-        color: #1e3c72;
-        text-align: center;
-        margin-bottom: 25px;
-        font-size: 26px;
-    }
-
-    .profile-container {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .profile-picture {
-        border-radius: 50%;
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-        border: 3px solid #1e3c72;
-        margin-bottom: 15px;
-    }
-
-#profile_picture {
-        margin: 20px auto 30px auto;
-        display: block;
-        padding: 8px 12px;
-        font-size: 15px;
-        border: 1px solid #1e3c72;
-        border-radius: 6px;
-        background-color: #f9f9f9;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-#profile_picture:hover {
-        background-color: #e6e6e6;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-    table td {
-        padding: 9px 8px;
-        vertical-align: baseline;
-        font-size: 16px;
-        color: #333;
-    }
-
-    label {
-        font-weight: 600;
-        color: #1e3c72;
-    }
-
-    input[type="text"] {
-        width: 90%;
-        padding: 8px 10px;
-        font-size: 15px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        display: inline-block;
-    }
-
-    button[type="button"], button[type="submit"] {
-        background-color: #1e3c72;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        font-size: 15px;
-        cursor: pointer;
-        margin-top: 20px;
-        transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-        background-color: #16345d;
-    }
-
-    .edit-btn {
-        background-color: #e0e0e0;
-        color: #333;
-        padding: 6px 12px;
-        margin-left: 10px;
-        border-radius: 5px;
-        font-size: 13px;
-    }
-
-    .edit-btn:hover {
-        background-color: #d0d0d0;
-    }
-
-    .flash-messages {
-        position: fixed;
-        top: 85px;
-        right: 10px;
-        z-index: 9999;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .flash-messages li {
-        background-color: #25c64a;
-        color: white;
-        padding: 12px 20px;
-        margin-top: 10px;
-        border-radius: 5px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        font-size: 14px;
-        opacity: 0;
-        transform: translateX(100%);
-        animation: slideInOut 5s forwards;
-        min-width: 250px;
-    }
-
-    @keyframes slideInOut {
-        0% { opacity: 0; transform: translateX(100%); }
-        10% { opacity: 1; transform: translateX(0); }
-        90% { opacity: 1; transform: translateX(0); }
-        100% { opacity: 0; transform: translateX(100%); }
-    }
-
-    @media (max-width: 600px) {
-        .content {
-            padding: 25px 20px;
         }
-
-        table td {
-            display: block;
-            width: 100%;
-        }
-
-        input[type="text"] {
-            width: 100%;
-        }
-    }
-    
-
-.form-group.row {
-  display: flex;
-  align-items: center;
-  gap: 15px; /* spacing between label and content */
-}
-
-    .form-label {
-  min-width: 150px;
-  font-weight: bold;
-  color: #1e3c72;
-}
-
-.form-info {
-  flex: 1;
-  font-size: 16px;
-  padding: 8px;
-  background-color: #f0f0f0;
-  border-radius: 6px;
-  color: #333;
-}
-
-.form-input {
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #1e3c72;
-  border-radius: 8px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.edit-button {
-  margin-left: 10px;
-  padding: 8px 14px;
-  background-color: #1e3c72;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.edit-button:hover {
-  background-color: #16345d;
-}
-.form-actions {
-    display: flex;
-    justify-content: center; /* center the Save button */
-    gap: 12px; /* space between buttons if there are multiple */
-    margin-top: 30px;
-}
-
-.save-button {
-    background-color: #1e3c72;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.save-button:hover {
-    background-color: #16345d;
-}
-
-.edit-button {
-    background-color: #e0e0e0;
-    color: #333;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.edit-button:hover {
-    background-color: #d0d0d0;
-}
-
-
-</style>
         
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            
+        }
+
+        /* Main container */
+        .content {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        
+
+        /* Page title */
+        .page-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: -0.04em;
+        }
+
+        /* Profile container */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 32px;
+            background-color: #121212;
+            border-radius: 8px;
+        }
+
+        /* Image container */
+        .image-container {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        /* Profile picture */
+        .profile-picture {
+            border-radius: 50%;
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border: 4px solid #ffea00;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        /* File input styling */
+        #profile_picture {
+            background-color: transparent;
+            color: #b3b3b3;
+            border: 1px solid #333333;
+            border-radius: 500px;
+            padding: 8px 20px;
+            margin-top: 0px;
+            font-size: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+
+        }
+
+        #profile_picture::-webkit-file-upload-button {
+            background-color: #ffea00;
+            color: #000000;
+            border: none;
+            border-radius: 500px;
+            padding: 8px 24px;
+            margin-right: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+
+            font-size: 8px;
+        }
+
+        #profile_picture:hover {
+            border-color: #ffea00;
+            transform: scale(1.04);
+        }
+
+        /* Form section */
+        .form-section {
+            background-color: #333333;
+            border-radius: 8px;
+            padding: 10px 30px;
+            margin-bottom: 24px;
+        }
+
+        .form-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #282828;
+            padding-bottom: 16px;
+        }
+
+        /* Form group styling */
+        .form-group {
+            margin-bottom: 2px;
+        }
+
+        .form-group.row {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 16px 0;
+            border-bottom: 1px solid #282828;
+        }
+
+        .form-group.row:last-child {
+            border-bottom: none;
+        }
+
+        /* Form label */
+        .form-label {
+            min-width: 140px;
+            font-weight: 400;
+            color: #b3b3b3;
+            font-size: 16px;
+        }
+
+        /* Form info display (read-only fields) */
+        .form-info {
+            flex: 1;
+            font-size: 16px;
+            color: #ffffff;
+            font-weight: 400;
+        }
+
+        .form-info.readonly {
+            color: #b3b3b3;
+            font-style: italic;
+        }
+
+        /* Form input */
+        .form-input {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            background-color: #121212;
+            color: #ffffff;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ffea00;
+            box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+        }
+
+        .form-input:disabled {
+            background-color: #282828;
+            color: #333333;
+            cursor: not-allowed;
+        }
+
+        /* Edit button */
+        .edit-button {
+             margin-bottom: 2px;
+            background-color: transparent;
+            color: #ffea00;
+            border: 1px solid #ffea00;
+            border-radius: 500px;
+            padding: 8px 24px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1.76px;
+            min-width: 80px;
+        }
+
+        .edit-button:hover {
+            background-color: #ffea00;
+            color: #000000;
+            transform: scale(1.04);
+        }
+
+        /* Form actions */
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 28px;
+        }
+
+        /* Save button */
+        .save-button {
+            background-color: #b8ac29;
+            color: #000000;
+            border: none;
+            border-radius: 500px;
+            padding: 16px 48px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1.76px;
+        }
+
+        .save-button:hover {
+            background-color: #ffea00;
+            transform: scale(1.04);
+        }
+
+        .save-button:disabled {
+            background-color: #333333;
+            color: #b3b3b3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Flash messages */
+        .flash-messages {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .flash-messages li {
+            background-color: #ffea00;
+            color: #000000;
+            padding: 16px 24px;
+            margin-top: 12px;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            font-size: 14px;
+            font-weight: 700;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideInOut 5s forwards;
+            min-width: 300px;
+            border-left: 4px solid #1ed760;
+        }
+
+        @keyframes slideInOut {
+            0% { opacity: 0; transform: translateX(100%); }
+            10% { opacity: 1; transform: translateX(0); }
+            90% { opacity: 1; transform: translateX(0); }
+            100% { opacity: 0; transform: translateX(100%); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .content {
+                padding: 24px 16px;
+            }
+
+            .page-title {
+                font-size: 32px;
+                margin-bottom: 32px;
+            }
+
+            .profile-picture {
+                width: 150px;
+                height: 150px;
+            }
+
+            .form-section {
+                padding: 24px 16px;
+            }
+
+            .form-group.row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 16px 0;
+            }
+
+            .form-label {
+                min-width: auto;
+                margin-bottom: 8px;
+            }
+
+            .form-input {
+                width: 100%;
+            }
+
+            .edit-button {
+                align-self: flex-start;
+                margin-top: 8px;
+            }
+
+            .flash-messages {
+                right: 16px;
+                left: 16px;
+            }
+
+            .flash-messages li {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 16px 12px;
+            }
+
+            .page-title {
+                font-size: 28px;
+            }
+
+            .profile-container {
+                padding: 24px 16px;
+            }
+
+            .profile-picture {
+                width: 120px;
+                height: 120px;
+            }
+
+            .form-section {
+                padding: 20px 12px;
+            }
+
+            .save-button {
+                padding: 14px 32px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
-  <h1>User Profile</h1>
+  <div class="content">
+    <h1 class="page-title">Profile</h1>
 
-  <form action="{{ url_for('profile') }}" method="POST" enctype="multipart/form-data">
-    <div class="profile-container">
-   <!-- Display Profile Picture -->
-   <div class="image-container">
-    {% if profile_picture %}
-        <img src="data:image/jpeg;base64,{{ profile_picture | b64encode }}" class="profile-picture" alt="Profile Picture" width="150" height="150">
-    {% else %}
-        <img src="{{ url_for('static', filename='default_profile.png') }}" class="profile-picture" alt="Default Profile Picture" width="150" height="150">
-    {% endif %}
-   </div>
+    <form action="{{ url_for('profile') }}" method="POST" enctype="multipart/form-data">
+      <!-- Profile Picture Section -->
+      <div class="profile-container">
+        <div class="image-container">
+          {% if profile_picture %}
+            <img src="data:image/jpeg;base64,{{ profile_picture | b64encode }}" class="profile-picture" alt="Profile Picture">
+          {% else %}
+            <img src="{{ url_for('static', filename='default_profile.png') }}" class="profile-picture" alt="Default Profile Picture">
+          {% endif %}
+        </div>
+        <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+      </div>
 
-   {% with messages = get_flashed_messages() %}
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="flash-messages" id="flash-messages">
             {% for message in messages %}
@@ -274,55 +379,115 @@
             {% endfor %}
           </ul>
         {% endif %}
-        {% endwith %}
+      {% endwith %}
 
-  <!-- Upload Profile Picture -->
-<input type="file" id="profile_picture" name="profile_picture" accept="image/*">
-
-<div class="form-group row">
-  <label for="username" class="form-label">Username</label>
-  <div class="form-info">
-    <span id="username_display">{{ username }}</span>
-    <input type="text" id="username_input" name="username" value="{{ username }}" class="form-input" style="display:none;" required>
-  </div>
-  <button type="button" class="edit-button" onclick="enableEdit()">Edit</button>
-</div>
-
-<div class="form-group row">
-  <label class="form-label">Token Number</label>
-  <p class="form-info">{{ token_number }}</p>
-</div>
-
-<div class="form-group row">
-  <label class="form-label">Start Date</label>
-  <p class="form-info">{{ start_date }}</p>
-</div>
-
-<div class="form-group row">
-  <label class="form-label">Expiry Date</label>
-  <p class="form-info">{{ expiry_date }}</p>
-</div>
+      <!-- Personal Information Section -->
+      <div class="form-section">
+        <h2 style="margin-bottom: 0px; margin-top: 10px;">Personal Information</h2>
 
 
-  
-  <script>
-    function enableEdit() {
-    const display = document.getElementById("username_display");
-    const input = document.getElementById("username_input");
-    display.style.display = "none";
-    input.style.display = "inline-block";
-    input.focus();
-}
-</script>
+        <div class="form-group row">
+          <label for="username" class="form-label">Username</label>
+          <div class="form-info">
+            <span id="username_display">{{ username }}</span>
+            <input type="text" id="username_input" name="username" value="{{ username }}" class="form-input" style="display:none;" required>
+          </div>
+          <button type="button" class="edit-button" onclick="enableEdit('username')">Edit</button>
+        </div>
+
+        <div class="form-group row">
+          <label for="email" class="form-label">Email</label>
+          <div class="form-info">{{ email }}</div>
+        </div>
+
+        <div class="form-group row">
+          <label for="password" class="form-label">Password</label>
+          <div class="form-info">••••••••••</div>
+          <button type="button" class="edit-button" onclick="enableEdit('password')">Edit</button>
+        </div>
+      </div>
+
+      <!-- Account Information Section -->
+      <div class="form-section">
+        <h2 style="margin-bottom: 0px; margin-top: 10px;">Account Information</h2>
+
+        <div class="form-group row">
+          <label class="form-label">Token Number</label>
+          <div class="form-info readonly">{{ token_number }}</div>
+        </div>
+
+        <div class="form-group row">
+          <label class="form-label">Start Date</label>
+          <div class="form-info readonly">{{ start_date }}</div>
+        </div>
+
+        <div class="form-group row">
+          <label class="form-label">Expiry Date</label>
+          <div class="form-info readonly">{{ expiry_date }}</div>
+        </div>
+      </div>
 
       <div class="form-actions">
-    <button type="submit" class="save-button">Save Changes</button>
-</div>
+        <button type="submit" class="save-button">Save Changes</button>
+      </div>
+    </form>
+  </div>
 
-  </form>
+  <script>
+    function enableEdit(fieldName) {
+      const display = document.getElementById(fieldName + "_display");
+      const input = document.getElementById(fieldName + "_input");
+      const button = event.target;
 
+      if (display && input) {
+        display.style.display = "none";
+        input.style.display = "block";
+        input.focus();
+
+        // Change button text to "Cancel" and add cancel functionality
+        button.textContent = "Cancel";
+        button.onclick = function() {
+          cancelEdit(fieldName);
+        };
+      }
+    }
+
+    function cancelEdit(fieldName) {
+      const display = document.getElementById(fieldName + "_display");
+      const input = document.getElementById(fieldName + "_input");
+      const button = event.target;
+
+      if (display && input) {
+        display.style.display = "block";
+        input.style.display = "none";
+
+        // Reset input value to original
+        if (fieldName === 'username') {
+          input.value = "{{ username }}";
+        } else if (fieldName === 'email') {
+          input.value = "{{ email or '' }}";
+        } else if (fieldName === 'password') {
+          input.value = "";
+        }
+
+        // Change button back to "Edit"
+        button.textContent = "Edit";
+        button.onclick = function() {
+          enableEdit(fieldName);
+        };
+      }
+    }
+
+    // Auto-hide flash messages after animation
+    document.addEventListener('DOMContentLoaded', function() {
+      const flashMessages = document.getElementById('flash-messages');
+      if (flashMessages) {
+        setTimeout(function() {
+          flashMessages.style.display = 'none';
+        }, 5000);
+      }
+    });
+  </script>
 </body>
 </html>
-
 {% endblock %}
-

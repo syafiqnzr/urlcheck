@@ -158,12 +158,6 @@ def result():
     raw_prediction = trainedmodel.predict(url_vector)[0]
     ml_prediction = 'Safe' if raw_prediction == 0 else 'Suspicious'
 
-    # Generate ml_note based on ML prediction
-    if raw_prediction == 1:
-        ml_note = "Warning: This URL may lead to a fake or harmful website designed to steal your personal information."
-    else:
-        ml_note = "This URL appears to be safe and does not show signs of harmful content."
-
     sender = session.get('username', 'guest')
 
     cursor = db.cursor(dictionary=True)
@@ -172,12 +166,12 @@ def result():
     insert_summary_query = """
     INSERT INTO scan_results (
         url, domain, ip_address, protocol, creation_date, updated_date,
-        expiry_date, age, registrar, url_length, classification, ml_prediction, note, ml_note, sender
+        expiry_date, age, registrar, url_length, classification, ml_prediction, ml_note, note, sender
     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     cursor.execute(insert_summary_query, (
         url, domain, ip_address, protocol, str(creation_date), str(updated_date),
-        str(expiry_date), age, registrar, url_length, final_result, ml_prediction, note, ml_note, sender
+        str(expiry_date), age, registrar, url_length, final_result, ml_prediction, note, note, sender
     ))
 
     # Save breakdown details
@@ -238,7 +232,7 @@ def details():
     # Get scan result for the given URL
     cursor.execute("""
         SELECT url, domain, ip_address, protocol, creation_date, updated_date,
-               expiry_date, age, registrar, url_length, classification, ml_prediction, note, ml_note, sender
+               expiry_date, age, registrar, url_length, classification, note, sender, ml_note, ml_prediction
         FROM scan_results
         WHERE url = %s
         ORDER BY id DESC
@@ -279,19 +273,15 @@ def details():
 
     cursor.close()
 
-    # Fetch ML prediction and note from scan_results table
-    ml_prediction = scan_result.get('ml_prediction', '')
-    ml_note = scan_result.get('note', '')
-
     return render_template(
         'detail_result.html',
         user=user,
         scan=scan_result,
+        ml_prediction=scan_result.get('ml_prediction', ''),
+        ml_note=scan_result.get('ml_note', ''),
         scan_url=url,
         sender=sender,
         features=features,
-        ml_prediction=ml_prediction,
-        ml_note=ml_note,
         is_admin=is_admin
     )
 
@@ -318,7 +308,7 @@ def details_by_url(url_encoded):
     # Get scan result for the given URL
     cursor.execute("""
         SELECT url, domain, ip_address, protocol, creation_date, updated_date,
-               expiry_date, age, registrar, url_length, classification, ml_prediction, note, sender
+               expiry_date, age, registrar, url_length, classification, note, sender, ml_prediction, ml_note
         FROM scan_results
         WHERE url = %s
         ORDER BY id DESC
@@ -364,6 +354,8 @@ def details_by_url(url_encoded):
         'detail_result.html',
         user=username,
         scan=scan_result,
+        ml_prediction=scan_result.get('ml_prediction', ''),
+        ml_note=scan_result.get('ml_note', ''),
         scan_url=url,
         sender=sender,
         features=features,
@@ -546,7 +538,13 @@ def profile():
     user = cursor.fetchone()
 
     if user:
-        
+        # Fetch email explicitly if not included or None
+        email = user.get('email', None)
+        if not email:
+            cursor.execute("SELECT email FROM users WHERE username = %s", (username,))
+            email_row = cursor.fetchone()
+            if email_row:
+                email = email_row.get('email', None)
         # Get token data
         cursor.execute("SELECT token_number, start_date, expiry_date FROM token WHERE token_number = %s", (user['token'],))
         token_info = cursor.fetchone()
@@ -580,6 +578,7 @@ def profile():
 
     return render_template('profile.html',
                                username=user['username'],
+                               email=email,
                                token_number=token_info['token_number'] if token_info else '',
                                start_date=token_info['start_date'].strftime('%d-%m-%Y') if token_info and token_info['start_date'] else '',
                                expiry_date=token_info['expiry_date'].strftime('%d-%m-%Y') if token_info and token_info['expiry_date'] else '',
@@ -1204,10 +1203,18 @@ def send_reset_otp():
         flash("Email is required to send OTP.", "error")
         return redirect(url_for('confirmation'))
 
-    cursor = db.cursor(dictionary=True)
+    # Create a new local connection to avoid unread result error
+    local_db = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="urlscanner"
+    )
+    cursor = local_db.cursor(buffered=True, dictionary=True)
     cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
     user = cursor.fetchone()
     cursor.close()
+    local_db.close()
 
     if not user:
         flash("Email not found in our records.", "error")

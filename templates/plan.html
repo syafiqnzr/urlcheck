@@ -5,140 +5,232 @@
 {% endif %}
 
 {% block content %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-   
+    <title>URLCHECK - Subscription Plans</title>
     <style>
+        /* Reset and base styles */
+        body, h1, h2, p, div {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            
+        }
+        
+        /* Main container */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        /* Page title */
+        .page-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 40px;
+            text-align: center;
+            letter-spacing: -0.04em;
+        }
+        
+        /* Pricing card */
+        .pricing-card {
+            background: #181818;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            max-width: 670px;
+            max-height: 220px;
+            margin: 0 auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+        }
+        
+        /* Left side of card */
+        .card-left {
+            background: #282828;
+            color: white;
+            padding: 40px 30px;
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .card-left h1 {
+            font-size: 27px;
+            margin-bottom: 0px;
+            margin-top: 20px;
+            font-weight: 700;
+            color: #5dcef0; /* Spotify green */
+        }
+        
+        .price {
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        
+        .duration {
+            font-size: 16px;
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+        
+        .buy-button {
 
-/* Reset some default margins */
-body, h1, p, form {
-    margin: 0;
-    padding: 0;
-}
- 
- /* Main content container */
- .content {
-    width: 90%;
-    max-width: 500px;
-    background-color: #ffffff;
-    margin: 40px auto;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    padding: 30px 20px;
-    box-sizing: border-box;
-    margin-top: 50px;
-}
-
-.content h1 {
-    color: #1e3c72;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 28px;
-}
-
-.content p {
-    text-align: center;
-    color: #555;
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
-form label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-    font-size: 16px;
-}
-
-form input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #1e3c72;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
-
-form input[type="submit"] {
-    width: 100%;
-    padding: 14px;
-    background-color: #1e3c72;
-    color: #ffffff;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-form input[type="submit"]:hover {
-    background-color: #16345d;
-}
-
-/* Flash messages */
-.flash-messages {
-    list-style: none;
-    padding: 0;
-}
-
-.flash-messages li {
-    color: red;
-
-    font-size: 12px;
-    text-align: center;
-}
-
-
-
-/* Responsive - make it more mobile friendly */
-@media (max-width: 600px) {
-    .content {
-        padding: 20px 15px;
-        margin-top: 30px;
-    }
-
-    .content h1 {
-        font-size: 24px;
-    }
-
-    form input[type="submit"] {
-        padding: 12px;
-        font-size: 15px;
-    }
-}
-
-
-</style>
-    
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .buy-button button {
+            background-color: #4aa4c0; /* Spotify green */
+            color: #000000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            
+        }
+        
+        .buy-button button:hover {
+            background-color: #5dcef0;
+            transform: scale(1.05);
+        }
+        
+        .buy-button a {
+            text-decoration: none;
+            color: #000000;
+            display: block;
+            width: 100%;
+        }
+        
+        /* Right side of card - features */
+        .features {
+            padding: 40px 30px;
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .features div {
+            padding: 2px 0;
+            font-size: 12px;
+            color: #b3b3b3;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #282828;
+        }
+        
+        .features div:last-child {
+            border-bottom: none;
+        }
+        
+        .features div:before {
+            content: "✓";
+            color: #5dcef0; /* Spotify green */
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+        
+        /* Additional plan info */
+        .plan-info {
+            max-width: 800px;
+            margin: 35px auto 0;
+            padding: 25px;
+            background-color: #181818;
+            border-radius: 8px;
+            border-left: 4px solid #5dcef0; /* Spotify green */
+            max-height: 70px;
+            margin-top: 20px;
+        }
+        
+        .plan-info h2 {
+            color: #ffffff;
+            margin-bottom: 10px;
+            margin-top: -7px;
+            font-size: 18px;
+            font-weight: 700;
+            
+        }
+        
+        .plan-info p {
+            color: #b3b3b3;
+            font-size: 12.5px;
+            line-height: 1.6;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .pricing-card {
+                flex-direction: column;
+                max-width: 400px;
+            }
+            
+            .card-left, .features {
+                width: 100%;
+                padding: 30px 20px;
+            }
+            
+            .page-title {
+                font-size: 28px;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Pricing Plan Section -->
-  <div class="container">
-    <div class="pricing-card">
-      <div class="card-left">
-
-        <h1>Plan</h1>
-        <div class="price">RM 0.00</div>
-        <div class="duration">/ 3 month</div>
-        <div class="buy-button">
-          <button><a href="https://shopee.com.my/">Buy Now</a></button>
+    <div class="container">
+        <h1 class="page-title">Subscription Plan</h1>
+        
+        <div class="pricing-card">
+            <div class="card-left">
+                <h1>Business Plan</h1>
+                <div class="price">RM 20.90</div>
+                <div class="duration">/ 3 months</div>
+                <div class="buy-button">
+                    <button><a href="https://shopee.com.my/">Get Started</a></button>
+                </div>
+            </div>
+            <div class="features">
+                <div>Full access to URLCHECK scanning tools</div>
+                <div>Detailed security analysis reports</div>
+                <div>Access to URL scanning history</div>
+                <div>Basic threat detection capabilities</div>
+                <div>Email support assistance</div>
+            </div>
         </div>
-      </div>
-      <div class="features">
-        <div>Full access to URLCHECK</div>
-        <div>Detail report scan</div>
-        <div>Get access to archive URL</div>
-      </div>
+        
+        <div class="plan-info">
+            <h2>Why Choose URLCHECK?</h2>
+            <p>URLCHECK provides comprehensive URL security scanning to protect you from phishing attempts, malware, and other online threats. Our advanced machine learning algorithms analyze URLs in real-time to detect suspicious patterns and potential security risks before you visit them.</p>
+        </div>
     </div>
-  </div>
+        <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px;  margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
+
 </body>
 </html>
 {% endblock %}

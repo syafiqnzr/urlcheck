@@ -5,81 +5,123 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>URLCHECK</title>
-<style>
-/* Reset some default margins */
-        body, h1, p, form {
+    <title>URLCHECK - Email Verification</title>
+    <style>
+               /* Reset and base styles */
+        body, h1, h2, p, div {
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            
         }
 
         /* Main content container */
+        
+        /* Main container */
         .content {
-            width: 90%;
-            max-width: 600px;
-            background-color: #ffffff;
+            max-width: 400px;
             margin: 40px auto;
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            padding: 30px 20px;
-            box-sizing: border-box;
-            margin-top: 50px;
-            position: center;
+            padding: 0 20px;
         }
-
-        .content h1 {
-            color: #1e3c72;
+        
+        /* Page title */
+        .page-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 30px;
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 28px;
+            letter-spacing: -0.04em;
+
         }
 
-    .content p2 {
-    display: block; /* Makes sure it's treated like a block-level element */
-    text-align: center;
-    color: #000000;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.5;
-    margin: 0 auto 20px auto; /* Horizontally center and keep bottom margin */
-    width: 380px; /* Shrinks the width to fit the content */
+        .page-subtitle {
+            color: #a7a7a7;
+            font-size: 16px;
+            margin-bottom: 32px;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        /* Add this to your existing styles */
+    .email-form {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .email_send-form label {
+        font-weight: 500;
+            margin-bottom: 5px;
+            color: #c40202;
+    }
+    
+    .email-form input {
+        flex: 1;
+        margin-bottom: 0; /* Override the existing margin */
+    }
+    
+    .email-form button {
+        margin-bottom: 0; /* Override the existing margin */
     }
 
-
-        label {
-            display: block;
-            font-weight: 500;;
-            margin-bottom: 10px;
-            color: #333;
-            font-size: 16px;
+         /* Login Form Styles */
+        .otp-form {
+            display: flex;
+            flex-direction: column;
         }
 
-
-
-        form input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            font-size: 14px;
-            border: 1px solid #1e3c72;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
+        .otp-form label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #b3b3b3;
         }
 
-        form input[type="email"] {
+        .email-form input, .otp-form input[type="text"],
+        .email-form input, .otp-form input[type="password"] {
             padding: 10px 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            margin-bottom: 20px;
+            background-color: #282828;
+            border: 1px solid #333;
+            border-radius: 30px;
+            margin-bottom: 18px;
             font-size: 14px;
-            width: 78.5%;
+            color: #ffffff;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
-        
+        .email-form input:focus, .otp-form input[type="text"]:focus,
+        .email-form input:focus, .otp-form input[type="password"]:focus{
+            border-color: #ffea00;
+            box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
+            outline: none;
+        }
 
-        /* Flash messages container */
+        .email-form button, .otp-form button{
+            margin-bottom: 20px;
+            padding: 12px;
+            background-color: #b8ac29;
+            color: rgb(0, 0, 0);
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .email-form button:hover, .otp-form button:hover{
+            background-color: #ffea00;
+            transform: scale(1.02);
+        }
+
+        /* Flash messages */
         .flash-messages {
             position: fixed;
             top: 85px;
@@ -91,12 +133,12 @@
         }
 
         .flash-messages li {
-            background-color: #36f456; /* Red background */
+            background-color: #E91429; /* Spotify red */
             color: white;
             padding: 15px 25px;
             margin-top: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             font-size: 14px;
             opacity: 0;
             transform: translateX(100%);
@@ -105,7 +147,6 @@
             min-width: 250px;
         }
 
-        /* Animation for slide in from right and fade out */
         @keyframes slideInOut {
             0% {
                 opacity: 0;
@@ -125,16 +166,62 @@
             }
         }
 
+        /* Loading overlay */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loading-container {
+            background-color: #282828;
+            width: 280px;
+            height: 180px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        #loading-spinner {
+            border: 6px solid #333333;
+            border-top: 6px solid #ffea00; /* Spotify green */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        #loading-message {
+            font-size: 16px;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg);}
             100% { transform: rotate(360deg);}
         }
 
-        /* Responsive - make it more mobile friendly */
+        /* Responsive design */
         @media (max-width: 600px) {
             .content {
+                width: 95%;
                 padding: 20px 15px;
-                margin-top: 30px;
+                margin: 20px auto;
             }
 
             .content h1 {
@@ -143,7 +230,6 @@
 
             form input[type="submit"] {
                 padding: 12px;
-                font-size: 15px;
             }
 
             .flash-messages li {
@@ -153,82 +239,16 @@
             }
 
             #loading-container {
-                width: 180px;
-                height: 110px;
-                padding: 12px;
-            }
-
-            #loading-spinner {
-                width: 40px;
-                height: 40px;
-                margin-bottom: 8px;
-            }
-
-            #loading-message {
-                font-size: 14px;
+                width: 240px;
+                height: 160px;
             }
         }
-
-    button {
-    padding: 12px;
-    background-color: #1e3c72;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 300;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.button:hover {
-    background-color: #16345d;
-    transform: scale(1.02);
-}
-
-.email-form button {
-    padding: 12px;
-    background-color: #16345d;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 300;
-    cursor: pointer;
-    width:16%;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.email-form button:hover {
-    background-color: #16345d;
-    transform: scale(1.02);
-}
-
-.otp-form button {
-    padding: 12px;
-    background-color: #16345d;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 300;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.otp-form button:hover {
-    background-color: #16345d;
-    transform: scale(1.02);
-}
-
-
-
     </style>
 
 </head>
 <body>
-    <h1>Forgot Password</h1>
+
+    <h1 class="page-title">Forgot Password</h1>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -239,21 +259,19 @@
           </ul>
     {% endif %}
     {% endwith %}
-
-    <label for="otp">Enter Email:</label>
-
     
+        <label for="email_send">Enter Email:</label>
     <form method="post" action="{{ url_for('send_reset_otp') }}" class="email-form">
+        
         <input type="email" id="email_send" name="email" placeholder="Email" required />
         <button type="submit">Send OTP</button>
     </form>
 
     <form method="post" action="{{ url_for('confirmation') }}" class="otp-form">
-        <label for="otp">Enter OTP</label>
+        <label for="otp">Enter OTP:</label>
         <input type="text" id="otp" name="otp" placeholder="OTP" required />
         <button type="submit">Confirm OTP</button>
     </form>
-
 <script>
      // Remove flash message on click
         document.addEventListener('DOMContentLoaded', function() {
@@ -279,6 +297,7 @@
             });
         });
 </script>
+
 </body>
 </html>
 {% endblock %}

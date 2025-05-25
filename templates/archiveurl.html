@@ -5,211 +5,249 @@
 {% endif %}
 
 {% block content %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>History</title>
-</head>
+    <title>Scan History</title>
     <style>
- 
- /* Main content container */
- .content {
-    width: 90%;
-    max-width: 20000px;
-    background-color: #ffffff;
-    margin: 40px auto;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    padding: 30px 20px;
-    box-sizing: border-box;
-    margin-top: 50px;
-}
+        /* Reset and base styles */
+        body, h1, table, tr, th, td {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
 
-.content h1 {
-    color: #1e3c72;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 28px;
-}
+        }
 
-.content p {
-    text-align: center;
-    color: #555;
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
-form label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-    font-size: 16px;
-}
-
-form input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #1e3c72;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
-
-form input[type="submit"] {
-    width: 100%;
-    padding: 14px;
-    background-color: #1e3c72;
-    color: #ffffff;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-form input[type="submit"]:hover {
-    background-color: #16345d;
-}
-
-/* Flash messages */
-.flash-messages {
-    list-style: none;
-    padding: 0;
-}
-
-.flash-messages li {
-    color: red;
-
-    font-size: 12px;
-    text-align: center;
-}
-
-/* Container to center the content */
+        /* Main container */
         .container {
             max-width: 1200px;
             margin: 40px auto;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            background-color: #ffffff;
-            border-radius: 10px;
+            padding: 0 20px;
+        }
+        
+        /* Page title */
+        .page-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 48px;
+            text-align: center;
+            letter-spacing: -0.04em;
+
         }
 
-        /* Table Styling */
+        /* Table styling */
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: auto; /* Allow flexible column width */
-            font-size: 12px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px 15px;
-            word-wrap: break-word; /* Allow long text to wrap */
-        }
-        th {
-            background-color: #f5f5f5;
-            text-align: left;
-            font-weight: bold;
-        }
-        td {
-            vertical-align: top;
+            margin-top: 20px;
+            font-size: 14px;
+            
         }
 
-        /* Responsive for smaller screens */
+        th {
+            background-color: #282828;
+            color: #ffffff;
+            font-weight: 600;
+            text-align: left;
+            padding: 15px;
+            border-bottom: 2px solid #333333;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #333333;
+            color: #b3b3b3;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: #222222;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* URL column with truncation */
+        .url-cell {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Classification styling */
+        .classification {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .safe {
+            background-color: #1DB954; /* Spotify green */
+            color: #000000;
+        }
+
+        .suspicious {
+            background-color: #E91429; /* Spotify red */
+            color: #ffffff;
+        }
+
+        /* Center align the classification column */
+        td[data-label="Classification"] {
+            text-align: center;
+        }
+
+        /* Detail button */
+        .detail-button {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .detail-button:hover {
+            background-color: #ffea00; /* Spotify green */
+            color: #000000;
+            transform: scale(1.05);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #b3b3b3;
+            font-style: italic;
+        }
+
+        /* Responsive design */
         @media (max-width: 768px) {
             .container {
+                padding: 20px 15px;
                 margin: 20px;
-                padding: 15px;
             }
+
             table, thead, tbody, th, td, tr {
                 display: block;
             }
+
             thead tr {
-                display: none; /* Hide the header on small screens */
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
             }
+
+            tr {
+                margin-bottom: 15px;
+                background-color: #222222;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
             td {
                 position: relative;
                 padding-left: 50%;
-                border: none;
-                border-bottom: 1px solid #eee;
+                text-align: center;
+                border-bottom: 1px solid #333333;
             }
+
             td:before {
                 position: absolute;
-                top: 12px;
+                top: 15px;
                 left: 15px;
                 width: 45%;
                 padding-right: 10px;
                 white-space: nowrap;
+                text-align: center;
                 font-weight: bold;
+                content: attr(data-label);
+                color: #ffffff;
             }
-            td:nth-of-type(1):before { content: "URL"; }
-            td:nth-of-type(2):before { content: "Classification"; }
-            td:nth-of-type(3):before { content: "Note"; }
-            td:nth-of-type(4):before { content: "Sender"; }
-            td:nth-of-type(5):before { content: "Detail"; }
+
+            td:nth-of-type(1):before { content: "No."; }
+            td:nth-of-type(2):before { content: "URL"; }
+            td:nth-of-type(3):before { content: "Classification"; }
+            td:nth-of-type(4):before { content: "Note"; }
+            td:nth-of-type(5):before { content: "Date"; }
+            td:nth-of-type(6):before { content: "Detail"; }
+
+            .url-cell {
+                max-width: none;
+                white-space: normal;
+                word-break: break-all;
+            }
         }
 
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 24px;
+            }
 
-/* Responsive - make it more mobile friendly */
-@media (max-width: 600px) {
-    .content {
-        padding: 20px 15px;
-        margin-top: 30px;
-    }
-
-    .content h1 {
-        font-size: 24px;
-    }
-
-    form input[type="submit"] {
-        padding: 12px;
-        font-size: 15px;
-    }
-}
+            td {
+                padding: 12px 15px 12px 50%;
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Scan History</h1>
+    <div class="container">
+        <h1 class="page-title">Scan History</h1>
 
-    
-
-    <table>
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>URL</th>
-                <th>Classification</th>
-                <th>Note</th>
-                <th>Date</th>
-                <th>Detail</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in results %}
-            <tr>
-                <td>{{ loop.index }}</td> <!-- This automatically numbers rows -->
-                <td>{{ row.url }}</td>
-                <td>{{ row.classification }}</td>
-                <td>{{ row.note }}</td>
-                <td>{{ row.timestamp }}</td>
-                <td>
-                    <a href="{{ url_for('details_by_url', url_encoded=row.url|urlencode) }}" class="btn btn-primary">Detail</a>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="6">No results found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
+        <table>
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>URL</th>
+                    <th style="text-align: center;">Classification</th>
+                    <th>Note</th>
+                    <th>Date</th>
+                    <th style="text-align: center;">Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results %}
+                <tr>
+                    <td data-label="No.">{{ loop.index }}</td>
+                    <td data-label="URL" class="url-cell">{{ row.url }}</td>
+                    <td data-label="Classification">
+                        <span class="classification {% if row.classification == 'Safe' %}safe{% else %}suspicious{% endif %}">
+                            {{ row.classification }}
+                        </span>
+                    </td>
+                    <td data-label="Note">{{ row.note }}</td>
+                    <td data-label="Date">{{ row.timestamp }}</td>
+                    <td data-label="Detail">
+                        <a href="{{ url_for('details_by_url', url_encoded=row.url|urlencode) }}" class="detail-button">View Details</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="empty-state">No scan history found. Try scanning some URLs first.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
 {% endblock %}

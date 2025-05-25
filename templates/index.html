@@ -5,95 +5,113 @@
 {% endif %}
 
 {% block content %}
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PURLCHECK</title>
+    <title>URLCHECK</title>
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-
- 
     <style>
-        body, h1, p, form {
+        /* Reset and base styles */
+        body, h1, h2, p, div {
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #ffffff;
             
         }
 
         /* Main content container */
-        .content {
-            width: 90%;
-            max-width: 600px;
-            background-color: #ffffff;
+        
+        /* Main container */
+        .container {
+            max-width: 1200px;
             margin: 40px auto;
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            padding: 30px 20px;
-            box-sizing: border-box;
-            margin-top: 50px;
-            position: center;
+            padding: 0 20px;
         }
-
-        .content h1 {
-            color: #1e3c72;
+        
+        /* Page title */
+        .page-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 30px;
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 28px;
+            letter-spacing: -0.04em;
+
         }
 
-    .content p2 {
-    display: block; /* Makes sure it's treated like a block-level element */
-    text-align: center;
-    color: #000000;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.5;
-    margin: 0 auto 25px auto; /* Horizontally center and keep bottom margin */
-    width: 380px; /* Shrinks the width to fit the content */
-}
+        
 
+        .content p {
+            color: #b3b3b3;
+            font-size: 14px;
+            margin-bottom: 30px;
+            text-align: center;
+            
+        }
 
+        /* Form styling */
+        .scan-form {
+            background-color: #282828;
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 710px;
+            margin: 0 auto;
+        }
 
         form label {
             display: block;
-            margin-bottom: 7px;
-            font-family: 'Calibri';
-            color: #333;
+            margin-bottom: 10px;
+            color: #ffffff;
             font-size: 16px;
+            font-weight: 500;
+            text-align: left;
         }
 
         form input[type="text"] {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             font-size: 16px;
-            border: 1px solid #1e3c72;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            border: none;
+            background-color: #333333;
+            color: #ffffff;
+            border-radius: 4px;
+            margin-bottom: 20px;
             box-sizing: border-box;
+            transition: background-color 0.3s;
+        }
+
+        form input[type="text"]:focus {
+            outline: none;
+            background-color: #404040;
+            box-shadow: 0 0 0 2px rgba(248, 236, 0, 0.5);
         }
 
         form input[type="submit"] {
             width: 100%;
             padding: 14px;
-            background-color: #1e3c72;
-            color: #ffffff;
+            background-color:  #4aa4c0; /* Spotify green */
+            color: #000000;
             font-size: 16px;
+            font-weight: 700;
             border: none;
-            border-radius: 8px;
+            border-radius: 30px;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         form input[type="submit"]:hover {
-            background-color: #16345d;
+            background-color: #5dcef0;
+            transform: scale(1.02);
         }
 
-        /* Flash messages container */
+        /* Flash messages */
         .flash-messages {
             position: fixed;
             top: 85px;
@@ -105,12 +123,12 @@
         }
 
         .flash-messages li {
-            background-color: #f44336; /* Red background */
+            background-color: #E91429; /* Spotify red */
             color: white;
             padding: 15px 25px;
             margin-top: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             font-size: 14px;
             opacity: 0;
             transform: translateX(100%);
@@ -119,7 +137,6 @@
             min-width: 250px;
         }
 
-        /* Animation for slide in from right and fade out */
         @keyframes slideInOut {
             0% {
                 opacity: 0;
@@ -148,17 +165,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.7);
             align-items: center;
             justify-content: center;
         }
 
         #loading-container {
-            background-color: white;
+            background-color: #282828;
             width: 280px;
             height: 180px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -169,18 +186,18 @@
         }
 
         #loading-spinner {
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #1e3c72;
+            border: 6px solid #333333;
+            border-top: 6px solid #ffea00; /* Spotify green */
             border-radius: 50%;
             width: 50px;
             height: 50px;
             animation: spin 1s linear infinite;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         #loading-message {
             font-size: 16px;
-            color: #1e3c72;
+            color: #ffffff;
             font-weight: 600;
         }
 
@@ -189,11 +206,12 @@
             100% { transform: rotate(360deg);}
         }
 
-        /* Responsive - make it more mobile friendly */
+        /* Responsive design */
         @media (max-width: 600px) {
             .content {
+                width: 95%;
                 padding: 20px 15px;
-                margin-top: 30px;
+                margin: 20px auto;
             }
 
             .content h1 {
@@ -202,7 +220,6 @@
 
             form input[type="submit"] {
                 padding: 12px;
-                font-size: 15px;
             }
 
             .flash-messages li {
@@ -212,31 +229,25 @@
             }
 
             #loading-container {
-                width: 180px;
-                height: 110px;
-                padding: 12px;
-            }
-
-            #loading-spinner {
-                width: 40px;
-                height: 40px;
-                margin-bottom: 8px;
-            }
-
-            #loading-message {
-                font-size: 14px;
+                width: 240px;
+                height: 160px;
             }
         }
     </style>
 </head>
 <body>
-    <h1>Scan Now !!</h1>
-    <!-- Show login/register or logout depending on session -->
-    
-    <p2>Check if a link is safe to open with URLCHECK. Avoid suspicious websites and getting scammed online.</p2>
-    <form method="post" action="/result" id="scan-form">
-        <label for="url">Enter URL to scan:</label>
-        <input type="text" name="url" id="url" size="60" required />
+<div class="container">
+    <h1 class="page-title">Scan Now!!</h1>
+        <p>Check if a link is safe to open with URLCHECK. Protect yourself<br>from suspicious websites and online scams.</p>
+        
+        <div class="scan-form">
+            <form method="post" action="/result" id="scan-form">
+                <label for="url">Enter URL to scan:</label>
+                <input type="text" name="url" id="url" placeholder="https://example.com" required />
+                <input type="submit" value="Scan URL" />
+            </form>
+        </div>
+
         {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="flash-messages" id="flash-messages">
@@ -246,16 +257,15 @@
           </ul>
         {% endif %}
         {% endwith %}
-        <input type="submit" value="Scan URL" />
-    </form>
+
 
     <div id="loading-overlay">
         <div id="loading-container">
             <div id="loading-spinner"></div>
-            <div id="loading-message">Loading...</div>
+            <div id="loading-message">Analyzing URL...</div>
         </div>
     </div>
-
+</div>
     <script>
         // Remove flash message on click
         document.addEventListener('DOMContentLoaded', function() {
@@ -269,18 +279,16 @@
                 });
             });
 
-            // Show loading overlay on form submit and prevent multiple submits
+            // Show loading overlay on form submit
             const form = document.getElementById('scan-form');
             form.addEventListener('submit', function(event) {
-                // Show loading overlay
                 document.getElementById('loading-overlay').style.display = 'flex';
-
-                // Disable submit button to prevent multiple submits
                 const submitButton = form.querySelector('input[type="submit"]');
                 submitButton.disabled = true;
             });
         });
     </script>
+        <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px;  margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 </body>
 </html>
 {% endblock %}
