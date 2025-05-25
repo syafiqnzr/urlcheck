@@ -190,6 +190,8 @@ form input[type="submit"]:hover {
         <p><strong>Age:</strong> {{ scan.age }}</p>
         <p><strong>Classification:</strong> {{ scan.classification }}</p>
         <p><strong>Sender:</strong> {{ scan.sender }}</p>
+        <p><strong>ML Prediction:</strong> {{ ml_prediction }}</p>
+        <p><strong>ML Note:</strong> {{ ml_note }}</p>
     {% else %}
         <p>No scan result available.</p>
     {% endif %}

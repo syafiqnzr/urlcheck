@@ -147,7 +147,7 @@ def result():
         return redirect(url_for('index'))
 
     # Run classification and analysis
-    final_result, note, breakdown, reasons, mitigation, domain, ip_address = classify_url(url)
+    final_result, note, breakdown, reasons, mitigation, domain, ip_address = classify_url(original_url, url)
     _, creation_date, age = get_domain_age(url)
     _, registrar = get_domain_registrar(url)
     _, _, updated_date, expiry_date = get_domain_details(url)
@@ -158,6 +158,12 @@ def result():
     raw_prediction = trainedmodel.predict(url_vector)[0]
     ml_prediction = 'Safe' if raw_prediction == 0 else 'Suspicious'
 
+    # Generate ml_note based on ML prediction
+    if raw_prediction == 1:
+        ml_note = "Warning: This URL may lead to a fake or harmful website designed to steal your personal information."
+    else:
+        ml_note = "This URL appears to be safe and does not show signs of harmful content."
+
     sender = session.get('username', 'guest')
 
     cursor = db.cursor(dictionary=True)
@@ -166,12 +172,12 @@ def result():
     insert_summary_query = """
     INSERT INTO scan_results (
         url, domain, ip_address, protocol, creation_date, updated_date,
-        expiry_date, age, registrar, url_length, classification, ml_prediction, note, sender
-    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        expiry_date, age, registrar, url_length, classification, ml_prediction, note, ml_note, sender
+    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     cursor.execute(insert_summary_query, (
         url, domain, ip_address, protocol, str(creation_date), str(updated_date),
-        str(expiry_date), age, registrar, url_length, final_result, ml_prediction, note, sender
+        str(expiry_date), age, registrar, url_length, final_result, ml_prediction, note, ml_note, sender
     ))
 
     # Save breakdown details
@@ -232,7 +238,7 @@ def details():
     # Get scan result for the given URL
     cursor.execute("""
         SELECT url, domain, ip_address, protocol, creation_date, updated_date,
-               expiry_date, age, registrar, url_length, classification, note, sender
+               expiry_date, age, registrar, url_length, classification, ml_prediction, note, ml_note, sender
         FROM scan_results
         WHERE url = %s
         ORDER BY id DESC
@@ -273,6 +279,10 @@ def details():
 
     cursor.close()
 
+    # Fetch ML prediction and note from scan_results table
+    ml_prediction = scan_result.get('ml_prediction', '')
+    ml_note = scan_result.get('note', '')
+
     return render_template(
         'detail_result.html',
         user=user,
@@ -280,6 +290,8 @@ def details():
         scan_url=url,
         sender=sender,
         features=features,
+        ml_prediction=ml_prediction,
+        ml_note=ml_note,
         is_admin=is_admin
     )
 
@@ -306,7 +318,7 @@ def details_by_url(url_encoded):
     # Get scan result for the given URL
     cursor.execute("""
         SELECT url, domain, ip_address, protocol, creation_date, updated_date,
-               expiry_date, age, registrar, url_length, classification, note, sender
+               expiry_date, age, registrar, url_length, classification, ml_prediction, note, sender
         FROM scan_results
         WHERE url = %s
         ORDER BY id DESC

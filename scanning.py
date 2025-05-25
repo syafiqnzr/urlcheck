@@ -205,7 +205,7 @@ def is_valid_url(url):
         r'(\/[A-Z0-9._%+-]*)*$', re.IGNORECASE)  # Path
     return bool(url_regex.match(url))
 
-def classify_url(url):
+def classify_url(original_url, url):
     """Classifies a URL based on ML prediction and URL Breakdown Analysis."""
 
     def get_domain_extension(domain):
@@ -218,11 +218,11 @@ def classify_url(url):
     parsed_url = urlparse(url)
     domain = parsed_url.netloc if parsed_url.netloc else parsed_url.path
 
-    # ML Model Prediction
-    url_vector = vectorizer.transform([original_url])  # Use 'url' instead of 'original_url'
+    # ML Model Prediction using original_url
+    url_vector = vectorizer.transform([original_url])
     ml_prediction = trainedmodel.predict(url_vector)[0]  # 0 (Safe) or 1 (Malicious)
 
-    # URL Breakdown Analysis
+    # URL Breakdown Analysis using url
     breakdown_results, reasons, mitigation = analyze_url_parts(url)
 
     scheme = breakdown_results.get('Scheme', 0)
