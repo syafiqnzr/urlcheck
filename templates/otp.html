@@ -5,125 +5,233 @@
 <html>
 <head>
     <title>OTP Verification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
+        /* Reset and base styles */
+        body, h1, h2, p, div {
             margin: 0;
             padding: 0;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .content {
-    width: 90%;
-    max-width: 500px;
-    background-color: #ffffff;
-    margin: 40px auto;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    padding: 30px 20px;
-    box-sizing: border-box;
-    margin-top: 50px;
-    margin-bottom: 80px; /* <-- adds space below the container */
-}
+        /* Dark mode base styles */
+        body {
+            background: linear-gradient(135deg, #141719 0%, #121212 100%);
+            color: #ffffff;
+        }
 
-.content:hover {
-    transform: scale(1.01);
-    transition: transform 0.3s ease;
-}
+        /* Input field styling for dark mode */
+        input[type="text"],
+        input[type="text"]:focus,
+        input[type="text"]:active,
+        input[type="text"]:hover,
+        input[type="password"],
+        input[type="password"]:focus,
+        input[type="email"],
+        input[type="email"]:focus,
+        textarea,
+        textarea:focus,
+        select,
+        select:focus {
+            background-color: #333333 !important;
+            color: #ffffff !important;
+            border: 1px solid #444444;
+            outline-color: #1e3c72;
+        }
 
-        h1 {
-            text-align: center;
-            font-weight: 700;
-            color: #1e3c72;
+        /* Override browser autofill styles which often use white backgrounds */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #333333 inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Page title */
+        .page-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
             margin-bottom: 30px;
-            font-size: 28px;
+            text-align: center;
+            letter-spacing: -0.04em;
         }
 
-        form {
+        /* OTP Form Styles */
+        .otp-form {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            width: 30%;
+            margin: auto;
         }
 
-        label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
+        .otp-form label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #b3b3b3;
             font-size: 14px;
-            align-self: flex-start;
         }
 
-        input[type="text"] {
-            width: 100%;
+        .otp-form input[type="text"] {
             padding: 10px 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            background-color: #282828;
+            border: 1px solid #333;
+            border-radius: 30px;
+            margin-bottom: 18px;
             font-size: 16px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
+            color: #ffffff;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
             text-align: center;
-            letter-spacing: 10px;
+            letter-spacing: 8px;
+            box-sizing: border-box;
         }
 
-        input[type="text"]:focus {
-            border-color: #1e3c72;
-            box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.15);
+        .otp-form input[type="text"]:focus {
+            border-color: #5dcef0;
+            box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
             outline: none;
         }
 
-        button {
-            background-color: #1e3c72;
-            color: white;
+        .otp-form button {
+            margin-top: 10px;
+            padding: 12px;
+            background-color: #4aa4c0;
+            color: rgb(0, 0, 0);
             border: none;
-            border-radius: 8px;
-            padding: 14px 0;
+            border-radius: 25px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        button:hover {
-            background-color: #16325c;
+        .otp-form button:hover {
+            background-color: #5dcef0;
+            transform: scale(1.02);
         }
 
-        .error {
-            color: red;
-            background-color: #ffe6e6;
-            padding: 10px;
-            border: 1px solid #ffcccc;
-            border-radius: 6px;
-            margin-bottom: 15px;
+        /* Flash messages container */
+        .flash-messages {
+            position: fixed;
+            top: 85px;
+            right: -2px;
+            z-index: 9999;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .flash-messages li {
+            background-color: #ff0019a8;
+            color: white;
+            padding: 15px 25px;
+            margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             font-size: 14px;
-            text-align: left;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideInOut 5s forwards;
+            cursor: pointer;
+            min-width: 250px;
+        }
+
+        /* Animation for slide in from right and fade out */
+        @keyframes slideInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            10% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            90% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 15px;
+                margin: 20px auto;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .otp-form {
+                width: 90%;
+            }
+
+            .otp-form button {
+                padding: 12px;
+                font-size: 15px;
+            }
+
+            .flash-messages li {
+                min-width: 200px;
+                padding: 12px 20px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>
 <body>
-
-        <h1>OTP Verification</h1>
+    <div class="container">
+        <h1 class="page-title">OTP Verification</h1>
 
         {% with messages = get_flashed_messages(category_filter=["error", "success"]) %}
           {% if messages %}
-            <div class="error">
+            <ul class="flash-messages" id="flash-messages">
               {% for message in messages %}
-                <p>{{ message }}</p>
+                <li>{{ message }}</li>
               {% endfor %}
-            </div>
+            </ul>
           {% endif %}
         {% endwith %}
 
         <form method="POST" class="otp-form">
             <label for="otp">Enter the 6-digit OTP sent to your email:</label>
-<input type="text" name="otp" id="otp" maxlength="6" pattern="\d{6}" required autofocus>
-
+            <input type="text" name="otp" id="otp" maxlength="6" pattern="\d{6}" required autofocus>
             <button type="submit">Verify OTP</button>
         </form>
-    
+    </div>
+
+    <!-- Copyright notice -->
+    <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%; left: 0px;">Copyright © URLCHECK 2025</p>
+
+    <script>
+        // Remove flash message on click
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-messages li');
+            flashMessages.forEach(function(msg) {
+                msg.addEventListener('click', function() {
+                    msg.style.animation = 'slideOut 0.5s forwards';
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 500);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
 

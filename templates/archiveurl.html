@@ -18,9 +18,9 @@
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background-color: #121212;
+    background: linear-gradient(135deg, #141719 0%, #121212 100%);
 
         }
 
@@ -30,7 +30,7 @@
             margin: 40px auto;
             padding: 0 20px;
         }
-        
+
         /* Page title */
         .page-title {
             font-size: 48px;
@@ -48,7 +48,7 @@
             border-collapse: collapse;
             margin-top: 20px;
             font-size: 14px;
-            
+
         }
 
         th {
@@ -87,7 +87,7 @@
         .classification {
             display: inline-block;
             padding: 5px 10px;
-            border-radius: 20px;
+            border-radius: 5px;
             font-size: 12px;
             font-weight: 600;
             text-align: center;
@@ -109,6 +109,11 @@
             text-align: center;
         }
 
+        /* Center align the date column */
+        td[data-label="Date"] {
+            text-align: center;
+        }
+
         /* Detail button */
         .detail-button {
             display: inline-block;
@@ -126,7 +131,7 @@
         }
 
         .detail-button:hover {
-            background-color: #ffea00; /* Spotify green */
+            background-color: #4aa4c0; /* Spotify green */
             color: #000000;
             transform: scale(1.05);
         }
@@ -220,7 +225,7 @@
                     <th>URL</th>
                     <th style="text-align: center;">Classification</th>
                     <th>Note</th>
-                    <th>Date</th>
+                    <th style="text-align: center;">Date</th>
                     <th style="text-align: center;">Detail</th>
                 </tr>
             </thead>
@@ -234,8 +239,8 @@
                             {{ row.classification }}
                         </span>
                     </td>
-                    <td data-label="Note">{{ row.note }}</td>
-                    <td data-label="Date">{{ row.timestamp }}</td>
+                    <td data-label="Note">{{ row.note }}</td> 
+                    <td data-label="Date">{{ row.timestamp.strftime('%d.%m.%Y %H:%M') if row.timestamp else 'N/A' }}</td>
                     <td data-label="Detail">
                         <a href="{{ url_for('details_by_url', url_encoded=row.url|urlencode) }}" class="detail-button">View Details</a>
                     </td>

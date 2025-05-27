@@ -8,81 +8,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* Main content container */
- .content {
-    width: 90%;
-    max-width: 1200px;
-    background-color: #ffffff;
-    margin: 40px auto;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    padding: 30px 20px;
-    box-sizing: border-box;
-    margin-top: 50px;
-}
+        /* Reset and base styles */
+        body, h1, h2, p, div {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-.content h1 {
-    color: #1e3c72;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 28px;
-}
+        /* Dark theme base styles */
+        body {
+            background: linear-gradient(135deg, #141719 0%, #121212 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
 
-.content p {
-    text-align: center;
-    color: #555;
-    font-size: 18px;
-    margin-bottom: 20px;
-}
+        /* Input field styling for dark mode */
+        input[type="text"],
+        input[type="text"]:focus,
+        input[type="text"]:active,
+        input[type="text"]:hover,
+        input[type="password"],
+        input[type="password"]:focus,
+        input[type="email"],
+        input[type="email"]:focus,
+        textarea,
+        textarea:focus,
+        select,
+        select:focus {
+            background-color: #333333 !important;
+            color: #ffffff !important;
+            border: 1px solid #444444;
+            outline-color: #b148f3;
+        }
 
-form label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-    font-size: 16px;
-}
+        /* Override browser autofill styles */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #333333 inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
 
-form input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #1e3c72;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
+        /* Main container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
 
-form input[type="submit"] {
-    width: 100%;
-    padding: 14px;
-    background-color: #1e3c72;
-    color: #ffffff;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
+            align-items: center;
+        }
 
-form input[type="submit"]:hover {
-    background-color: #16345d;
-}
+        /* Page title */
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 52px;
+            font-weight: 900;
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 20px;
+            letter-spacing: -0.04em;
+            text-shadow: 0 4px 20px rgba(177, 72, 243, 0.3);
+        }
 
-/* Flash messages */
-.flash-messages {
-    list-style: none;
-    padding: 0;
-}
+        /* Subtitle */
+        .page-subtitle {
+            font-size: 18px;
+            color: #b3b3b3;
+            text-align: center;
+            margin-bottom: 0px;
+            font-weight: 300;
+        }
 
-.flash-messages li {
-    color: red;
+        /* Dashboard content wrapper */
+        .dashboard-content {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+                        margin-bottom: 85px;
+        }
 
-    font-size: 12px;
-    text-align: center;
-}
+        /* Form styling */
+        form input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #282828;
+            border: 1px solid #444444;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            color: #ffffff;
+        }
+
+        form input[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background-color: #b148f3;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #9a3dd9;
+            transform: translateY(-1px);
+        }
+
+        /* Flash messages */
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+        }
+
+        .flash-messages li {
+            color: #ff6b6b;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(255, 107, 107, 0.1);
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
 
 
 
@@ -102,116 +163,319 @@ form input[type="submit"]:hover {
         font-size: 15px;
     }
 }
-        /* General Reset */
-        
-        .row {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
+        /* Grid layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+            justify-items: center;
         }
 
+        /* Single row for all cards */
+        .cards-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: nowrap;
+            align-items: stretch;
+            width: 100%;
+            max-width: 1300px;
+        }
+
+        /* Enhanced card styling - horizontal layout */
         .card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(145deg, #2a2a2a 0%, #1e1e1e 100%);
+            border: 1px solid #404040;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
             overflow: hidden;
-            width: 300px;
+            flex: 1;
+            max-width: 300px;
+            min-width: 240px;
             text-align: center;
-            transition: transform 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            height: auto;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #b148f3, #9a3dd9, #b148f3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
         }
 
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(177, 72, 243, 0.25);
+            border-color: #b148f3;
         }
 
         .card-body {
-            padding: 20px;
+            padding: 25px 20px;
+            position: relative;
+        }
+
+        .card-icon {
+            font-size: 2.2rem;
+            color: #b148f3;
+            margin-bottom: 15px;
+            display: block;
         }
 
         h3 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #444;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+            font-weight: 600;
+            line-height: 1.3;
         }
 
+        .card-description {
+            font-size: 12px;
+            color: #b3b3b3;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* Enhanced button styling - smaller size */
         .btn {
             display: inline-block;
-            padding: 10px 20px;
-            font-size: 1rem;
+            padding: 10px 24px;
+            font-size: 12px;
+            font-weight: 600;
             border: none;
-            border-radius: 4px;
+            border-radius: 25px;
             cursor: pointer;
             text-decoration: none;
-            transition: background 0.3s ease, transform 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            position: relative;
+            overflow: hidden;
+            min-width: 140px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-primary {
-            background-color: #007bff;
-            color: #fff;
+            background: linear-gradient(135deg, #b148f3 0%, #9a3dd9 100%);
+            color: #ffffff;
+            box-shadow: 0 6px 20px rgba(177, 72, 243, 0.4);
         }
 
         .btn-primary:hover {
-            background-color: #0056b3;
+            background: linear-gradient(135deg, #9a3dd9 0%, #8a2be2 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(177, 72, 243, 0.5);
         }
 
         .btn-success {
-            background-color: #28a745;
-            color: #fff;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
         }
 
         .btn-success:hover {
-            background-color: #1e7e34;
+            background: linear-gradient(135deg, #1e7e34 0%, #17a2b8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.5);
         }
 
-        .btn:hover {
-            transform: scale(1.05);
-        }
-
+        /* Alert styling for dark mode */
         .alert {
             margin: 20px 0;
-            padding: 15px;
+            padding: 15px 20px;
             border: 1px solid transparent;
-            border-radius: 4px;
+            border-radius: 8px;
             text-align: left;
+            backdrop-filter: blur(10px);
         }
 
         .alert-dismissible {
-            padding-right: 35px;
+            padding-right: 45px;
             position: relative;
         }
 
         .alert-dismissible .btn-close {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 15px;
+            right: 15px;
             background: none;
             border: none;
             font-size: 1.2rem;
             cursor: pointer;
+            color: inherit;
+            opacity: 0.7;
         }
 
         .alert-dismissible .btn-close:hover {
-            color: #000;
+            opacity: 1;
         }
 
         .alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
+            background-color: rgba(40, 167, 69, 0.15);
+            border-color: rgba(40, 167, 69, 0.3);
+            color: #4caf50;
         }
 
         .alert-error {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
+            background-color: rgba(220, 53, 69, 0.15);
+            border-color: rgba(220, 53, 69, 0.3);
+            color: #ff6b6b;
+        }
+        /* Remove old column layout - not needed for horizontal layout */
+
+        /* Enhanced responsive design */
+        @media (max-width: 1200px) {
+            .cards-row {
+                gap: 12px;
+            }
+
+            .card {
+                max-width: 280px;
+                min-width: 220px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .cards-row {
+                flex-wrap: wrap;
+                gap: 15px;
+                justify-content: center;
+            }
+
+            .card {
+                max-width: 240px;
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 15px;
+            }
+
+            .page-title {
+                font-size: 36px;
+                margin-bottom: 15px;
+            }
+
+            .page-subtitle {
+                font-size: 16px;
+                margin-bottom: 40px;
+            }
+
+            .cards-row {
+                flex-direction: column;
+                gap: 20px;
+                align-items: center;
+            }
+
+            .card {
+                width: 100%;
+                max-width: 280px;
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 28px;
+            }
+
+            .card {
+                width: 100%;
+                max-width: 260px;
+            }
+
+            .card-body {
+                padding: 20px 15px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 11px;
+                min-width: 120px;
+            }
+        }
+
+        /* Additional professional styling */
+        .row {
+            margin-bottom: 30px;
+        }
+
+        .mt-4 {
+            margin-top: 1.5rem;
+        }
+
+        /* Welcome section */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Stats or additional info section */
+        .stats-section {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            color: #b3b3b3;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #b148f3;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <div2 class="container">
-        <h1 class="text-center">Admin Dashboard</h1>
+    <div class="container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1 class="page-title">Admin Dashboard</h1>
 
-        
+        </div>
+
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -226,49 +490,51 @@ form input[type="submit"]:hover {
         {% endif %}
         {% endwith %}
 
-        <div class="row">
-            <div class="col-6">
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- All Cards in One Row -->
+            <div class="cards-row">
                 <div class="card">
-                    <div class="card-body text-center">
-                        <h3>Go to Admin Archive</h3>
+                    <div class="card-body">
+                        <div class="card-icon">📁</div>
+                        <h3>Admin Archive</h3>
+                        <p class="card-description">View and manage archived URLs and scan results</p>
                         <a href="{{ url_for('admin_archiveurl') }}" class="btn btn-primary">Go to Archive</a>
                     </div>
                 </div>
-            </div>
-            <div class="col-6">
+
                 <div class="card">
-                    <div class="card-body text-center">
-                        <h3>Go to Training Model</h3>
-                        <a href="{{ url_for('update_trainingmodel') }}" class="btn btn-success">Go to Training Model</a>
+                    <div class="card-body">
+                        <div class="card-icon">🤖</div>
+                        <h3>Training Model</h3>
+                        <p class="card-description">Update and manage machine learning models</p>
+                        <a href="{{ url_for('update_trainingmodel') }}" class="btn btn-success">Training Model</a>
                     </div>
                 </div>
-            </div>
-        </div>
-        <br> <br>
-            <div class="row">
-            <div class="col-6">
+
                 <div class="card">
-                    <div class="card-body text-center">
-                        <h3>Go to Generate Token</h3>
+                    <div class="card-body">
+                        <div class="card-icon">🔑</div>
+                        <h3>Generate Token</h3>
+                        <p class="card-description">Create and manage authentication tokens</p>
                         <a href="{{ url_for('generate_token') }}" class="btn btn-primary">Generate Token</a>
                     </div>
                 </div>
-            </div>
-        
-        <div class="col-6">
-            <div class="card">
-                <div class="card-body text-center">
-                    <h3>Go to Manage User</h3>
-                    <a href="{{ url_for('manage_user') }}" class="btn btn-primary">Manage user</a>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-icon">👥</div>
+                        <h3>Manage Users</h3>
+                        <p class="card-description">Administer user accounts and permissions</p>
+                        <a href="{{ url_for('manage_user') }}" class="btn btn-primary">Manage Users</a>
+                    </div>
                 </div>
             </div>
         </div>
-        
     </div>
-    <br>
-    </div2>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #b3b3b3; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 </body>
 </html>
 {% endblock %}

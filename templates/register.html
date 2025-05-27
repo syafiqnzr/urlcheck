@@ -5,6 +5,7 @@
 <html>
 <head>
     <title>Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
 
           /* Reset and base styles */
@@ -14,11 +15,40 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        body {
-            background-color: #121212;
-            color: #ffffff;
+        /* Dark mode base styles */
+body {
+    background: linear-gradient(135deg, #141719 0%, #121212 100%);
+    color: #ffffff;
+}
 
-        }
+/* Input field styling for dark mode */
+input[type="text"],
+input[type="text"]:focus,
+input[type="text"]:active,
+input[type="text"]:hover,
+input[type="password"],
+input[type="password"]:focus,
+input[type="email"],
+input[type="email"]:focus,
+textarea,
+textarea:focus,
+select,
+select:focus {
+    background-color: #333333 !important;
+    color: #ffffff !important;
+    border: 1px solid #5dcef0;
+    outline-color: #1e3c72;
+}
+
+/* Override browser autofill styles which often use white backgrounds */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #333333 inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
 
         /* Main content container */
 
@@ -31,13 +61,13 @@
 
         /* Page title */
         .page-title {
+            font-family: 'Poppins', sans-serif;
             font-size: 48px;
             font-weight: 900;
             color: #ffffff;
             margin-bottom: 30px;
             text-align: center;
             letter-spacing: -0.04em;
-
         }
 
          .content p {
@@ -45,7 +75,7 @@
             font-size: 14px;
             margin-bottom: 30px;
             text-align: center;
-            
+
         }
 
         form {
@@ -77,41 +107,93 @@
         }
 
         input:focus {
-            border-color: #4aa4c0;
+            border-color: #5dcef0;
             box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.15);
             outline: none;
         }
 
         .password-section {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .password-inputs {
-            flex: 1;
-            margin-right: 20px;
-            display: flex;
             flex-direction: column;
         }
 
-        .password-criteria {
-            font-size: 10px;
+        .password-input-wrapper {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+
+        .tooltip input {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 280px;
+            background-color: #333333;
+            color: #ffffff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 100%;
+            left: 60px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid #5dcef0;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 20px;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #5dcef0 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip-criteria {
             list-style: none;
-            padding-left: 0;
-            padding-top: 40px;
+            padding: 0;
             margin: 0;
-            max-width: 180px;
-            line-height: 1.7;
         }
 
-        .password-criteria li {
-            margin-top: 0%;
+        .tooltip-criteria li {
+            margin: 5px 0;
             color: #cb1023;
+            font-size: 11px;
         }
 
-        .password-criteria li.valid {
+        .tooltip-criteria li.valid {
             color: #1DB954;
+        }
+
+        .tooltip-criteria li::before {
+            content: "✗ ";
+            margin-right: 5px;
+        }
+
+        .tooltip-criteria li.valid::before {
+            content: "✓ ";
         }
 
         button {
@@ -159,7 +241,7 @@
             color: #ffffff;
             background-color: rgba(233, 20, 41, 0.2);
             padding: 10px;
-            border: 1px solid #E91429;
+            border: 1px solid #ff0019a8;
             border-radius: 6px;
             margin-bottom: 15px;
             font-size: 14px;
@@ -169,6 +251,7 @@
 <body>
 <div class="container">
         <h1 class="page-title">Sign Up</h1>
+        <p>To complete your registration, a valid token is required.<br>You can obtain it on the Plan page.</p>
 
         {% with messages = get_flashed_messages(category_filter=["error"]) %}
           {% if messages %}
@@ -188,40 +271,51 @@
             <input type="email" name="email" id="email" required>
 
             <div class="password-section">
-                <div class="password-inputs">
-                    <label for="password">Password:</label>
+                <label for="password">Password:</label>
+                <div class="tooltip">
                     <input type="password" name="password" id="password" oninput="validatePassword()" required>
-
-                    <label for="confirm_password">Confirm Password:</label>
-                    <input type="password" name="confirm_password" id="confirm_password" oninput="validatePassword()" required>
+                    <span class="tooltiptext">
+                        <strong>Password Requirements:</strong>
+                        <ul class="tooltip-criteria">
+                            <li id="uppercase">At least 1 uppercase letter (A-Z)</li>
+                            <li id="lowercase">At least 1 lowercase letter (a-z)</li>
+                            <li id="digit">At least 1 digit (0-9)</li>
+                            <li id="symbol">At least 1 symbol (!@#$%^&*)</li>
+                            <li id="length">At least 8 characters</li>
+                            <li id="match">Passwords match</li>
+                        </ul>
+                    </span>
                 </div>
-                <ul class="password-criteria">
-                    <li id="uppercase">At least 1 <span>uppercase letter (A-Z)</span></li>
-                    <li id="lowercase">At least 1 <span>lowercase letter (a-z)</span></li>
-                    <li id="digit">At least 1 <span>digit (0-9)</span></li>
-                    <li id="symbol">At least 1 <span>symbol (!@#$%^&*)</span></li>
-                    <li id="length">At least <span>8 characters</span></li>
-                    <li id="match">Passwords <span>match</span></li>
-                </ul>
+
+                <label for="confirm_password">Confirm Password:</label>
+                <div class="tooltip">
+                    <input type="password" name="confirm_password" id="confirm_password" oninput="validatePassword()" required>
+                    <span class="tooltiptext">
+                        <strong>Confirm Password:</strong>
+                        <ul class="tooltip-criteria">
+                            <li id="match-confirm">Passwords must match</li>
+                            <li id="not-empty-confirm">Field cannot be empty</li>
+                        </ul>
+                    </span>
+                </div>
             </div>
 
             <label for="token">Token:</label>
             <input type="text" name="token" id="token" required>
 
-            <button type="submit" id="submitBtn" disabled>Register</button>
+            <button type="submit" id="submitBtn">Register</button>
         </form>
 
         <div class="login-link">
             <a href="/login">Already have an account? Login</a>
         </div>
-  
+
     <script>
         function validatePassword() {
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirm_password").value;
-            const submitBtn = document.getElementById("submitBtn");
 
-            // Regular Expressions
+            // Regular Expressions for Password
             const hasUpper = /[A-Z]/.test(password);
             const hasLower = /[a-z]/.test(password);
             const hasDigit = /[0-9]/.test(password);
@@ -229,7 +323,7 @@
             const isLongEnough = password.length >= 8;
             const passwordsMatch = password === confirmPassword && password.length > 0;
 
-            // Toggle valid/invalid classes
+            // Toggle valid/invalid classes for Password tooltip (visual feedback only)
             document.getElementById("uppercase").classList.toggle("valid", hasUpper);
             document.getElementById("lowercase").classList.toggle("valid", hasLower);
             document.getElementById("digit").classList.toggle("valid", hasDigit);
@@ -237,9 +331,10 @@
             document.getElementById("length").classList.toggle("valid", isLongEnough);
             document.getElementById("match").classList.toggle("valid", passwordsMatch);
 
-            // Enable button only if all conditions are met
-            const allValid = hasUpper && hasLower && hasDigit && hasSymbol && isLongEnough && passwordsMatch;
-            submitBtn.disabled = !allValid;
+            // Toggle valid/invalid classes for Confirm Password tooltip (visual feedback only)
+            const confirmNotEmpty = confirmPassword.length > 0;
+            document.getElementById("match-confirm").classList.toggle("valid", passwordsMatch);
+            document.getElementById("not-empty-confirm").classList.toggle("valid", confirmNotEmpty);
         }
 
         function validateForm() {
@@ -262,7 +357,7 @@
             }
         });
     </script>
-           
+
 </div>
  <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; bottom: 0px;  margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 </body>

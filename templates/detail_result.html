@@ -18,20 +18,20 @@
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background-color: #121212;
+    background: linear-gradient(135deg, #141719 0%, #121212 100%);
             color: #ffffff;
 
         }
-        
+
         /* Dashboard container */
         .dashboard-container {
             max-width: 1200px;
             margin: 30px auto;
             padding: 0 15px;
         }
-        
+
         /* Header section */
         .scan-header {
             background-color: #282828;
@@ -41,15 +41,15 @@
             margin-bottom: 30px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
-        
+
         .scan-header h1 {
             font-size: 24px;
             margin: 0;
             font-weight: 700;
             letter-spacing: -0.5px;
-            color: #ffea00; /* Spotify green */
+            color: #5dcef0; /* Spotify green */
         }
-        
+
         .scan-header h2 {
             font-size: 16px;
             margin: 10px 0 0;
@@ -57,7 +57,7 @@
             word-break: break-all;
             opacity: 0.7;
         }
-        
+
         /* Card styling */
         .card {
             background: #181818;
@@ -66,38 +66,38 @@
             margin-bottom: 25px;
             overflow: hidden;
         }
-        
+
         .card-header {
             background: #282828;
             padding: 15px 20px;
             border-bottom: 1px solid #333333;
         }
-        
+
         .card-header h3 {
             margin: 0;
             color: #ffffff;
             font-size: 18px;
             font-weight: 600;
         }
-        
+
         .card-body {
             padding: 20px;
             color: #b3b3b3;
         }
-        
+
         /* Info grid */
         .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 15px;
         }
-        
+
         .info-item {
             padding: 15px;
             border-radius: 6px;
             background-color: #282828;
         }
-        
+
         .info-item strong {
             display: block;
             color: #ffffff;
@@ -105,41 +105,42 @@
             font-size: 14px;
             font-weight: 500;
         }
-        
+
         .info-item span {
             font-size: 15px;
             word-break: break-all;
             color: #b3b3b3;
         }
-        
+
         /* Classification badge */
         .badge {
             display: inline-block;
             padding: 5px 10px;
-            border-radius: 20px;
+            border-radius: 5px;
             font-weight: 600;
             font-size: 14px;
             text-align: center;
- 
+            width: 90%;
+            color: #000000 !important;
         }
-        
+
         .badge-safe {
             background-color: #1DB954; /* Spotify green */
             color: #000000;
         }
-        
+
         .badge-suspicious {
             background-color: #E91429; /* Spotify red */
-            color: white;
+            color: #000000;
         }
-        
+
         /* Table styling */
         .breakdown-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
         }
-        
+
         .breakdown-table th {
             background-color: #282828;
             color: #ffffff;
@@ -148,46 +149,46 @@
             padding: 12px 15px;
             border-bottom: 2px solid #333333;
         }
-        
+
         .breakdown-table td {
             padding: 12px 15px;
             border-bottom: 1px solid #333333;
             vertical-align: top;
             color: #b3b3b3;
         }
-        
+
         .breakdown-table tr:last-child td {
             border-bottom: none;
         }
-        
+
         .breakdown-table tr:hover {
             background-color: #222222;
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .info-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .breakdown-table, .breakdown-table thead, .breakdown-table tbody, 
+
+            .breakdown-table, .breakdown-table thead, .breakdown-table tbody,
             .breakdown-table th, .breakdown-table td, .breakdown-table tr {
                 display: block;
             }
-            
+
             .breakdown-table thead tr {
                 position: absolute;
                 top: -9999px;
                 left: -9999px;
             }
-            
+
             .breakdown-table tr {
                 border: 1px solid #333333;
                 margin-bottom: 15px;
                 border-radius: 6px;
                 overflow: hidden;
             }
-            
+
             .breakdown-table td {
                 border: none;
                 border-bottom: 1px solid #333333;
@@ -195,11 +196,11 @@
                 padding-left: 50%;
                 text-align: right;
             }
-            
+
             .breakdown-table td:last-child {
                 border-bottom: 0;
             }
-            
+
             .breakdown-table td:before {
                 position: absolute;
                 top: 12px;
@@ -222,7 +223,7 @@
             <h1>URL Scan Analysis</h1>
             <h2>{{ scan_url }}</h2>
         </div>
-        
+
         {% if scan %}
         <!-- Summary Card -->
         <div class="card">
@@ -232,7 +233,7 @@
             <div class="card-body">
                 <div class="info-grid">
                     <div class="info-item">
-                        <strong>Classification</strong>
+                        <strong>Final Result</strong>
                         <span class="badge {% if scan.classification == 'Safe' %}badge-safe{% else %}badge-suspicious{% endif %}">
                             {{ scan.classification }}
                         </span>
@@ -254,7 +255,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Details Card -->
         <div class="card">
             <div class="card-header">
@@ -268,15 +269,15 @@
                     </div>
                     <div class="info-item">
                         <strong>Created</strong>
-                        <span>{{ scan.creation_date }}</span>
+                        <span>{{ scan.creation_date | format_date }}</span>
                     </div>
                     <div class="info-item">
                         <strong>Updated</strong>
-                        <span>{{ scan.updated_date }}</span>
+                        <span>{{ scan.updated_date | format_date }}</span>
                     </div>
                     <div class="info-item">
                         <strong>Expiry</strong>
-                        <span>{{ scan.expiry_date }}</span>
+                        <span>{{ scan.expiry_date | format_date }}</span>
                     </div>
                     <div class="info-item">
                         <strong>Registrar</strong>
@@ -297,7 +298,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- ML Analysis Card -->
         <div class="card">
             <div class="card-header">
@@ -307,7 +308,7 @@
                 <p>{{ ml_note }}</p>
             </div>
         </div>
-        
+
         <!-- URL Breakdown Card -->
         <div class="card">
             <div class="card-header">

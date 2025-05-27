@@ -14,7 +14,7 @@ import socket
 from werkzeug.utils import secure_filename
 from flask import url_for
 import subprocess
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 import mysql.connector
 from dateutil.relativedelta import relativedelta
 from flask import Flask, render_template, request, redirect, url_for, session
@@ -26,6 +26,34 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for session tracking
+
+# Custom Jinja2 filter for date formatting
+@app.template_filter('format_date')
+def format_date_filter(date_string):
+    """Format date string to DD.MM.YYYY HH:MM format"""
+    if not date_string or date_string == 'None' or date_string.strip() == '':
+        return 'N/A'
+
+    try:
+        # Try to parse the date string
+        # Handle different possible formats
+        if 'T' in date_string:
+            # ISO format with T separator
+            dt = datetime.strptime(date_string.split('.')[0], '%Y-%m-%dT%H:%M:%S')
+        elif ' ' in date_string and ':' in date_string:
+            # Format like "2004-06-04 13:37:18"
+            dt = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+        elif ' ' in date_string:
+            # Format like "2004-06-04"
+            dt = datetime.strptime(date_string, '%Y-%m-%d')
+        else:
+            # Just date
+            dt = datetime.strptime(date_string, '%Y-%m-%d')
+
+        return dt.strftime('%d.%m.%Y %H:%M')
+    except (ValueError, AttributeError):
+        # If parsing fails, return the original string
+        return date_string
 
 # Paths
 dataset_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Dataset'
@@ -48,8 +76,11 @@ def inject_user():
     from flask import session
     profile_picture = None
     username = None
+
+    # Check for admin session (uses username)
     if 'username' in session:
         username = session['username']
+        ensure_db_connection()
         cursor = db.cursor(dictionary=True)
         # Check if user is admin
         cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
@@ -57,45 +88,101 @@ def inject_user():
         if admin_user:
             # Fetch profile_picture from admin table
             profile_picture = admin_user.get('profile_picture', None)
-        else:
-            # Fetch profile_picture from users table
-            cursor.execute("SELECT profile_picture FROM users WHERE username = %s", (username,))
-            user = cursor.fetchone()
-            if user and user['profile_picture']:
-                profile_picture = user['profile_picture']
         cursor.close()
+
+    # Check for regular user session (uses email)
+    elif 'email' in session:
+        email = session['email']
+        ensure_db_connection()
+        cursor = db.cursor(dictionary=True)
+        # Fetch user data from users table
+        cursor.execute("SELECT username, profile_picture FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
+        if user:
+            username = user['username']  # For display purposes
+            profile_picture = user.get('profile_picture', None)
+        cursor.close()
+
     return dict(profile_picture=profile_picture, username=username)
 
 # ---- Database Config ----
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="",  
+    password="",
     database="urlscanner"
 )
 
 cursor = db.cursor(dictionary=True)
 
+# Helper function to ensure database connection
+def ensure_db_connection():
+    global db
+    try:
+        if not db.is_connected():
+            db.reconnect()
+    except:
+        # If reconnect fails, create a new connection
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="urlscanner"
+        )
+
+# Helper function to convert sender to username for display
+def get_username_from_sender(sender):
+    """Convert sender (email or username) to username for display purposes"""
+    if not sender or sender == 'guest':
+        return 'Guest'
+
+    ensure_db_connection()
+    cursor = db.cursor(dictionary=True)
+
+    # First check if sender is admin username (direct match)
+    cursor.execute("SELECT username FROM admin WHERE username = %s", (sender,))
+    admin_result = cursor.fetchone()
+    if admin_result:
+        cursor.close()
+        return admin_result['username']
+
+    # Check if sender is user email
+    cursor.execute("SELECT username FROM users WHERE email = %s", (sender,))
+    user_result = cursor.fetchone()
+    cursor.close()
+
+    if user_result:
+        return user_result['username']
+
+    return 'Unknown User'
+
 
 @app.route('/', methods=['GET'])
 def index():
-    username = session.get('username')
     is_admin = False
-    if username:
+
+    # Check if admin is logged in (username session)
+    if 'username' in session:
+        username = session['username']
+        ensure_db_connection()
         cursor = db.cursor(dictionary=True)
         cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
         admin_user = cursor.fetchone()
         cursor.close()
         if admin_user:
             is_admin = True
+
     return render_template('index.html', is_admin=is_admin)
 
 
 @app.route('/result', methods=['POST'])
 def result():
-    username = session.get('username')
     is_admin = False
-    if username:
+
+    # Check if admin is logged in (username session)
+    if 'username' in session:
+        username = session['username']
+        ensure_db_connection()
         cursor = db.cursor(dictionary=True)
         cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
         admin_user = cursor.fetchone()
@@ -158,8 +245,15 @@ def result():
     raw_prediction = trainedmodel.predict(url_vector)[0]
     ml_prediction = 'Safe' if raw_prediction == 0 else 'Suspicious'
 
-    sender = session.get('username', 'guest')
+    # Get sender - use username for admin, email for regular users
+    if 'username' in session:
+        sender = session['username']  # Admin sender
+    elif 'email' in session:
+        sender = session['email']     # User sender
+    else:
+        sender = 'guest'              # Guest sender
 
+    ensure_db_connection()
     cursor = db.cursor(dictionary=True)
 
     # Save scan summary
@@ -215,18 +309,37 @@ def result():
 
 @app.route('/details', methods=['POST'])
 def details():
-    username = session.get('username')
+    # Check if user is logged in (either email for users or username for admin)
+    if 'email' not in session and 'username' not in session:
+        flash("Login to view detailed analysis", "warning")
+        return redirect(url_for('login'))
+
     is_admin = False
-    if username:
+    user = None
+
+    # Check if admin is logged in (username session)
+    if 'username' in session:
+        username = session['username']
+        ensure_db_connection()
         cursor = db.cursor(dictionary=True)
         cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
         admin_user = cursor.fetchone()
-        cursor.close()
         if admin_user:
             is_admin = True
+            user = username
+        cursor.close()
+    # Check if regular user is logged in (email session)
+    elif 'email' in session:
+        email = session['email']
+        ensure_db_connection()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT username FROM users WHERE email = %s", (email,))
+        user_data = cursor.fetchone()
+        user = user_data['username'] if user_data else 'Unknown User'
+        cursor.close()
 
-    user = session.get('user')
     url = request.form.get('url')
+    ensure_db_connection()
     cursor = db.cursor(dictionary=True)
 
     # Get scan result for the given URL
@@ -269,7 +382,10 @@ def details():
     """, (url, latest_timestamp))
     features = cursor.fetchall()
 
-    sender = features[0]['sender'] if features else ''
+    sender_raw = features[0]['sender'] if features else ''
+
+    # Convert sender to username for display
+    sender_username = get_username_from_sender(sender_raw)
 
     cursor.close()
 
@@ -280,7 +396,7 @@ def details():
         ml_prediction=scan_result.get('ml_prediction', ''),
         ml_note=scan_result.get('ml_note', ''),
         scan_url=url,
-        sender=sender,
+        sender=sender_username,
         features=features,
         is_admin=is_admin
     )
@@ -292,17 +408,31 @@ def loginn():
 
 @app.route('/details/<path:url_encoded>', methods=['GET'])
 def details_by_url(url_encoded):
+    # Check if user is logged in
+    if 'email' not in session:
+        flash("Login to view detailed analysis", "warning")
+        return redirect(url_for('login'))
+
     url = unquote(url_encoded)
-    username = session.get('username')
     is_admin = False
-    if username:
+    user = None
+
+    if 'email' in session:
+        email = session['email']
+        ensure_db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
+        cursor.execute("SELECT * FROM admin WHERE email = %s", (email,))
         admin_user = cursor.fetchone()
-        cursor.close()
         if admin_user:
             is_admin = True
+            user = admin_user.get('username', 'Admin')
+        else:
+            cursor.execute("SELECT username FROM users WHERE email = %s", (email,))
+            user_data = cursor.fetchone()
+            user = user_data['username'] if user_data else 'Unknown User'
+        cursor.close()
 
+    ensure_db_connection()
     cursor = db.cursor(dictionary=True)
 
     # Get scan result for the given URL
@@ -346,18 +476,21 @@ def details_by_url(url_encoded):
     """, (url, latest_timestamp))
     features = cursor.fetchall()
 
-    sender = features[0]['sender'] if features else ''
+    sender_raw = features[0]['sender'] if features else ''
+
+    # Convert sender to username for display
+    sender_username = get_username_from_sender(sender_raw)
 
     cursor.close()
 
     return render_template(
         'detail_result.html',
-        user=username,
+        user=user,
         scan=scan_result,
         ml_prediction=scan_result.get('ml_prediction', ''),
         ml_note=scan_result.get('ml_note', ''),
         scan_url=url,
-        sender=sender,
+        sender=sender_username,
         features=features,
         is_admin=is_admin
     )
@@ -367,7 +500,7 @@ def signup():
     name = request.form.get('name')
     email = request.form.get('email')
     password = request.form.get('password')
-    
+
     # Handle sign up logic here (e.g., save to DB)
     print(f"Signup attempt - Name: {name}, Email: {email}")
     return redirect(url_for('index'))
@@ -386,50 +519,62 @@ def signin():
 def login():
     is_admin = False
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
 
-        if not username or not password:
-            flash("Username and password are required.", "error")
+        if not email or not password:
+            flash("Email and password are required.", "error")
             return render_template('login.html', is_admin=is_admin)
 
+        ensure_db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+
+        # First check if user is admin (admin table should have email field)
+        cursor.execute("SELECT * FROM admin WHERE email = %s", (email,))
+        admin_user = cursor.fetchone()
+
+        if admin_user and admin_user['password'] == password:  # Admin uses plain text password
+            # Admin login successful
+            session['email'] = email
+            cursor.close()
+            return redirect('/')
+
+        # Check regular users table
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
 
         if user and check_password_hash(user['password'], password):
             cursor.execute("SELECT expiry_date FROM token WHERE token_number = %s", (user['token'],))
             token_data = cursor.fetchone()
 
-            if token_data and datetime.now() > token_data['expiry_date']:
-                flash(f"TOKEN_EXPIRED::{username}", "token_expired")
-                return redirect(url_for('login'))
-            
-            # Check if user is admin
-            cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
-            admin_user = cursor.fetchone()
-            if admin_user:
-                is_admin = True
-            
-            # Store user info in session
-            session['username'] = username
+            if token_data and token_data['expiry_date'] and datetime.now() > token_data['expiry_date']:
+                cursor.close()
+                # Store email in session for token renewal
+                session['expired_email'] = email
+                return render_template('login.html', is_admin=is_admin, token_expired=True, expired_username=user['username'])
+
+            # Store email in session for regular users
+            session['email'] = email
+            cursor.close()
             return redirect('/')
 
-        flash("Invalid username or password.", "error")
+        cursor.close()
+        flash("Invalid email or password.", "error")
         return render_template('login.html', is_admin=is_admin)
 
     else:
         # For GET request, check if user in session is admin
-        username = session.get('username')
-        if username:
+        if 'email' in session:
+            email = session['email']
+            ensure_db_connection()
             cursor = db.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
+            cursor.execute("SELECT * FROM admin WHERE email = %s", (email,))
             admin_user = cursor.fetchone()
             cursor.close()
             if admin_user:
                 is_admin = True
 
-    return render_template('login.html', is_admin=is_admin)  
+    return render_template('login.html', is_admin=is_admin)
 
 
 def generate_otp(length=6):
@@ -523,56 +668,153 @@ def allowed_file(filename):
 # Profile route to handle displaying and updating profile data
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    
-
-    if not db.is_connected():
-        db.reconnect()
-    cursor = db.cursor(dictionary=True)
-    if 'username' not in session:
+    # Check if user is logged in
+    if 'email' not in session:
         return redirect(url_for('login'))
 
-    username = session['username']
+    ensure_db_connection()
+    cursor = db.cursor(dictionary=True)
 
-    # Fetch user details from the database
-    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-    user = cursor.fetchone()
+    email = session['email']
 
-    if user:
-        # Fetch email explicitly if not included or None
-        email = user.get('email', None)
-        if not email:
-            cursor.execute("SELECT email FROM users WHERE username = %s", (username,))
-            email_row = cursor.fetchone()
-            if email_row:
-                email = email_row.get('email', None)
-        # Get token data
-        cursor.execute("SELECT token_number, start_date, expiry_date FROM token WHERE token_number = %s", (user['token'],))
-        token_info = cursor.fetchone()
-        profile_picture = user.get('profile_picture', None)
+    # First check if user is admin
+    cursor.execute("SELECT * FROM admin WHERE email = %s", (email,))
+    admin_user = cursor.fetchone()
+
+    if admin_user:
+        # Admin user - fetch from admin table
+        user = admin_user
+        is_admin = True
+        token_info = None  # Admins don't have tokens
     else:
+        # Regular user - fetch from users table
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
+        is_admin = False
+        if user:
+            # Get token data for regular users
+            cursor.execute("SELECT token_number, start_date, expiry_date FROM token WHERE token_number = %s", (user['token'],))
+            token_info = cursor.fetchone()
+        else:
+            token_info = None
+
+    if not user:
         flash("User not found!", "error")
         return redirect(url_for('login'))
 
+    profile_picture = user.get('profile_picture', None)
+
     if request.method == 'POST':
+        # Handle Password Change
+        if request.form.get('action') == 'change_password':
+            current_password = request.form.get('current_password')
+            new_password = request.form.get('new_password')
+
+            if not current_password or not new_password:
+                return jsonify({
+                    'success': False,
+                    'message': 'Both current and new password are required.'
+                })
+
+            # Verify current password based on user type
+            if is_admin:
+                # Admin password verification (plain text)
+                if user['password'] != current_password:
+                    return jsonify({
+                        'success': False,
+                        'message': 'Current password is incorrect.'
+                    })
+            else:
+                # Regular user password verification (hashed)
+                cursor.execute("SELECT password FROM users WHERE email = %s", (email,))
+                user_data = cursor.fetchone()
+                if not user_data or not check_password_hash(user_data['password'], current_password):
+                    return jsonify({
+                        'success': False,
+                        'message': 'Current password is incorrect.'
+                    })
+
+            # Validate new password (basic validation - frontend handles detailed validation)
+            if len(new_password) < 8:
+                return jsonify({
+                    'success': False,
+                    'message': 'New password must be at least 8 characters long.'
+                })
+
+            # Additional password validation
+            import re
+            if not re.search(r'[A-Z]', new_password):
+                return jsonify({
+                    'success': False,
+                    'message': 'New password must contain at least one uppercase letter.'
+                })
+
+            if not re.search(r'[a-z]', new_password):
+                return jsonify({
+                    'success': False,
+                    'message': 'New password must contain at least one lowercase letter.'
+                })
+
+            if not re.search(r'[0-9]', new_password):
+                return jsonify({
+                    'success': False,
+                    'message': 'New password must contain at least one digit.'
+                })
+
+            if not re.search(r'[!@#$%^&*]', new_password):
+                return jsonify({
+                    'success': False,
+                    'message': 'New password must contain at least one symbol (!@#$%^&*).'
+                })
+
+            try:
+                # Update password based on user type
+                if is_admin:
+                    # Update admin password (plain text)
+                    cursor.execute("UPDATE admin SET password = %s WHERE email = %s",
+                                  (new_password, email))
+                else:
+                    # Update regular user password (hashed)
+                    hashed_new_password = generate_password_hash(new_password)
+                    cursor.execute("UPDATE users SET password = %s WHERE email = %s",
+                                  (hashed_new_password, email))
+                db.commit()
+                return jsonify({
+                    'success': True,
+                    'message': 'Password updated successfully!'
+                })
+            except Exception as e:
+                db.rollback()
+                return jsonify({
+                    'success': False,
+                    'message': 'An error occurred while updating password. Please try again.'
+                })
+
         # Handle Profile Picture Upload
         if 'profile_picture' in request.files:
-            profile_picture = request.files['profile_picture']
-            if profile_picture and allowed_file(profile_picture.filename):
+            profile_picture_file = request.files['profile_picture']
+            if profile_picture_file and allowed_file(profile_picture_file.filename):
                 # Save the image as a BLOB in the database
-                profile_picture_data = profile_picture.read()
+                profile_picture_data = profile_picture_file.read()
 
-                cursor.execute("UPDATE users SET profile_picture = %s WHERE username = %s", 
-                               (profile_picture_data, username))
+                if is_admin:
+                    cursor.execute("UPDATE admin SET profile_picture = %s WHERE email = %s",
+                                   (profile_picture_data, email))
+                else:
+                    cursor.execute("UPDATE users SET profile_picture = %s WHERE email = %s",
+                                   (profile_picture_data, email))
                 db.commit()
                 flash("Profile picture updated successfully!", "success")
 
         # Handle Username Update
         new_username = request.form.get('username')
         if new_username:
-            cursor.execute("UPDATE users SET username = %s WHERE username = %s", (new_username, username))
+            if is_admin:
+                cursor.execute("UPDATE admin SET username = %s WHERE email = %s", (new_username, email))
+            else:
+                cursor.execute("UPDATE users SET username = %s WHERE email = %s", (new_username, email))
             db.commit()
-            session['username'] = new_username
-            flash("Username updated successfully!", "success")  
+            flash("Username updated successfully!", "success")
 
         return redirect(url_for('profile'))
 
@@ -588,26 +830,30 @@ def profile():
 
 @app.route('/plan', methods=['GET'])
 def plan():
-    username = session.get('username')
     is_admin = False
-    if username:
+
+    if 'email' in session:
+        email = session['email']
+        ensure_db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
+        cursor.execute("SELECT * FROM admin WHERE email = %s", (email,))
         admin_user = cursor.fetchone()
         cursor.close()
         if admin_user:
             is_admin = True
+
     return render_template('plan.html', is_admin=is_admin)
 
 @app.route('/archiveurl')
 def archiveurl():
-    if 'username' not in session:
+    if 'email' not in session:
         flash("You must be logged in to view your scan history.", "warning")
         return redirect(url_for('login'))
 
-    username = session['username']
+    email = session['email']
+    ensure_db_connection()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT url, classification, note, timestamp, sender FROM scan_results WHERE sender = %s ORDER BY timestamp DESC", (username,))
+    cursor.execute("SELECT url, classification, note, timestamp, sender FROM scan_results WHERE sender = %s ORDER BY timestamp DESC", (email,))
     results = cursor.fetchall()
     cursor.close()
     return render_template('archiveurl.html', results=results)
@@ -631,43 +877,43 @@ def export_csv():
                 unique_rows.append(row)
                 seen_urls.add(row['url'])
 
-        # Directory to save CSV files
-        dataset_dir = dataset_path
+        # Create CSV content in memory
+        import io
+        output = io.StringIO()
+        fieldnames = ['url', 'type']
+        writer = csv.DictWriter(output, fieldnames=fieldnames)
 
-        # Find existing files matching pattern "urlcheck_dataset X.csv"
-        existing_files = [f for f in os.listdir(dataset_dir) if f.startswith('urlcheck_dataset') and f.endswith('.csv')]
+        writer.writeheader()
+        for row in unique_rows:
+            writer.writerow({'url': row['url'], 'type': row['classification']})
 
-        # Extract numbers from existing filenames
-        numbers = []
-        for filename in existing_files:
-            parts = filename.replace('.csv', '').split(' ')
-            if len(parts) == 2 and parts[1].isdigit():
-                numbers.append(int(parts[1]))
+        # Get CSV content
+        csv_content = output.getvalue()
+        output.close()
 
-        # Determine next number
-        next_number = max(numbers) + 1 if numbers else 1
+        # Generate filename with current date and time
+        from datetime import datetime
+        current_datetime = datetime.now()
+        # Format: DDMMYYYY_HHMMSS
+        date_time_str = current_datetime.strftime('%d%m%Y_%H%M%S')
+        new_filename = f'urlcheck_dataset_{date_time_str}.csv'
 
-        # New filename
-        new_filename = f'urlcheck_dataset {next_number}.csv'
-        csv_path = os.path.join(dataset_dir, new_filename)
+        # Create response for file download
+        from flask import make_response
+        response = make_response(csv_content)
+        response.headers['Content-Type'] = 'text/csv'
+        response.headers['Content-Disposition'] = f'attachment; filename="{new_filename}"'
 
-        with open(csv_path, mode='w', newline='', encoding='utf-8') as csvfile:
-            fieldnames = ['url', 'type']
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        return response
 
-            writer.writeheader()
-            for row in unique_rows:
-                writer.writerow({'url': row['url'], 'type': row['classification']})
-
-        flash(f'CSV file has been saved successfully at {csv_path}', 'success')
     except Exception as e:
         flash(f'Failed to export CSV file: {str(e)}', 'error')
-
-    from_page = request.args.get('from')
-    if from_page == 'admin':
-        return redirect(url_for('admin_archiveurl'))
-    else:
-        return redirect(url_for('admin_archiveurl'))
+        # Check if request came from admin page
+        from_page = request.args.get('from')
+        if from_page == 'admin':
+            return redirect(url_for('admin_archiveurl'))
+        else:
+            return redirect(url_for('admin_archiveurl'))
 
 
 # ADMIN LOGIN
@@ -677,18 +923,20 @@ def login_admin():
         username = request.form['username']
         password = request.form['password']
 
-        # Regular user login logic
+        # Admin login logic using username
+        ensure_db_connection()
+        cursor = db.cursor(dictionary=True)
         cursor.execute('SELECT * FROM admin WHERE username = %s AND password = %s', (username, password))
         user = cursor.fetchone()
+        cursor.close()
 
         if user:
-            session['username'] = username  # Store the logged-in user in session
-            
+            session['username'] = username  # Store the logged-in admin username in session
             return redirect(url_for('dashboard_admin'))
         else:
             flash('Invalid username or password. Please try again.')
             return render_template('login_admin.html', message='Invalid username or password!')
-           
+
     return render_template('login_admin.html')
 
 @app.route('/dashboard_admin')
@@ -739,7 +987,7 @@ def admin_profile():
                 # Save the image as a BLOB in the database
                 profile_picture_data = profile_picture_file.read()
 
-                cursor.execute("UPDATE admin SET profile_picture = %s WHERE username = %s", 
+                cursor.execute("UPDATE admin SET profile_picture = %s WHERE username = %s",
                                (profile_picture_data, username))
                 db.commit()
                 flash("Profile picture updated successfully!", "success")
@@ -750,12 +998,12 @@ def admin_profile():
             cursor.execute("UPDATE admin SET username = %s WHERE username = %s", (new_username, username))
             db.commit()
             session['username'] = new_username
-            flash("Username updated successfully!", "success")  
+            flash("Username updated successfully!", "success")
 
         return redirect(url_for('admin_profile'))
 
     return render_template('admin_profile.html', username=user['username'], profile_picture=profile_picture)
-   
+
 
 @app.route('/manage_user', methods=['GET'])
 def manage_user():
@@ -764,6 +1012,7 @@ def manage_user():
         flash("You must be logged in to access this page.", "warning")
         return redirect(url_for('login_admin'))
 
+    ensure_db_connection()
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
     admin_user = cursor.fetchone()
@@ -830,6 +1079,86 @@ def edit_user(user_id):
 
     return render_template('edit_user.html', user=user)
 
+@app.route('/update_user', methods=['POST'])
+def update_user():
+    username = session.get('username')
+    if not username:
+        return jsonify({'success': False, 'message': 'You must be logged in to perform this action.'})
+
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
+    admin_user = cursor.fetchone()
+    if not admin_user:
+        return jsonify({'success': False, 'message': 'Access denied. Admins only.'})
+
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        new_username = data.get('username')
+        new_token = data.get('token_number')
+
+        if not user_id or not new_username:
+            return jsonify({'success': False, 'message': 'User ID and username are required.'})
+
+        # Check if username already exists (excluding current user)
+        cursor.execute("SELECT id FROM users WHERE username = %s AND id != %s", (new_username, user_id))
+        existing_user = cursor.fetchone()
+        if existing_user:
+            return jsonify({'success': False, 'message': 'Username already exists.'})
+
+        # Update user information
+        if new_token:
+            # Check if token exists and is available
+            cursor.execute("SELECT * FROM token WHERE token_number = %s", (new_token,))
+            token_data = cursor.fetchone()
+            if not token_data:
+                return jsonify({'success': False, 'message': 'Token does not exist.'})
+
+            # Check if token is already assigned to another user
+            cursor.execute("SELECT username FROM users WHERE token = %s AND id != %s", (new_token, user_id))
+            token_user = cursor.fetchone()
+            if token_user:
+                return jsonify({'success': False, 'message': f'Token is already assigned to user: {token_user["username"]}'})
+
+            # Update user with new token
+            cursor.execute("UPDATE users SET username = %s, token = %s WHERE id = %s",
+                          (new_username, new_token, user_id))
+
+            # Update token dates when token is assigned
+            from datetime import datetime, timedelta
+            start_date = datetime.now()
+            expiry_date = start_date + relativedelta(months=3)  # 1 hour expiry
+
+            cursor.execute("UPDATE token SET start_date = %s, expiry_date = %s WHERE token_number = %s",
+                          (start_date, expiry_date, new_token))
+
+            db.commit()
+
+            return jsonify({
+                'success': True,
+                'message': 'User updated successfully.',
+                'start_date': start_date.strftime('%d.%m.%Y'),
+                'expiry_date': expiry_date.strftime('%d.%m.%Y')
+            })
+        else:
+            # Update user without token (remove token assignment)
+            cursor.execute("UPDATE users SET username = %s, token = NULL WHERE id = %s",
+                          (new_username, user_id))
+            db.commit()
+
+            return jsonify({
+                'success': True,
+                'message': 'User updated successfully.',
+                'start_date': 'Not Set',
+                'expiry_date': 'Not Set'
+            })
+
+    except Exception as e:
+        db.rollback()
+        return jsonify({'success': False, 'message': f'Error updating user: {str(e)}'})
+    finally:
+        cursor.close()
+
 @app.route('/delete_user/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
     username = session.get('username')
@@ -866,7 +1195,7 @@ def admin_archiveurl():
         if admin_user:
             is_admin = True
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT url, classification, note, sender FROM scan_results ORDER BY timestamp DESC")
+    cursor.execute("SELECT id, url, classification, note, sender FROM scan_results ORDER BY timestamp DESC")
     results = cursor.fetchall()
     cursor.close()
     print(results)  # 🔥 Add this line
@@ -1036,6 +1365,63 @@ def delete_url(id):
 
     return redirect(url_for('admin_archiveurl'))
 
+# ADMIN DELETE SCAN RESULT URL
+@app.route('/delete_scan_result', methods=['POST'])
+def delete_scan_result():
+    # Check if admin is logged in
+    username = session.get('username')
+    if not username:
+        flash("You must be logged in to perform this action.", "error")
+        return redirect(url_for('login_admin'))
+
+    # Verify admin status
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
+    admin_user = cursor.fetchone()
+    if not admin_user:
+        flash("Access denied. Admins only.", "error")
+        return redirect(url_for('index'))
+
+    # Get form data
+    scan_id = request.form.get('scan_id')
+    admin_password = request.form.get('admin_password')
+
+    if not scan_id or not admin_password:
+        flash("Missing required information.", "error")
+        return redirect(url_for('admin_archiveurl'))
+
+    # Verify admin password
+    if admin_user['password'] != admin_password:
+        flash("Incorrect admin password.", "error")
+        return redirect(url_for('admin_archiveurl'))
+
+    try:
+        # First get the URL to delete related breakdown entries
+        cursor.execute("SELECT url FROM scan_results WHERE id = %s", (scan_id,))
+        url_result = cursor.fetchone()
+
+        if url_result:
+            url_to_delete = url_result['url']
+
+            # Delete related url_breakdown entries first
+            cursor.execute("DELETE FROM url_breakdown WHERE scan_url = %s", (url_to_delete,))
+
+            # Then delete from scan_results table
+            cursor.execute("DELETE FROM scan_results WHERE id = %s", (scan_id,))
+
+            db.commit()
+            flash("URL deleted successfully.", "success")
+        else:
+            flash("URL not found.", "error")
+
+    except Exception as e:
+        db.rollback()
+        flash(f"Error deleting URL: {str(e)}", "error")
+    finally:
+        cursor.close()
+
+    return redirect(url_for('admin_archiveurl'))
+
 # ---- Generate Token Route ----
 @app.route('/generate_token', methods=['GET', 'POST'])
 def generate_token():
@@ -1082,14 +1468,81 @@ def generate_token():
 
     return render_template('generate_token.html', tokens=tokens_sorted, now=now)
 
+# ADMIN DELETE TOKEN
+@app.route('/delete_token', methods=['POST'])
+def delete_token():
+    # Check if admin is logged in
+    username = session.get('username')
+    if not username:
+        flash("You must be logged in to perform this action.", "error")
+        return redirect(url_for('login_admin'))
+
+    # Verify admin status
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
+    admin_user = cursor.fetchone()
+    if not admin_user:
+        flash("Access denied. Admins only.", "error")
+        return redirect(url_for('index'))
+
+    # Get form data
+    token_number = request.form.get('token_number')
+    admin_password = request.form.get('admin_password')
+
+    if not token_number or not admin_password:
+        flash("Missing required information.", "error")
+        return redirect(url_for('generate_token'))
+
+    # Verify admin password
+    if admin_user['password'] != admin_password:
+        flash("Incorrect admin password.", "error")
+        return redirect(url_for('generate_token'))
+
+    try:
+        # Check if token is being used by any user
+        cursor.execute("SELECT username FROM users WHERE token = %s", (token_number,))
+        user_with_token = cursor.fetchone()
+
+        if user_with_token:
+            flash(f"Cannot delete token. It is currently assigned to user: {user_with_token['username']}", "error")
+            return redirect(url_for('generate_token'))
+
+        # Delete the token
+        cursor.execute("DELETE FROM token WHERE token_number = %s", (token_number,))
+
+        if cursor.rowcount > 0:
+            db.commit()
+            flash(f"Token {token_number} deleted successfully.", "success")
+        else:
+            flash("Token not found.", "error")
+
+    except Exception as e:
+        db.rollback()
+        flash(f"Error deleting token: {str(e)}", "error")
+    finally:
+        cursor.close()
+
+    return redirect(url_for('generate_token'))
+
 @app.route('/renew_token', methods=['GET', 'POST'])
 def renew_token():
-    username = request.args.get('username')
+    # Get email from session (for expired token flow) or URL parameter (for direct access)
+    email = session.get('expired_email') or request.args.get('email')
+
+    if not email:
+        flash("Access denied. Please log in first.", "error")
+        return redirect(url_for('login'))
+
+    # Get username for display purposes
+    ensure_db_connection()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT username FROM users WHERE email = %s", (email,))
+    user = cursor.fetchone()
+    username = user['username'] if user else 'Unknown User'
 
     if request.method == 'POST':
         token_input = request.form['token']
 
-        cursor = db.cursor(dictionary=True)
         cursor.execute("SELECT * FROM token WHERE token_number = %s AND start_date IS NULL AND expiry_date IS NULL", (token_input,))
         new_token = cursor.fetchone()
 
@@ -1097,21 +1550,43 @@ def renew_token():
             start_date = datetime.now()
             expiry_date = start_date + timedelta(minutes=1)
 
-            cursor.execute("UPDATE users SET token = %s WHERE username = %s", (token_input, username))
-            cursor.execute("UPDATE token SET start_date = %s, expiry_date = %s WHERE token_number = %s",
-                           (start_date, expiry_date, token_input))
+            # Create a new unique token for this user by copying the original token
+            # Generate a new unique token number for this user
+            import random
+            new_user_token = f"{token_input}_{random.randint(1000, 9999)}"
+
+            # Check if this new token already exists
+            cursor.execute("SELECT token_number FROM token WHERE token_number = %s", (new_user_token,))
+            while cursor.fetchone():
+                new_user_token = f"{token_input}_{random.randint(1000, 9999)}"
+                cursor.execute("SELECT token_number FROM token WHERE token_number = %s", (new_user_token,))
+
+            # Create a new token record for this user
+            cursor.execute("INSERT INTO token (token_number, start_date, expiry_date) VALUES (%s, %s, %s)",
+                           (new_user_token, start_date, expiry_date))
+
+            # Update user's token to the new individual token
+            cursor.execute("UPDATE users SET token = %s WHERE email = %s", (new_user_token, email))
+
             db.commit()
 
+            # Clear the expired email from session
+            session.pop('expired_email', None)
+
+            cursor.close()
             return redirect('/login')
         else:
+            cursor.close()
             return render_template('renew_token.html', username=username, error="Invalid or used token")
 
+    cursor.close()
     return render_template('renew_token.html', username=username)
 
 
 @app.route('/logout')
 def logout():
     session.clear()
+    flash("You have been logged out successfully.", "success")
     return redirect(url_for('index'))
 
 
@@ -1159,14 +1634,27 @@ def otp():
             # OTP verified, save user to DB
             cursor = db.cursor(dictionary=True)
             try:
-                cursor.execute("INSERT INTO users (username, email, password, token) VALUES (%s, %s, %s, %s)",
-                               (registration_data['username'], registration_data['email'], registration_data['password'], registration_data['token']))
-                db.commit()
+                # Create a new unique token for this user
+                import random
+                original_token = registration_data['token']
+                new_user_token = f"{original_token}_{random.randint(1000, 9999)}"
+
+                # Check if this new token already exists
+                cursor.execute("SELECT token_number FROM token WHERE token_number = %s", (new_user_token,))
+                while cursor.fetchone():
+                    new_user_token = f"{original_token}_{random.randint(1000, 9999)}"
+                    cursor.execute("SELECT token_number FROM token WHERE token_number = %s", (new_user_token,))
 
                 start_date = datetime.now()
                 expiry_date = start_date + timedelta(minutes=60)
-                cursor.execute("UPDATE token SET start_date = %s, expiry_date = %s WHERE token_number = %s",
-                               (start_date, expiry_date, registration_data['token']))
+
+                # Create new token record for this user
+                cursor.execute("INSERT INTO token (token_number, start_date, expiry_date) VALUES (%s, %s, %s)",
+                               (new_user_token, start_date, expiry_date))
+
+                # Insert user with the new individual token
+                cursor.execute("INSERT INTO users (username, email, password, token) VALUES (%s, %s, %s, %s)",
+                               (registration_data['username'], registration_data['email'], registration_data['password'], new_user_token))
                 db.commit()
             except Exception as e:
                 db.rollback()

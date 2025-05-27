@@ -7,51 +7,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Training Model</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* General Styles */
-     
-         /* General Styles */
-     
-       
-   
-   
-       /* Card Styles */
-       .card {
-           background-color: #ffffff;
-           border: 1px solid #ddd;
-           border-radius: 8px;
-           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-           margin-bottom: 20px;
-       }
-   
-       .card-header {
-           background-color: #f1f1f1;
-           padding: 15px;
-           font-size: 1.25rem;
-           font-weight: bold;
-           border-bottom: 1px solid #ddd;
-           border-radius: 8px 8px 0 0;
-           color: #495057;
-       }
-   
-       .card-body {
-           padding: 20px;
-       }
-   
+        /* Reset and base styles */
+        body, h1, h2, p, div {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Light theme base styles */
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333333;
+            min-height: 100vh;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Page title */
+        .page-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: #333333;
+            margin-bottom: 30px;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .card-header {
+            background-color: #5dcef0;
+            color: #ffffff;
+            padding: 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
        /* Form Styles */
        form {
            display: flex;
            flex-direction: column;
            gap: 10px;
        }
-   
+
        .form-label {
            font-weight: bold;
            color: #495057;
            margin-bottom: 5px;
        }
-   
+
        .form-control {
            padding: 10px;
            font-size: 1rem;
@@ -60,11 +86,11 @@
            outline: none;
            transition: border-color 0.2s ease;
        }
-   
+
        .form-control:focus {
            border-color: #007bff;
        }
-   
+
        /* Button Styles */
        .btn {
            display: inline-block;
@@ -78,27 +104,27 @@
            cursor: pointer;
            transition: background-color 0.3s ease, transform 0.2s ease;
        }
-   
+
        .btn-primary {
-           background-color: #007bff;
+           background-color: #5dcef0;
        }
-   
+
        .btn-primary:hover {
-           background-color: #0056b3;
+           background-color: #4ac3e8;
        }
-   
+
        .btn-success {
            background-color: #28a745;
        }
-   
+
        .btn-success:hover {
            background-color: #1e7e34;
        }
-   
+
        .btn:hover {
            transform: scale(1.05);
        }
-   
+
        /* Alert Styles */
        .alert {
            padding: 15px;
@@ -107,11 +133,11 @@
            border-radius: 4px;
            text-align: left;
        }
-   
+
        .alert-dismissible {
            position: relative;
        }
-   
+
        .alert .btn-close {
            position: absolute;
            top: 10px;
@@ -122,19 +148,19 @@
            cursor: pointer;
            color: #000;
        }
-   
+
        .alert-success {
            background-color: #d4edda;
            border-color: #c3e6cb;
            color: #155724;
        }
-   
+
        .alert-error {
            background-color: #f8d7da;
            border-color: #f5c6cb;
            color: #721c24;
        }
-   
+
        /* Uploaded Dataset Details */
        .uploaded-dataset {
            padding: 15px;
@@ -142,8 +168,8 @@
            border: 1px solid #ddd;
            border-radius: 4px;
        }
-   
-   
+
+
        /* Card Styles */
        .card {
            background-color: #ffffff;
@@ -152,7 +178,7 @@
            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
            margin-bottom: 20px;
        }
-   
+
        .card-header {
            background-color: #f1f1f1;
            padding: 15px;
@@ -162,24 +188,24 @@
            border-radius: 8px 8px 0 0;
            color: #495057;
        }
-   
+
        .card-body {
            padding: 20px;
        }
-   
+
        /* Form Styles */
        form {
            display: flex;
            flex-direction: column;
            gap: 10px;
        }
-   
+
        .form-label {
            font-weight: bold;
            color: #495057;
            margin-bottom: 5px;
        }
-   
+
        .form-control {
            padding: 10px;
            font-size: 1rem;
@@ -188,11 +214,11 @@
            outline: none;
            transition: border-color 0.2s ease;
        }
-   
+
        .form-control:focus {
            border-color: #007bff;
        }
-   
+
        /* Button Styles */
        .btn {
            display: inline-block;
@@ -206,27 +232,27 @@
            cursor: pointer;
            transition: background-color 0.3s ease, transform 0.2s ease;
        }
-   
+
        .btn-primary {
-           background-color: #007bff;
+           background-color: #5dcef0;
        }
-   
+
        .btn-primary:hover {
-           background-color: #0056b3;
+           background-color: #4ac3e8;
        }
-   
+
        .btn-success {
            background-color: #28a745;
        }
-   
+
        .btn-success:hover {
            background-color: #1e7e34;
        }
-   
+
        .btn:hover {
            transform: scale(1.05);
        }
-   
+
        /* Alert Styles */
        .alert {
            padding: 15px;
@@ -235,11 +261,11 @@
            border-radius: 4px;
            text-align: left;
        }
-   
+
        .alert-dismissible {
            position: relative;
        }
-   
+
        .alert .btn-close {
            position: absolute;
            top: 10px;
@@ -250,19 +276,19 @@
            cursor: pointer;
            color: #000;
        }
-   
+
        .alert-success {
            background-color: #d4edda;
            border-color: #c3e6cb;
            color: #155724;
        }
-   
+
        .alert-error {
            background-color: #f8d7da;
            border-color: #f5c6cb;
            color: #721c24;
        }
-   
+
        /* Uploaded Dataset Details */
        .uploaded-dataset {
            padding: 15px;
@@ -493,17 +519,34 @@ form input[type="submit"] {
         .dataset-files-list button.delete-btn:hover {
             background-color: #b02a37;
         }
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            .card {
+                margin-bottom: 20px;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    
-   
-        <h1 class="text-center">Training Model</h1>
+    <div class="container">
+        <h1 class="page-title">Training Model</h1>
 
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <div class="card-header">
+        <div style="margin-bottom: 20px;">
             {% for category, message in messages %}
             <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
                 {{ message }}
@@ -514,7 +557,7 @@ form input[type="submit"] {
         {% endif %}
         {% endwith %}
 
-        
+
         <div style="display: flex; gap: 20px; margin-bottom: 20px;">
             <!-- Upload Dataset Card -->
             <div class="card" style="flex: 1;">
@@ -536,7 +579,7 @@ form input[type="submit"] {
             {% if is_admin and dataset_files %}
             <div class="card" style="flex: 1;">
                 <div class="card-header">
-                    <h3 class=>Dataset Files</h3>
+                    <h3>Dataset Files</h3>
                 </div>
                 <div class="card-body dataset-files-list">
                     <ul>
@@ -608,8 +651,8 @@ form input[type="submit"] {
                 </div>
             </div>
             {% endif %}
-
-
+    </div>
+    <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 </body>
 </html>
 {% endblock %}

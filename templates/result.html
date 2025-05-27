@@ -16,15 +16,44 @@
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            
-        }
+
+        /* Dark mode base styles */
+body {
+    background: linear-gradient(135deg, #141719 0%, #121212 100%);
+    color: #ffffff;
+}
+
+/* Input field styling for dark mode */
+input[type="text"],
+input[type="text"]:focus,
+input[type="text"]:active,
+input[type="text"]:hover,
+input[type="password"],
+input[type="password"]:focus,
+input[type="email"],
+input[type="email"]:focus,
+textarea,
+textarea:focus,
+select,
+select:focus {
+    background-color: #333333 !important;
+    color: #ffffff !important;
+    border: 1px solid #444444;
+    outline-color: #1e3c72;
+}
+
+/* Override browser autofill styles which often use white backgrounds */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #333333 inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
 
         /* Main content container */
-        
+
         /* Main container */
         .container {
             max-width: 1200px;
@@ -32,7 +61,7 @@
             padding: 0 300px;
             margin-bottom: 0px;
         }
-        
+
         /* Page title */
         .page-title {
             font-size: 48px;
@@ -44,22 +73,29 @@
 
         }
 
-        
+
 
         .content p {
             color: #b3b3b3;
             font-size: 14px;
             margin-bottom: 30px;
             text-align: center;
-            
+
         }
+
+
 
         /* URL display */
         .url-display {
             background-color: #282828;
             padding: 10px;
             border-radius: 4px;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
+            width: 68%;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+
         }
 
         .url-display input[type="text"] {
@@ -77,6 +113,14 @@
         /* Result section */
         .result-section {
             margin-bottom: 25px;
+            width: 33%;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .result-label {
@@ -87,16 +131,16 @@
 
         /* Badge styling */
         .badge {
-            display: inline-block;
+            display: block;
             padding: 8px 16px;
-            border-radius: 10px;
+            border-radius: 5px;
             font-weight: 700;
             font-size: 16px;
-            margin-bottom: 20px;
             text-align: center;
-            position:center;
-            margin: auto;
-            width: 93%;
+            width: 200%;
+            min-width: 90px;
+            position: relative;
+            transform: translateX(0);
         }
 
         .safe-badge {
@@ -106,8 +150,7 @@
 
         .suspicious-badge {
             background-color: #E91429; /* Spotify red */
-            color: white;
-
+            color: #000000;
         }
 
         /* Note styling */
@@ -116,9 +159,13 @@
             font-size: 14px;
             padding: 15px;
             border-radius: 4px;
-            border-left: 4px solid #ffea00; /* Spotify green */
+            border-left: 4px solid #5dcef0; /* Spotify green */
             text-align: left;
             margin-bottom: 25px;
+            width: 66%;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .note strong {
@@ -128,11 +175,13 @@
         /* Button group */
         .button-group {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 20px;
-            position:center;
-
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 0 auto 40px auto;
+            padding: 20px 0;
+            width: 100%;
         }
 
         .button {
@@ -143,40 +192,58 @@
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
-            position:center;
-            margin: auto;
         }
 
         .primary-button {
-            background-color: #b8ac29; /* Spotify green */
-            color: #000000;
+            background-color: #121212;
+            color: #5dcef0;
             border: none;
-            padding: 12px;
-            width:30%;
-            position:center;
+            padding: 14px 28px;
             text-align: center;
+            width: 200px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
         }
 
         .primary-button:hover {
-            background-color: #ffea00;
-            transform: scale(1.02);
+            background-color: #121212;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(74, 164, 192, 0.4);
         }
 
         .secondary-button {
-            background-color: transparent;
-            color: #ffffff;
-            border: 1px solid #b3b3b3;
+            background-color: #4aa4c0;
+            color: #000000;
+            border: none;
+            padding: 14px 28px;
+            text-align: center;
+            width: 200px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            font-weight: 600;
+            font-size: 15px;
+            box-shadow: 0 4px 12px rgba(74, 164, 192, 0.3);
+            transition: all 0.3s ease;
         }
 
         .secondary-button:hover {
-            border-color: #ffffff;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #5dcef0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(74, 164, 192, 0.4);
         }
 
         .login-note {
-            margin-top: 5px;
-            margin-bottom: 0px;
+            margin-top: 20px;
+            margin-bottom: px;
             font-style: italic;
             color: #b3b3b3;
         }
@@ -203,12 +270,31 @@
                 padding: 12px;
                 font-size: 15px;
             }
+
+            .url-display, .result-section, .note {
+                width: 95%;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+                margin: 25px auto 30px auto;
+                padding: 15px 0;
+            }
+
+            .primary-button, .secondary-button {
+                width: 100%;
+                max-width: 280px;
+                height: 48px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="page-title">Scan Result</h1>
+       
 
         <div class="url-display">
             <input type="text" value="{{ url }}" readonly>
@@ -228,16 +314,18 @@
         <div class="button-group">
             <a href="/" class="button primary-button">Scan Another URL</a>
 
-            {% if session %}
-            <form method="post" action="/details" style="margin: 0;">
-                <input type="hidden" name="url" value="{{ url }}">
-                <button type="submit" class="button secondary-button" style="width: 100%;">View Detailed Analysis</button>
-            </form>
-            {% else %}
-            <p class="login-note">Login to view detailed analysis</p>
-            {% endif %}
+           {% if session and session.get('username') and session.get('username') != 'guest' and session.get('username') != 'none' %}
+<form method="post" action="/details" style="margin: 0;">
+    <input type="hidden" name="url" value="{{ url }}">
+    <button type="submit" class="button secondary-button">View Detailed Analysis</button>
+</form>
+{% else %}
+<p class="login-note">Login to view detailed analysis</p>
+{% endif %}
         </div>
     </div>
+
+    <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 15px; left: 0; right: 0; margin: 0; width: 100%;">Copyright © URLCHECK 2025</p>
 </body>
 </html>
 {% endblock %}

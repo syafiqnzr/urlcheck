@@ -1,5 +1,5 @@
 {% extends "header_admin.html" %}
- 
+
 {% block content %}
 
 <!DOCTYPE html>
@@ -8,281 +8,570 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive URL</title>
-</head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
- 
- /* Main content container */
- .content {
-    width: 90%;
-    max-width: 20000px;
-    background-color: #ffffff;
-    margin: 40px auto;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    padding: 30px 20px;
-    box-sizing: border-box;
-    margin-top: 50px;
-}
+        /* Reset and base styles */
+        body, h1, h2, p, div, table, tr, th, td {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-.content h1 {
-    color: #1e3c72;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 28px;
-}
+        /* Dark theme base styles */
+        body {
+            background: linear-gradient(135deg, #141719 0%, #121212 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
 
-.content p {
-    text-align: center;
-    color: #555;
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
-form label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-    font-size: 16px;
-}
-
-form input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #1e3c72;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
-
-form input[type="submit"] {
-    width: 100%;
-    padding: 14px;
-    background-color: #1e3c72;
-    color: #ffffff;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-form input[type="submit"]:hover {
-    background-color: #16345d;
-}
-
-/* Flash messages */
-.flash-messages {
-    list-style: none;
-    padding: 0;
-}
-
-.flash-messages li {
-    color: red;
-
-    font-size: 12px;
-    text-align: center;
-}
-
-/* Container to center the content */
+        /* Container */
         .container {
             max-width: 1200px;
             margin: 40px auto;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            background-color: #ffffff;
-            border-radius: 10px;
+            padding: 0 20px;
+        }
+
+        /* Page title */
+        .page-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 48px;
+            text-align: center;
+            letter-spacing: -0.04em;
+        }
+
+        /* Main content container */
+        .content {
+            width: 100%;
+            background-color: transparent;
+            margin: 0 auto;
+            border-radius: 12px;
+            padding: 20px 0;
+            box-sizing: border-box;
+        }
+
+        /* Button styles */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background-color: #b148f3;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: #9a3de0;
+            transform: scale(1.05);
+        }
+
+        /* Flash messages container */
+        .flash-messages {
+            position: fixed;
+            top: 85px;
+            right: -2px;
+            z-index: 9999;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .flash-messages li {
+            background-color: #ff0019a8;
+            color: white;
+            padding: 15px 25px;
+            margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            font-size: 14px;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideInOut 5s forwards;
+            cursor: pointer;
+            min-width: 250px;
+        }
+
+        /* Animation for slide in from right and fade out */
+        @keyframes slideInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            10% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            90% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
         }
 
         /* Table Styling */
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: auto; /* Allow flexible column width */
-            font-size: 12px;
+            margin-top: 20px;
+            font-size: 14px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px 15px;
-            word-wrap: break-word; /* Allow long text to wrap */
-        }
+
         th {
-            background-color: #f5f5f5;
+            background-color: #282828;
+            color: #ffffff;
+            font-weight: 600;
             text-align: left;
-            font-weight: bold;
+            padding: 15px;
+            border-bottom: 2px solid #333333;
         }
+
         td {
-            vertical-align: top;
+            padding: 15px;
+            border-bottom: 1px solid #333333;
+            color: #b3b3b3;
+            vertical-align: middle;
         }
-/* Card Styles */
-.card {
-           background-color: #ffffff;
-           border: 1px solid #ddd;
-           border-radius: 8px;
-           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-           margin-bottom: 20px;
-       }
-   
-       .card-header {
-           background-color: #f1f1f1;
-           padding: 15px;
-           font-size: 1.25rem;
-           font-weight: bold;
-           border-bottom: 1px solid #ddd;
-           border-radius: 8px 8px 0 0;
-           color: #495057;
-       }
-   
-       .card-body {
-           padding: 20px;
-       }
-        /* Responsive for smaller screens */
+
+        tr:hover {
+            background-color: #222222;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* URL column with truncation */
+        .url-cell {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        /* Card Styles */
+        .card {
+            background-color: #282828;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: #333333;
+            padding: 15px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-bottom: 1px solid #444444;
+            border-radius: 8px 8px 0 0;
+            color: #ffffff;
+        }
+
+        .card-body {
+            padding: 20px;
+            color: #b3b3b3;
+        }
+
+        /* Alert styles for flash messages */
+        .alert {
+            padding: 12px 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            color: #ffffff;
+        }
+
+        .alert-danger {
+            background-color: #dc3545;
+            border: 1px solid #c82333;
+        }
+
+        .alert-success {
+            background-color: #28a745;
+            border: 1px solid #1e7e34;
+        }
+
+        .alert-info {
+            background-color: #17a2b8;
+            border: 1px solid #138496;
+        }
+        /* Responsive design */
         @media (max-width: 768px) {
             .container {
+                padding: 20px 15px;
                 margin: 20px;
-                padding: 15px;
             }
+
+            .page-title {
+                font-size: 36px;
+                margin-bottom: 30px;
+            }
+
             table, thead, tbody, th, td, tr {
                 display: block;
             }
+
             thead tr {
-                display: none; /* Hide the header on small screens */
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
             }
+
+            tr {
+                margin-bottom: 15px;
+                background-color: #222222;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
             td {
                 position: relative;
                 padding-left: 50%;
-                border: none;
-                border-bottom: 1px solid #eee;
+                text-align: center;
+                border-bottom: 1px solid #333333;
             }
+
             td:before {
                 position: absolute;
-                top: 12px;
+                top: 15px;
                 left: 15px;
                 width: 45%;
                 padding-right: 10px;
                 white-space: nowrap;
+                text-align: center;
                 font-weight: bold;
+                content: attr(data-label);
+                color: #ffffff;
             }
-            td:nth-of-type(1):before { content: "URL"; }
-            td:nth-of-type(2):before { content: "Classification"; }
-            td:nth-of-type(3):before { content: "Note"; }
-            td:nth-of-type(4):before { content: "Sender"; }
+
+            td:nth-of-type(1):before { content: "No."; }
+            td:nth-of-type(2):before { content: "URL"; }
+            td:nth-of-type(3):before { content: "Classification"; }
+            td:nth-of-type(4):before { content: "Note"; }
+            td:nth-of-type(5):before { content: "Sender"; }
+            td:nth-of-type(6):before { content: "Remove"; }
+
+            .url-cell {
+                max-width: none;
+                white-space: normal;
+                word-break: break-all;
+            }
         }
 
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 28px;
+            }
 
-/* Responsive - make it more mobile friendly */
-@media (max-width: 600px) {
-.content {
-   padding: 20px 15px;
-   margin-top: 30px;
-}
+            td {
+                padding: 12px 15px 12px 50%;
+                font-size: 13px;
+            }
 
-.content h1 {
-   font-size: 24px;
-}
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
 
-form input[type="submit"] {
-   padding: 12px;
-   font-size: 15px;
-}
-}
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #b3b3b3;
+            font-style: italic;
+        }
 
-/* Flash messages */
-.flash-messages {
-list-style: none;
-padding: 0;
-}
+        /* Modal styles for confirmation popup */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
 
-.flash-messages li {
-color: red;
+        .modal-content {
+            background-color: #282828;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #333333;
+        }
 
-font-size: 12px;
-text-align: center;
-}
+        .modal-content h2 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: 600;
+        }
 
-div1 {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-margin-top: 20px;
-}
+        .modal-content p {
+            color: #b3b3b3;
+            margin-bottom: 25px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
 
-.profile-container {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-margin-top: 20px;
-}
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
 
-.image-container {
-margin-bottom: 15px;
-}
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
 
-.profile-picture {
-border-radius: 50%;
-object-fit: cover;
-border: 2px solid #007BFF;
-}
+        .btn-confirm {
+            background-color: #b148f3;
+            color: #ffffff;
+        }
 
-#profile_picture {
-display: block;
-margin: 10px auto;
-}
+        .btn-confirm:hover {
+            background-color: #9a3de0;
+            transform: scale(1.05);
+        }
+
+        .btn-cancel {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        .btn-cancel:hover {
+            background-color: #444444;
+            transform: scale(1.05);
+        }
+
+        /* Delete button styles */
+        .delete-btn {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+            transform: scale(1.1);
+        }
+
+        .delete-icon {
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
-    <h1>Archive of Scanned URLs</h1>
+    <div class="container">
+        <h1 class="page-title">Archive of Scanned URLs</h1>
+        <div class="content">
+
+    <form id="csvForm" action="{{ url_for('export_csv') }}?from=admin" method="get" style="margin-bottom: 20px;">
+        <button type="button" class="btn btn-primary" onclick="showConfirmationModal()">Print to CSV file</button>
+    </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>URL</th>
+                        <th style="text-align: center;">Classification</th>
+                        <th>Note</th>
+                        <th style="text-align: center;">Sender</th>
+                        <th style="text-align: center;">Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in results %}
+                    <tr>
+                        <td data-label="No.">{{ loop.index }}</td>
+                        <td data-label="URL" class="url-cell">{{ row.url }}</td>
+                        <td data-label="Classification" style="text-align: center;">
+                            <span style="display: inline-block; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: 600; text-align: center; min-width: 80px; background-color: {% if row.classification == 'Safe' %}#1DB954; color: #000000;{% else %}#E91429; color: #ffffff;{% endif %}">
+                                {{ row.classification }}
+                            </span>
+                        </td>
+                        <td data-label="Note">{{ row.note }}</td>
+                        <td data-label="Sender" style="text-align: center;">{{ row.sender }}</td>
+                        <td data-label="Remove" style="text-align: center;">
+                            <button class="delete-btn" onclick="showDeleteModal({{ row.id }}, '{{ row.url|truncate(30) }}')">
+                                <i class="delete-icon">🗑️</i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="empty-state">No archive data found. URLs will appear here after being scanned.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-    <div class="card-header">
+    <ul class="flash-messages" id="flash-messages">
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        <li>{{ message }}</li>
         {% endfor %}
-    </div>
+    </ul>
     {% endif %}
     {% endwith %}
 
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmationModal">
+        <div class="modal-content">
+            <h2>CSV Export Instructions</h2>
+            <p>When you click "Export CSV", the file will be downloaded to your browser's default download location.</p>
+            <p style="margin-top: 15px; color: #ffffff; font-weight: 600;">Please choose where you want to save the CSV file:</p>
+            <ul style="text-align: left; margin: 15px 0; color: #b3b3b3; padding-left: 20px;">
+                <li>Your browser will prompt you to choose a save location</li>
+                <li>Select your preferred folder (e.g., Desktop, Documents, etc.)</li>
+                <li>The file will be named automatically as "urlcheck_dataset_DDMMYYYY_HHMMSS.csv"</li>
+                <li>Example: "urlcheck_dataset_15012025_143022.csv"</li>
+            </ul>
+            <div class="modal-buttons">
+                <button class="modal-btn btn-confirm" onclick="confirmExport()">Export CSV</button>
+                <button class="modal-btn btn-cancel" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-    <form action="{{ url_for('export_csv') }}?from=admin" method="get" style="margin-bottom: 20px;">
-        <button type="submit" class="btn btn-primary">Print to CSV file</button>
-    </form>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-content">
+            <h2>Delete URL Confirmation</h2>
+            <p>Are you sure you want to delete this URL from the archive?</p>
+            <p style="margin-top: 15px; color: #ffffff; font-weight: 600;">URL: <span id="urlToDelete" style="color: #b3b3b3;"></span></p>
+            <p style="margin-top: 15px; color: #ff6b6b; font-weight: 600;">⚠️ This action cannot be undone!</p>
 
-    <table>
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>URL</th>
-                <th>Classification</th>
-                <th>Note</th>
-                <th>Sender</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in results %}
-            <tr>
-                <td>{{ loop.index }}</td> <!-- This automatically numbers rows -->
-                <td>{{ row.url }}</td>
-                <td>{{ row.classification }}</td>
-                <td>{{ row.note }}</td>
-                <td>{{ row.sender }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="5">No results found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            <form id="deleteForm" action="{{ url_for('delete_scan_result') }}" method="post" style="margin-top: 20px;">
+                <input type="hidden" id="scanIdToDelete" name="scan_id" value="">
 
+                <div style="margin-bottom: 15px;">
+                    <label for="adminPassword" style="display: block; color: #ffffff; margin-bottom: 8px; font-weight: 600;">Enter Admin Password:</label>
+                    <input type="password" id="adminPassword" name="admin_password" required
+                           style="width: 100%; padding: 10px; border: 1px solid #333333; border-radius: 6px; background-color: #1a1a1a; color: #ffffff; font-size: 14px;">
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn btn-confirm" style="background-color: #dc3545;">Delete URL</button>
+                    <button type="button" class="modal-btn btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #b3b3b3; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
+
+    <script>
+        // Show confirmation modal
+        function showConfirmationModal() {
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('confirmationModal').style.display = 'none';
+        }
+
+        // Confirm export and submit form
+        function confirmExport() {
+            document.getElementById('csvForm').submit();
+        }
+
+        // Show delete confirmation modal
+        function showDeleteModal(scanId, urlPreview) {
+            document.getElementById('scanIdToDelete').value = scanId;
+            document.getElementById('urlToDelete').textContent = urlPreview;
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const confirmModal = document.getElementById('confirmationModal');
+            const deleteModal = document.getElementById('deleteModal');
+
+            if (event.target === confirmModal) {
+                closeModal();
+            }
+            if (event.target === deleteModal) {
+                closeDeleteModal();
+            }
+        }
+
+        // Remove flash message on click
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-messages li');
+            flashMessages.forEach(function(msg) {
+                msg.addEventListener('click', function() {
+                    msg.style.animation = 'slideOut 0.5s forwards';
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 500);
+                });
+            });
+        });
+
+        // Add slideOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                0% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
 {% endblock %}

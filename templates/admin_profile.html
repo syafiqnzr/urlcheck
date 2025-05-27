@@ -8,38 +8,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body, h1, p, form {
-    margin: 0;
-    padding: 0;
-}
- 
- /* Main content container */
- .content {
-    width: 90%;
-    max-width: 500px;
-    background-color: #ffffff;
-    margin: 40px auto;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    padding: 30px 20px;
-    box-sizing: border-box;
-    margin-top: 50px;
-}
+        /* Reset and base styles */
+        body, h1, h2, p, div {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-.content h1 {
-    color: #1e3c72;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 28px;
-}
+        /* Light theme base styles */
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333333;
+            min-height: 100vh;
+        }
 
-.content p {
-    text-align: center;
-    color: #555;
-    font-size: 18px;
-    margin-bottom: 20px;
-}
+        /* Container */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Page title */
+        .page-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: #333333;
+            margin-bottom: 30px;
+        }
+
+        /* Main content container */
+        .content {
+            width: 100%;
+            max-width: 500px;
+            background-color: #ffffff;
+            margin: 0 auto;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px 30px;
+            box-sizing: border-box;
+        }
 .div1 {
     color: #1e3c72;
     text-align: center;
@@ -54,32 +67,55 @@ form label {
     font-size: 16px;
 }
 
-form input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #1e3c72;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
+        /* Form styles */
+        form {
+            margin-top: 20px;
+        }
 
-form input[type="submit"] {
-    width: 100%;
-    padding: 14px;
-    background-color: #1e3c72;
-    color: #ffffff;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
+        form label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333333;
+            font-size: 16px;
+        }
 
-form input[type="submit"]:hover {
-    background-color: #16345d;
-}
+        form input[type="text"],
+        form input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        form input[type="text"]:focus,
+        form input[type="file"]:focus {
+            outline: none;
+            border-color: #5dcef0;
+        }
+
+        /* Button styles */
+        button, input[type="submit"] {
+            background-color: #5dcef0;
+            color: #ffffff;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        button:hover, input[type="submit"]:hover {
+            background-color: #4ac3e8;
+            transform: translateY(-1px);
+        }
 
 /* Flash messages */
 .flash-messages {
@@ -141,37 +177,53 @@ div1 {
         font-size: 15px;
     }
 }
-        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Admin Profile</h1>
+    <div class="container">
+        <h1 class="page-title">Admin Profile</h1>
 
-    <form action="{{ url_for('admin_profile') }}" method="POST" enctype="multipart/form-data">
-      <div class="profile-container">
-     <!-- Display Profile Picture -->
-     <div class="image-container">
-      {% if profile_picture %}
-          <img src="data:image/jpeg;base64,{{ profile_picture | b64encode }}" class="profile-picture" alt="Profile Picture" width="150" height="150">
-      {% else %}
-          <img src="{{ url_for('static', filename='default_profile.png') }}" class="profile-picture" alt="Default Profile Picture" width="150" height="150">
-      {% endif %}
-     </div>
-  
-    <!-- Upload Profile Picture -->
-    <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
-    <br>
-    <table>
-      <tr>
-        <td><label for="username">Username</label></td>
-        <td>
-          <span id="username_display">{{ username }}</span>
-          <input type="text" id="username_input" name="username" value="{{ username }}" style="display:none;" required>
-          <button type="button" onclick="enableEdit()">Edit</button>
-        </td>
-      </tr>
-    </table>
-    
+        <div class="content">
+            <form action="{{ url_for('admin_profile') }}" method="POST" enctype="multipart/form-data">
+                <div class="profile-container">
+                    <!-- Display Profile Picture -->
+                    <div class="image-container">
+                        {% if profile_picture %}
+                            <img src="data:image/jpeg;base64,{{ profile_picture | b64encode }}" class="profile-picture" alt="Profile Picture" width="150" height="150">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='default_profile.png') }}" class="profile-picture" alt="Default Profile Picture" width="150" height="150">
+                        {% endif %}
+                    </div>
+
+                    <!-- Upload Profile Picture -->
+                    <label for="profile_picture">Profile Picture</label>
+                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+
+                    <table style="width: 100%; margin-top: 20px;">
+                        <tr>
+                            <td><label for="username">Username</label></td>
+                            <td>
+                                <span id="username_display">{{ username }}</span>
+                                <input type="text" id="username_input" name="username" value="{{ username }}" style="display:none;" required>
+                                <button type="button" onclick="enableEdit()">Edit</button>
+                            </td>
+                        </tr>
+                    </table>
+
     <script>
       function enableEdit() {
         document.getElementById("username_display").style.display = "none";
@@ -179,21 +231,24 @@ div1 {
         document.getElementById("username_input").focus();
       }
     </script>
-    
-    <br>
-  
-        <button type="submit">Save Changes</button>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul class="flash-messages">
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-    </form>
-  
+
+
+                    <input type="submit" value="Update Profile" />
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <ul class="flash-messages">
+                            {% for category, message in messages %}
+                                <li class="{{ category }}">{{ message }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </form>
+        </div>
+    </div>
+    <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 </body>
 </html>
 

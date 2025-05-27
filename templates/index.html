@@ -19,41 +19,70 @@
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            
-        }
+
+        /* Dark mode base styles */
+body {
+    background: linear-gradient(135deg, #141719 0%, #121212 100%);
+    color: #ffffff;
+}
+
+/* Input field styling for dark mode */
+input[type="text"],
+input[type="text"]:focus,
+input[type="text"]:active,
+input[type="text"]:hover,
+input[type="password"],
+input[type="password"]:focus,
+input[type="email"],
+input[type="email"]:focus,
+textarea,
+textarea:focus,
+select,
+select:focus {
+    background-color: #333333 !important;
+    color: #ffffff !important;
+    border: 1px solid #444444;
+    outline-color: #1e3c72;
+}
+
+/* Override browser autofill styles which often use white backgrounds */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #333333 inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
 
         /* Main content container */
-        
+
         /* Main container */
         .container {
             max-width: 1200px;
             margin: 40px auto;
             padding: 0 20px;
         }
-        
+
         /* Page title */
         .page-title {
             font-size: 48px;
             font-weight: 900;
             color: #ffffff;
-            margin-bottom: 30px;
+            margin-bottom: 60px;
             text-align: center;
             letter-spacing: -0.04em;
 
         }
 
-        
+
 
         .content p {
             color: #b3b3b3;
             font-size: 14px;
             margin-bottom: 30px;
             text-align: center;
-            
+
         }
 
         /* Form styling */
@@ -90,7 +119,7 @@
         form input[type="text"]:focus {
             outline: none;
             background-color: #404040;
-            box-shadow: 0 0 0 2px rgba(248, 236, 0, 0.5);
+            box-shadow: 0 0 0 2px rgba(0, 178, 248, 0.5);
         }
 
         form input[type="submit"] {
@@ -123,7 +152,7 @@
         }
 
         .flash-messages li {
-            background-color: #E91429; /* Spotify red */
+            background-color: #00b2f880; /* Spotify blue */
             color: white;
             padding: 15px 25px;
             margin-top: 10px;
@@ -181,13 +210,13 @@
             align-items: center;
             justify-content: center;
             padding: 15px;
-            box-sizing: border-box;  
-            text-align: center; 
+            box-sizing: border-box;
+            text-align: center;
         }
 
         #loading-spinner {
             border: 6px solid #333333;
-            border-top: 6px solid #ffea00; /* Spotify green */
+            border-top: 6px solid #5dcef0; /* Spotify green */
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -237,12 +266,12 @@
 </head>
 <body>
 <div class="container">
-    <h1 class="page-title">Scan Now!!</h1>
+    <h1 class="page-title">Scan Now!</h1>
+
         <p>Check if a link is safe to open with URLCHECK. Protect yourself<br>from suspicious websites and online scams.</p>
-        
+
         <div class="scan-form">
             <form method="post" action="/result" id="scan-form">
-                <label for="url">Enter URL to scan:</label>
                 <input type="text" name="url" id="url" placeholder="https://example.com" required />
                 <input type="submit" value="Scan URL" />
             </form>

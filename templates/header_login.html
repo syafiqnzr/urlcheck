@@ -189,7 +189,7 @@ body {
         var dropdown = document.getElementById("dropdown-content");
         dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
     }
-    
+
     // Hide dropdown if clicked outside
     window.onclick = function(event) {
       if (!event.target.matches('.profile-button') && !event.target.closest('.profile-dropdown')) {
@@ -223,7 +223,7 @@ body {
         <a href="/">Home</a>
         <a href="/plan">Plan</a>
 
-            {% if 'username' in session %}
+            {% if 'email' in session or 'username' in session %}
             <div class="profile-dropdown">
                 <button class="profile-button" onclick="toggleDropdown()">
                     {% if profile_picture %}
@@ -233,7 +233,7 @@ body {
                   {% endif %}
                   {{ username }}
                 </button>
-            
+
                 <div id="dropdown-content" class="dropdown-content">
                   <div class="profile-info">
                     {% if profile_picture %}
@@ -246,14 +246,14 @@ body {
                   <a href="/logout">Logout</a>
                 </div>
               </div>
-                 
+
             {% else %}
 
             <a href="/login_admin">Admin Login</a>
             <a href="/register">Register</a>
         {% endif %}
     </div>
-    
+
 </div>
 
 <div class="content">

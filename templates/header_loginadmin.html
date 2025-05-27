@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>URLCHECK</title>
-   <style>
+     <style>
 /* Base Styles */
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -20,7 +21,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(90deg, #1e3c72, #2a5298);
+    background: linear-gradient(90deg, #000000, #000000);
     padding: 15px 20px;
     color: white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -39,7 +40,7 @@ body {
 }
 
 .header .logo a:hover {
-    color: #ffdd57;
+    color: #ffffff;
 }
 
 /* Navigation */
@@ -54,13 +55,13 @@ body {
     text-decoration: none;
     font-size: 16px;
     padding: 8px 14px;
-    border-radius: 6px;
+
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .nav-links a:hover {
-    background-color: #ffdd57;
-    color: #1e3c72;
+    background-color: #000000;
+    color: #d19af3;
 }
 
 /* Hamburger Icon */
@@ -84,7 +85,7 @@ body {
         display: none;
         flex-direction: column;
         height: 245px;
-        background-color: #1e3c72;
+        background-color: #000000;
         position: fixed;
         top: 65px;
         right: 0;
@@ -95,7 +96,7 @@ body {
 
     .nav-links a {
         padding: 12px;
-        border-top: 1px solid #1e3c72;
+        border-top: 1px solid #000000;
     }
 
     .menu-toggle {
@@ -149,8 +150,8 @@ body {
 #dropdown-content {
     display: none;
     position: absolute;
-    right: 0;
-    background-color: #6A1B9A; /* purple */
+    right: 0px;
+    background-color:#000000; /* black */
     min-width: 220px;
     box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
     border-radius: 10px;
@@ -180,6 +181,8 @@ body {
 .signout-button:hover {
     background-color: #f2f2f2;
 }
+
+
   </style>
   <script>
     function toggleDropdown() {

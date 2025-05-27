@@ -1,13 +1,9 @@
-{% extends "header_admin.html" %}
-
-{% block content %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management</title>
+    <title>User Management - Preview</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         /* Reset and base styles */
@@ -22,35 +18,6 @@
             background: linear-gradient(135deg, #141719 0%, #121212 100%);
             color: #ffffff;
             min-height: 100vh;
-        }
-
-        /* Input field styling for dark mode */
-        input[type="text"],
-        input[type="text"]:focus,
-        input[type="text"]:active,
-        input[type="text"]:hover,
-        input[type="password"],
-        input[type="password"]:focus,
-        input[type="email"],
-        input[type="email"]:focus,
-        textarea,
-        textarea:focus,
-        select,
-        select:focus {
-            background-color: #333333 !important;
-            color: #ffffff !important;
-            border: 1px solid #444444;
-            outline-color: #b148f3;
-        }
-
-        /* Override browser autofill styles */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active {
-            -webkit-box-shadow: 0 0 0 30px #333333 inset !important;
-            -webkit-text-fill-color: #ffffff !important;
-            transition: background-color 5000s ease-in-out 0s;
         }
 
         /* Container */
@@ -190,18 +157,6 @@
             background: rgba(255, 167, 38, 0.1);
         }
 
-        /* No Users Message */
-        .no-users {
-            text-align: center;
-            color: #b3b3b3;
-            font-size: 18px;
-            margin-top: 60px;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            border: 1px dashed #404040;
-        }
-
         /* Modal Popup Styles */
         .modal {
             display: none;
@@ -290,7 +245,6 @@
         .info-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             margin-bottom: 15px;
             padding: 12px;
             background: rgba(255, 255, 255, 0.05);
@@ -300,49 +254,11 @@
         .info-label {
             color: #b3b3b3;
             font-weight: 500;
-            min-width: 120px;
         }
 
         .info-value {
             color: #ffffff;
             font-weight: 600;
-            flex: 1;
-            text-align: right;
-        }
-
-        /* Editable input fields in modal */
-        .info-input {
-            background-color: #333333;
-            color: #ffffff;
-            border: 1px solid #444444;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 14px;
-            width: 100%;
-            max-width: 200px;
-            transition: border-color 0.3s ease;
-        }
-
-        .info-input:focus {
-            border-color: #b148f3;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(177, 72, 243, 0.2);
-        }
-
-        .info-input:disabled {
-            background-color: #222222;
-            color: #888888;
-            cursor: not-allowed;
-        }
-
-        /* Edit mode styles */
-        .edit-mode .info-row.editable {
-            background: rgba(177, 72, 243, 0.1);
-            border: 1px solid rgba(177, 72, 243, 0.3);
-        }
-
-        .edit-mode .info-row.readonly {
-            opacity: 0.7;
         }
 
         .modal-actions {
@@ -404,6 +320,25 @@
             transform: translateY(-2px);
         }
 
+        /* Editable input fields in modal */
+        .info-input {
+            background-color: #333333;
+            color: #ffffff;
+            border: 1px solid #444444;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            width: 100%;
+            max-width: 200px;
+            transition: border-color 0.3s ease;
+        }
+
+        .info-input:focus {
+            border-color: #b148f3;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(177, 72, 243, 0.2);
+        }
+
         /* Hide/show buttons based on mode */
         .view-mode .edit-buttons {
             display: flex;
@@ -421,32 +356,14 @@
             display: flex;
         }
 
-        /* Loading state */
-        .btn.loading {
+        /* Edit mode styles */
+        .edit-mode .info-row.editable {
+            background: rgba(177, 72, 243, 0.1);
+            border: 1px solid rgba(177, 72, 243, 0.3);
+        }
+
+        .edit-mode .info-row.readonly {
             opacity: 0.7;
-            cursor: not-allowed;
-            position: relative;
-        }
-
-        .btn.loading::after {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            margin: auto;
-            border: 2px solid transparent;
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         /* Responsive design */
@@ -494,51 +411,66 @@
                 font-size: 28px;
             }
         }
-</style>
+    </style>
 </head>
 <body>
     <div class="container">
         <h1 class="page-title">User Management</h1>
         <div class="content">
-            {% if users %}
-                <div class="users-grid">
-                    {% for user in users %}
-                    <div class="user-card"
-                         data-user-id="{{ user.id }}"
-                         data-username="{{ user.username }}"
-                         data-email="{{ user.email }}"
-                         data-token="{{ user.token_number if user.token_number else '' }}"
-                         data-start-date="{{ user.start_date.strftime('%d.%m.%Y') if user.start_date else '' }}"
-                         data-expiry-date="{{ user.expiry_date.strftime('%d.%m.%Y') if user.expiry_date else '' }}"
-                         data-profile-picture="{% if user.profile_picture %}data:image/jpeg;base64,{{ user.profile_picture | b64encode }}{% endif %}"
-                         onclick="openUserModalFromCard(this)">
-                        <div class="user-avatar">
-                            {% if user.profile_picture %}
-                                <img src="data:image/jpeg;base64,{{ user.profile_picture | b64encode }}" alt="Profile Picture" />
-                            {% else %}
-                                <div class="no-image">No Image</div>
-                            {% endif %}
-                        </div>
-                        <div class="user-info">
-                            <h3>{{ user.username }}</h3>
-                            <div class="email">{{ user.email }}</div>
-                            <div class="expiry {% if not user.expiry_date %}no-token{% endif %}">
-                                {% if user.expiry_date %}
-                                    Expires: {{ user.expiry_date.strftime('%d.%m.%Y') }}
-                                {% else %}
-                                    No Token
-                                {% endif %}
-                            </div>
+            <div class="users-grid">
+                <!-- Sample User Cards -->
+                <div class="user-card" onclick="openUserModal('1', 'Rebecca Fox', 'rebecca@example.com', '1234-ab-5678', '15.01.2025', '15.02.2025', '')">
+                    <div class="user-avatar">
+                        <div class="no-image">RF</div>
+                    </div>
+                    <div class="user-info">
+                        <h3>Rebecca Fox</h3>
+                        <div class="email">rebecca@example.com</div>
+                        <div class="expiry">
+                            Expires: 15.02.2025
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-            {% else %}
-                <div class="no-users">
-                    <h3>No users found</h3>
-                    <p>There are currently no users in the system.</p>
+
+                <div class="user-card" onclick="openUserModal('2', 'Stanis Ryle', 'stanis@example.com', '9876-cd-5432', '10.01.2025', '10.02.2025', '')">
+                    <div class="user-avatar">
+                        <div class="no-image">SR</div>
+                    </div>
+                    <div class="user-info">
+                        <h3>Stanis Ryle</h3>
+                        <div class="email">stanis@example.com</div>
+                        <div class="expiry">
+                            Expires: 10.02.2025
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
+
+                <div class="user-card" onclick="openUserModal('3', 'Brian Lord', 'brian@example.com', '', '', '', '')">
+                    <div class="user-avatar">
+                        <div class="no-image">BL</div>
+                    </div>
+                    <div class="user-info">
+                        <h3>Brian Lord</h3>
+                        <div class="email">brian@example.com</div>
+                        <div class="expiry no-token">
+                            No Token
+                        </div>
+                    </div>
+                </div>
+
+                <div class="user-card" onclick="openUserModal('4', 'Diana Hall', 'diana@example.com', '5555-ef-1111', '01.01.2025', '01.01.2025', '')">
+                    <div class="user-avatar">
+                        <div class="no-image">DH</div>
+                    </div>
+                    <div class="user-info">
+                        <h3>Diana Hall</h3>
+                        <div class="email">diana@example.com</div>
+                        <div class="expiry expired">
+                            Expires: 01.01.2025
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -587,10 +519,10 @@
             <div class="modal-actions">
                 <div class="edit-buttons">
                     <button class="btn btn-edit" onclick="enableEditMode()">Edit User</button>
-                    <button class="btn btn-delete" onclick="deleteUser()">Delete User</button>
+                    <button class="btn btn-delete" onclick="alert('Delete functionality')">Delete User</button>
                 </div>
                 <div class="save-buttons">
-                    <button class="btn btn-save" onclick="saveUserChanges()">Save Changes</button>
+                    <button class="btn btn-save" onclick="alert('Save functionality - would update username and token')">Save Changes</button>
                     <button class="btn btn-cancel" onclick="cancelEdit()">Cancel</button>
                 </div>
             </div>
@@ -598,24 +530,9 @@
     </div>
 
     <script>
-        let currentUserId = null;
         let originalUserData = {};
 
-        function openUserModalFromCard(cardElement) {
-            const userId = cardElement.getAttribute('data-user-id');
-            const username = cardElement.getAttribute('data-username');
-            const email = cardElement.getAttribute('data-email');
-            const tokenNumber = cardElement.getAttribute('data-token');
-            const startDate = cardElement.getAttribute('data-start-date');
-            const expiryDate = cardElement.getAttribute('data-expiry-date');
-            const profilePicture = cardElement.getAttribute('data-profile-picture');
-
-            openUserModal(userId, username, email, tokenNumber, startDate, expiryDate, profilePicture);
-        }
-
         function openUserModal(userId, username, email, tokenNumber, startDate, expiryDate, profilePicture) {
-            currentUserId = userId;
-
             // Store original data for cancel functionality
             originalUserData = {
                 username: username,
@@ -644,7 +561,7 @@
             if (profilePicture && profilePicture.trim() !== '') {
                 modalAvatar.innerHTML = '<img src="' + profilePicture + '" alt="Profile Picture" />';
             } else {
-                modalAvatar.innerHTML = '<div class="no-image">No Image</div>';
+                modalAvatar.innerHTML = '<div class="no-image">' + username.split(' ').map(n => n[0]).join('') + '</div>';
             }
 
             // Reset to view mode
@@ -690,84 +607,6 @@
             setViewMode();
         }
 
-        function saveUserChanges() {
-            const newUsername = document.getElementById('modalUsernameInput').value.trim();
-            const newToken = document.getElementById('modalTokenInput').value.trim();
-
-            if (!newUsername) {
-                alert('Username cannot be empty');
-                return;
-            }
-
-            // Show loading state
-            const saveBtn = document.querySelector('.btn-save');
-            saveBtn.classList.add('loading');
-            saveBtn.disabled = true;
-
-            // Prepare data for update
-            const updateData = {
-                user_id: currentUserId,
-                username: newUsername,
-                token_number: newToken || null
-            };
-
-            // Send AJAX request to update user
-            fetch('/update_user', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updateData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                saveBtn.classList.remove('loading');
-                saveBtn.disabled = false;
-
-                if (data.success) {
-                    // Update display values
-                    document.getElementById('modalUsernameDisplay').textContent = newUsername;
-                    document.getElementById('modalTokenDisplay').textContent = newToken || 'No Token';
-                    document.getElementById('modalUsername').textContent = newUsername;
-
-                    // Update dates if provided
-                    if (data.start_date) {
-                        document.getElementById('modalStartDate').textContent = data.start_date;
-                    }
-                    if (data.expiry_date) {
-                        document.getElementById('modalExpiryDate').textContent = data.expiry_date;
-                    }
-
-                    // Update original data
-                    originalUserData.username = newUsername;
-                    originalUserData.tokenNumber = newToken;
-                    originalUserData.startDate = data.start_date || originalUserData.startDate;
-                    originalUserData.expiryDate = data.expiry_date || originalUserData.expiryDate;
-
-                    setViewMode();
-
-                    // Refresh the page to update the card
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    alert('Error: ' + (data.message || 'Failed to update user'));
-                }
-            })
-            .catch(error => {
-                saveBtn.classList.remove('loading');
-                saveBtn.disabled = false;
-                console.error('Error:', error);
-                alert('An error occurred while updating the user');
-            });
-        }
-
-        function deleteUser() {
-            if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-                window.location.href = '/delete_user/' + currentUserId;
-            }
-        }
-
         function closeUserModal() {
             document.getElementById('userModal').style.display = 'none';
             setViewMode(); // Reset to view mode when closing
@@ -792,4 +631,3 @@
     <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 </body>
 </html>
-{% endblock %}

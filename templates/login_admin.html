@@ -6,52 +6,83 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Login</title>
-     <style>
-
-        body, h1, p, form {
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        body, h1, h2, p, div {
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* Main content container */
-        .content {
-            width: 90%;
-            max-width: 600px;
-            background-color: #ffffff;
+        /* Dark theme base styles */
+        body {
+            background: linear-gradient(135deg, #141719 0%, #121212 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        /* Input field styling for dark mode */
+        input[type="text"],
+        input[type="text"]:focus,
+        input[type="text"]:active,
+        input[type="text"]:hover,
+        input[type="password"],
+        input[type="password"]:focus,
+        input[type="email"],
+        input[type="email"]:focus,
+        textarea,
+        textarea:focus,
+        select,
+        select:focus {
+            background-color: #333333 !important;
+            color: #ffffff !important;
+            border: 1px solid #444444;
+            outline-color: #b148f3;
+        }
+
+        /* Override browser autofill styles */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #333333 inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+
+        /* Main container */
+        .container {
+            max-width: 1200px;
             margin: 40px auto;
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            padding: 30px 20px;
-            box-sizing: border-box;
-            margin-top: 50px;
-
+            padding: 0 0px;
         }
 
-        .content h1 {
-            color: #1e3c72;
+        /* Page title */
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 30px;
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 28px;
+            letter-spacing: -0.04em;
         }
 
-    .content p2 {
-    display: block; /* Makes sure it's treated like a block-level element */
-    text-align: center;
-    color: #000000;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.5;
-    margin: 0 auto 20px auto; /* Horizontally center and keep bottom margin */
-    width: 380px; /* Shrinks the width to fit the content */
-    }
+        .content p {
+            color: #b3b3b3;
+            font-size: 14px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
 
 
         label {
             display: block;
-            font-weight: 500;;
-            margin-bottom: 10px;
-            color: #333;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #b3b3b3;
             font-size: 16px;
         }
 
@@ -66,134 +97,107 @@
         }
 
         .modal-content {
-            background-color: #fff;
+            background-color: #282828;
             margin: 15% auto;
             padding: 20px;
             width: 300px;
             text-align: center;
             border-radius: 8px;
+            color: #ffffff;
         }
 
         .modal button {
             margin: 5px;
         }
-        /* Main content container */
-.content {
-    width: 90%;
-    max-width: 420px;
-    background-color: #ffffff;
-    margin: 60px auto;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    padding: 40px 30px;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    transition: transform 0.3s ease;
-}
-
-.content:hover {
-    transform: scale(1.01);
-}
-
-.content h1 {
-    color: #1e3c72;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 28px;
-}
-
-.content p {
-    text-align: center;
-    color: #444;
-    font-size: 16px;
-    margin-bottom: 20px;
-}
 
 
 
-/* Login Form Styles */
-.login-form {
-    display: flex;
-    flex-direction: column;
-}
 
-.login-form label {
-    font-weight: 500;
-    margin-bottom: 5px;
-    color: #333;
-}
+        /* Login Form Styles */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            width: 30%;
+            margin: auto;
+            position: center;
+        }
 
-.login-form input[type="text"],
-.login-form input[type="password"] {
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 18px;
-    font-size: 14px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
+        .login-form label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #b3b3b3;
+        }
 
-.login-form input:focus {
-    border-color: #1e3c72;
-    box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.2);
-    outline: none;
-}
+        .login-form input[type="text"],
+        .login-form input[type="email"],
+        .login-form input[type="password"] {
+            padding: 10px 12px;
+            background-color: #282828;
+            border: 1px solid #333;
+            border-radius: 30px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            color: #ffffff;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
 
-.login-form button {
-    padding: 12px;
-    background-color: #1e3c72;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
+        .login-form input:focus {
+            border-color: #b148f3;
+            box-shadow: 0 0 0 2px rgba(177, 72, 243, 0.2);
+            outline: none;
+        }
 
-.login-form button:hover {
-    background-color: #16345d;
-    transform: scale(1.02);
-}
+        .login-form button {
+            margin-top: 0px;
+            padding: 12px;
+            background-color: #b148f3;
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
 
-.register-link {
-    margin-top: 20px;
-    max-width: 1000px;
-    text-align: center;
-}
+        .login-form button:hover {
+            background-color: #9a3dd9;
+            transform: scale(1.02);
+        }
 
-.register-link a {
-    
-    padding: 10px 20px;
-    text-decoration: none;
-    color: #1e3c72;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    font-size: 14px;
-}
+        .register-link {
+            margin-top: 20px;
+            text-align: center;
+        }
 
-.register-link a:hover {
-    color: #12294b;
-}
+        .register-link a {
+            text-decoration: none;
+            color: #b3b3b3;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            font-size: 14px;
+        }
 
-.forgot-link {
-    margin-top: -19px;
-    margin-bottom: 18px;
-    text-align: right;
-}
+        .register-link a:hover {
+            color: #b148f3;
+        }
 
-.forgot-link a {
-    
-    text-decoration: none;
-    color: #1e3c72;
-    font-weight: 600;
-    transition: color 0.3s ease;
-    font-size: 12px;
-}
+        .forgot-link {
+            margin-top: -19px;
+            margin-bottom: 18px;
+            text-align: right;
+        }
 
-.forgot-link a:hover {
-    color: #12294b;
-}
+        .forgot-link a {
+            text-decoration: none;
+            color: #b3b3b3;
+            font-size: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-link a:hover {
+            color: #b148f3;
+        }
 
         /* Flash messaes container */
         .flash-messages {
@@ -207,12 +211,12 @@
         }
 
         .flash-messages li {
-            background-color: #f43636; /* Red background */
+            background-color: #ff0019a8;
             color: white;
             padding: 15px 25px;
             margin-top: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             font-size: 14px;
             opacity: 0;
             transform: translateX(100%);
@@ -257,7 +261,7 @@
                 font-size: 24px;
             }
 
-            form input[type="submit"] {
+            .login-form button {
                 padding: 12px;
                 font-size: 15px;
             }
@@ -267,24 +271,7 @@
                 padding: 12px 20px;
                 font-size: 13px;
             }
-
-            #loading-container {
-                width: 180px;
-                height: 110px;
-                padding: 12px;
-            }
-
-            #loading-spinner {
-                width: 40px;
-                height: 40px;
-                margin-bottom: 8px;
-            }
-
-            #loading-message {
-                font-size: 14px;
-            }
         }
-
     </style>
     <script>
         // JavaScript function to show alert if a message exists
@@ -304,37 +291,43 @@
                     }, 500);
                 });
             });
-
-            // Show loading overlay on form submit and prevent multiple submits
-            const form = document.getElementById('scan-form');
-            form.addEventListener('submit', function(event) {
-                // Show loading overlay
-                document.getElementById('loading-overlay').style.display = 'flex';
-
-                // Disable submit button to prevent multiple submits
-                const submitButton = form.querySelector('input[type="submit"]');
-                submitButton.disabled = true;
-            });
         });
     </script>
 </head>
 <body>
-    
-    <h1>Admin Login</h1>
-    <form method="POST" action="/login_admin">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
-        
-        <br><button type="submit">Submit</button><br>
-    </form>
+<div class="container">
+    <div class="content">
+        <h1 class="page-title">Admin Login</h1>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <ul class="flash-messages" id="flash-messages">
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login_admin" class="login-form">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">LOG IN</button>
+        </form>
+    </div>
+
+    <p2 style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px;  margin-bottom: 15px; width: 100%; left: 0px;">Copyright © URLCHECK 2025</p2>
 
     <!-- Pop-up alert -->
     <script>
         // Fetch any error message passed from Flask and display it
         showAlert('{{ message }}');
     </script>
+</div>
 </body>
 </html>
 {% endblock %}

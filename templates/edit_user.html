@@ -7,25 +7,50 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Edit User</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
+        /* Reset and base styles */
+        body, h1, h2, p, div {
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .container {
-            max-width: 480px;
-            margin: 50px auto;
-            background: white;
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+
+        /* Light theme base styles */
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333333;
+            min-height: 100vh;
         }
-        h1 {
-            color: #1e3c72;
+
+        /* Container */
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Page title */
+        .page-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
             text-align: center;
-            margin-bottom: 25px;
+            color: #333333;
+            margin-bottom: 30px;
+        }
+
+        /* Content container */
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #ffffff;
+            margin: 0 auto;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px 30px;
+            box-sizing: border-box;
         }
         form label {
             display: block;
@@ -34,29 +59,49 @@
             color: #333;
             font-size: 16px;
         }
+        /* Form styles */
+        form label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333333;
+            font-size: 16px;
+        }
+
         form input[type="text"],
         form input[type="email"] {
             width: 100%;
             padding: 12px;
             font-size: 16px;
-            border: 1px solid #1e3c72;
+            border: 2px solid #e9ecef;
             border-radius: 8px;
             margin-bottom: 20px;
             box-sizing: border-box;
+            transition: border-color 0.3s ease;
         }
+
+        form input[type="text"]:focus,
+        form input[type="email"]:focus {
+            outline: none;
+            border-color: #5dcef0;
+        }
+
         form input[type="submit"] {
             width: 100%;
             padding: 14px;
-            background-color: #1e3c72;
+            background-color: #5dcef0;
             color: white;
             font-size: 16px;
+            font-weight: 500;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
         }
+
         form input[type="submit"]:hover {
-            background-color: #16345d;
+            background-color: #4ac3e8;
+            transform: translateY(-1px);
         }
         .flash-messages {
             list-style: none;
@@ -71,47 +116,69 @@
         a.back-link {
             display: inline-block;
             margin-top: 15px;
-            color: #1e3c72;
+            color: #5dcef0;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
         }
+
         a.back-link:hover {
+            color: #4ac3e8;
             text-decoration: underline;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 30px 20px;
+            }
+
+            .main-container {
+                padding: 20px 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Edit User</h1>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <ul class="flash-messages">
-              {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
-        <form method="POST" action="{{ url_for('edit_user', user_id=user.id) }}">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" value="{{ user.username }}" required />
+    <div class="main-container">
+        <h1 class="page-title">Edit User</h1>
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flash-messages">
+                        {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
 
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="{{ user.email }}" required />
+            <form method="POST" action="{{ url_for('edit_user', user_id=user.id) }}">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" value="{{ user.username }}" required />
 
-            <label for="token_number">Token Number</label>
-            <input type="text" id="token_number" name="token_number" value="{{ user.token if user.token else '' }}" />
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" required />
 
-            <label for="start_date">Start Date</label>
-            <input type="text" id="start_date" name="start_date" value="{{ user.start_date.strftime('%d-%m-%Y') if user.start_date else '' }}" readonly />
+                <label for="token_number">Token Number</label>
+                <input type="text" id="token_number" name="token_number" value="{{ user.token if user.token else '' }}" />
 
-            <label for="expiry_date">Expiry Date</label>
-            <input type="text" id="expiry_date" name="expiry_date" value="{{ user.expiry_date.strftime('%d-%m-%Y') if user.expiry_date else '' }}" readonly />
+                <label for="start_date">Start Date</label>
+                <input type="text" id="start_date" name="start_date" value="{{ user.start_date.strftime('%d.%m.%Y') if user.start_date else '' }}" readonly />
 
-            <input type="submit" value="Update User" />
-        </form>
-        <a href="{{ url_for('manage_user') }}" class="back-link">Back to Manage Users</a>
+                <label for="expiry_date">Expiry Date</label>
+                <input type="text" id="expiry_date" name="expiry_date" value="{{ user.expiry_date.strftime('%d.%m.%Y') if user.expiry_date else '' }}" readonly />
+
+                <input type="submit" value="Update User" />
+            </form>
+
+            <a href="{{ url_for('manage_user') }}" class="back-link">Back to Manage Users</a>
+        </div>
     </div>
+    <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 </body>
 </html>
 {% endblock %}

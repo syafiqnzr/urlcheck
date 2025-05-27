@@ -191,7 +191,7 @@ body {
         var dropdown = document.getElementById("dropdown-content");
         dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
     }
-    
+
     // Hide dropdown if clicked outside
     window.onclick = function(event) {
       if (!event.target.matches('.profile-button') && !event.target.closest('.profile-dropdown')) {
@@ -243,44 +243,44 @@ body {
     <div class="nav-links" id="navLinks">
         <a href="/">Home</a>
         <a href="/plan">Plan</a>
-        
 
-            {% if 'username' in session %}
+
+            {% if 'email' in session or 'username' in session %}
             <a href="/archiveurl">History</a>
             <div class="profile-dropdown">
                 <button class="profile-button" onclick="toggleDropdown()">
                     {% if profile_picture %}
                     <img src="data:image/jpeg;base64,{{ profile_picture | b64encode }}" alt="Profile Picture" class="mini-profile-pic">
                   {% else %}
-                    <img src="{{ url_for('static', filename='default_profile.png') }}" alt="Default Profile" class="mini-profile-pic">
+                    <img src="{{ url_for('static', filename='profilee.jpg') }}" alt="Default Profile" class="mini-profile-pic">
                   {% endif %}
                   {{ username }}
                 </button>
-            
+
                 <div id="dropdown-content" class="dropdown-content">
                   <div class="profile-info">
                     {% if profile_picture %}
                     <img src="data:image/jpeg;base64,{{ profile_picture | b64encode }}" alt="Profile Picture" class="large-profile-pic">
                   {% else %}
-                    <img src="{{ url_for('static', filename='default_profile.png') }}" alt="Default Profile" class="large-profile-pic">
+                    <img src="{{ url_for('static', filename='profilee.jpg') }}" alt="Default Profile" class="large-profile-pic">
                   {% endif %}
                   </div>
                   <a href="/profile">Edit Profile</a>
                   <a href="/logout">Logout</a>
                 </div>
               </div>
-                 
+
             {% else %}
 
             <a href="/login">Login</a>
             <a href="/register">Register</a>
         {% endif %}
     </div>
-    
+
 </div>
 
 <div class="content">
-    
+
     {% block content %}
     <div>
         <h1>{{ page_title }}</h1>

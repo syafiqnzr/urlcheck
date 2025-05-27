@@ -13,25 +13,54 @@
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background-color: #121212;
-            color: #ffffff;
-            
-        }
+    background: linear-gradient(135deg, #141719 0%, #121212 100%);
+    color: #ffffff;
+}
+
+/* Input field styling for dark mode */
+input[type="text"],
+input[type="text"]:focus,
+input[type="text"]:active,
+input[type="text"]:hover,
+input[type="password"],
+input[type="password"]:focus,
+input[type="email"],
+input[type="email"]:focus,
+textarea,
+textarea:focus,
+select,
+select:focus {
+    background-color: #333333 !important;
+    color: #ffffff !important;
+    border: 1px solid #5dcef0;
+    outline-color: #1e3c72;
+}
+
+/* Override browser autofill styles which often use white backgrounds */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #333333 inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
 
         /* Main content container */
-        
+
         /* Main container */
         .content {
             max-width: 400px;
             margin: 40px auto;
             padding: 0 20px;
         }
-        
+
         /* Page title */
         .page-title {
-            font-size: 48px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 46.5px;
             font-weight: 900;
             color: #ffffff;
             margin-bottom: 30px;
@@ -56,18 +85,18 @@
         gap: 10px;
         margin-bottom: 20px;
     }
-    
+
     .email_send-form label {
         font-weight: 500;
             margin-bottom: 5px;
-            color: #c40202;
+            color: #00b2f880;
     }
-    
+
     .email-form input {
         flex: 1;
         margin-bottom: 0; /* Override the existing margin */
     }
-    
+
     .email-form button {
         margin-bottom: 0; /* Override the existing margin */
     }
@@ -96,9 +125,14 @@
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
+        /* Center text in OTP input box */
+        .otp-form input[type="text"] {
+            text-align: center;
+        }
+
         .email-form input:focus, .otp-form input[type="text"]:focus,
         .email-form input:focus, .otp-form input[type="password"]:focus{
-            border-color: #ffea00;
+            border-color: #5dcef0;
             box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
             outline: none;
         }
@@ -106,7 +140,7 @@
         .email-form button, .otp-form button{
             margin-bottom: 20px;
             padding: 12px;
-            background-color: #b8ac29;
+            background-color: #4aa4c0;
             color: rgb(0, 0, 0);
             border: none;
             border-radius: 25px;
@@ -117,7 +151,7 @@
         }
 
         .email-form button:hover, .otp-form button:hover{
-            background-color: #ffea00;
+            background-color: #5dcef0;
             transform: scale(1.02);
         }
 
@@ -133,7 +167,7 @@
         }
 
         .flash-messages li {
-            background-color: #E91429; /* Spotify red */
+            background-color: #00b2f880; /* Spotify red */
             color: white;
             padding: 15px 25px;
             margin-top: 10px;
@@ -197,7 +231,7 @@
 
         #loading-spinner {
             border: 6px solid #333333;
-            border-top: 6px solid #ffea00; /* Spotify green */
+            border-top: 6px solid #5dcef0; /* Spotify green */
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -259,10 +293,10 @@
           </ul>
     {% endif %}
     {% endwith %}
-    
+
         <label for="email_send">Enter Email:</label>
     <form method="post" action="{{ url_for('send_reset_otp') }}" class="email-form">
-        
+
         <input type="email" id="email_send" name="email" placeholder="Email" required />
         <button type="submit">Send OTP</button>
     </form>
@@ -272,6 +306,8 @@
         <input type="text" id="otp" name="otp" placeholder="OTP" required />
         <button type="submit">Confirm OTP</button>
     </form>
+            <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 15px; left: 0; right: 0; margin: 0; width: 100%;">Copyright © URLCHECK 2025</p>
+
 <script>
      // Remove flash message on click
         document.addEventListener('DOMContentLoaded', function() {
