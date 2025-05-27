@@ -261,7 +261,9 @@
             td:nth-of-type(3):before { content: "Classification"; }
             td:nth-of-type(4):before { content: "Note"; }
             td:nth-of-type(5):before { content: "Sender"; }
-            td:nth-of-type(6):before { content: "Remove"; }
+            td:nth-of-type(6):before { content: "View Detail"; }
+            td:nth-of-type(7):before { content: "Edit"; }
+            td:nth-of-type(8):before { content: "Remove"; }
 
             .url-cell {
                 max-width: none;
@@ -394,6 +396,51 @@
         .delete-icon {
             font-size: 16px;
         }
+
+        /* Edit button styles */
+        .edit-btn {
+            background-color: #ffc107;
+            color: #000000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+        }
+
+        .edit-btn:hover {
+            background-color: #e0a800;
+            transform: scale(1.1);
+        }
+
+        .edit-icon {
+            font-size: 16px;
+        }
+
+        /* Detail button styles */
+        .detail-button {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .detail-button:hover {
+            background-color: #b148f3;
+            color: #ffffff;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -413,6 +460,8 @@
                         <th style="text-align: center;">Classification</th>
                         <th>Note</th>
                         <th style="text-align: center;">Sender</th>
+                        <th style="text-align: center;">View Detail</th>
+                        <th style="text-align: center;">Edit</th>
                         <th style="text-align: center;">Remove</th>
                     </tr>
                 </thead>
@@ -428,6 +477,14 @@
                         </td>
                         <td data-label="Note">{{ row.note }}</td>
                         <td data-label="Sender" style="text-align: center;">{{ row.sender }}</td>
+                        <td data-label="View Detail" style="text-align: center;">
+                            <a href="{{ url_for('admin_details_by_url', url_encoded=row.url|urlencode) }}" class="detail-button">View Details</a>
+                        </td>
+                        <td data-label="Edit" style="text-align: center;">
+                            <button class="edit-btn" onclick="showEditModal({{ row.id }}, '{{ row.classification }}', '{{ row.note|replace("'", "\\'") }}')">
+                                <i class="edit-icon">✏️</i>
+                            </button>
+                        </td>
                         <td data-label="Remove" style="text-align: center;">
                             <button class="delete-btn" onclick="showDeleteModal({{ row.id }}, '{{ row.url|truncate(30) }}')">
                                 <i class="delete-icon">🗑️</i>
@@ -436,7 +493,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="empty-state">No archive data found. URLs will appear here after being scanned.</td>
+                        <td colspan="8" class="empty-state">No archive data found. URLs will appear here after being scanned.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -499,6 +556,57 @@
         </div>
     </div>
 
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <h2>Edit URL Information</h2>
+            <form id="editForm">
+                <input type="hidden" id="editScanId" name="scan_id">
+
+                <div style="margin-bottom: 20px; text-align: left;">
+                    <label for="editClassification" style="display: block; margin-bottom: 8px; color: #ffffff; font-weight: 600;">Classification:</label>
+                    <select id="editClassification" name="classification" style="width: 100%; padding: 10px; border: 1px solid #333333; border-radius: 6px; background-color: #1a1a1a; color: #ffffff; font-size: 14px;">
+                        <option value="Safe">Safe</option>
+                        <option value="Suspicious">Suspicious</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 25px; text-align: left;">
+                    <label for="editNote" style="display: block; margin-bottom: 8px; color: #ffffff; font-weight: 600;">Note:</label>
+                    <textarea id="editNote" name="note" rows="4" style="width: 100%; padding: 10px; border: 1px solid #333333; border-radius: 6px; background-color: #1a1a1a; color: #ffffff; font-size: 14px; resize: vertical;" placeholder="Enter note..."></textarea>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn btn-confirm" onclick="showPasswordConfirmation()">Save Changes</button>
+                    <button type="button" class="modal-btn btn-cancel" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password Confirmation Modal -->
+    <div class="modal-overlay" id="passwordModal">
+        <div class="modal-content">
+            <h2>Admin Password Confirmation</h2>
+            <p>Please enter your admin password to confirm the changes:</p>
+            <form id="passwordForm" action="{{ url_for('update_scan_result') }}" method="post">
+                <input type="hidden" id="confirmScanId" name="scan_id">
+                <input type="hidden" id="confirmClassification" name="classification">
+                <input type="hidden" id="confirmNote" name="note">
+
+                <div style="margin-bottom: 25px; text-align: left;">
+                    <label for="adminPasswordEdit" style="display: block; margin-bottom: 8px; color: #ffffff; font-weight: 600;">Admin Password:</label>
+                    <input type="password" id="adminPasswordEdit" name="admin_password" required style="width: 100%; padding: 10px; border: 1px solid #333333; border-radius: 6px; background-color: #1a1a1a; color: #ffffff; font-size: 14px;" placeholder="Enter admin password">
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn btn-confirm" style="background-color: #ffc107; color: #000000;">Confirm Update</button>
+                    <button type="button" class="modal-btn btn-cancel" onclick="closePasswordModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #b3b3b3; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 
     <script>
@@ -530,16 +638,57 @@
             document.getElementById('deleteModal').style.display = 'none';
         }
 
+        // Show edit modal
+        function showEditModal(scanId, classification, note) {
+            document.getElementById('editScanId').value = scanId;
+            document.getElementById('editClassification').value = classification;
+            document.getElementById('editNote').value = note;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Show password confirmation modal
+        function showPasswordConfirmation() {
+            const scanId = document.getElementById('editScanId').value;
+            const classification = document.getElementById('editClassification').value;
+            const note = document.getElementById('editNote').value;
+
+            document.getElementById('confirmScanId').value = scanId;
+            document.getElementById('confirmClassification').value = classification;
+            document.getElementById('confirmNote').value = note;
+            document.getElementById('adminPasswordEdit').value = '';
+
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        // Close password modal
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
         // Close modal when clicking outside
         window.onclick = function(event) {
             const confirmModal = document.getElementById('confirmationModal');
             const deleteModal = document.getElementById('deleteModal');
+            const editModal = document.getElementById('editModal');
+            const passwordModal = document.getElementById('passwordModal');
 
             if (event.target === confirmModal) {
                 closeModal();
             }
             if (event.target === deleteModal) {
                 closeDeleteModal();
+            }
+            if (event.target === editModal) {
+                closeEditModal();
+            }
+            if (event.target === passwordModal) {
+                closePasswordModal();
             }
         }
 

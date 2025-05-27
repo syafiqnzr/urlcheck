@@ -59,7 +59,8 @@ input:-webkit-autofill:active {
             max-width: 1200px;
             margin: 40px auto;
             padding: 0 300px;
-            margin-bottom: 0px;
+
+            margin-bottom: 100px;
         }
 
         /* Page title */
@@ -294,7 +295,7 @@ input:-webkit-autofill:active {
 <body>
     <div class="container">
         <h1 class="page-title">Scan Result</h1>
-       
+
 
         <div class="url-display">
             <input type="text" value="{{ url }}" readonly>
@@ -314,7 +315,7 @@ input:-webkit-autofill:active {
         <div class="button-group">
             <a href="/" class="button primary-button">Scan Another URL</a>
 
-           {% if session and session.get('username') and session.get('username') != 'guest' and session.get('username') != 'none' %}
+           {% if session and session.get('email') and session.get('email') != 'guest' and session.get('email') != 'none' %}
 <form method="post" action="/details" style="margin: 0;">
     <input type="hidden" name="url" value="{{ url }}">
     <button type="submit" class="button secondary-button">View Detailed Analysis</button>

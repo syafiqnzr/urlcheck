@@ -171,23 +171,12 @@
         }
 
         .user-info .expiry {
-            color: #b148f3;
             font-size: 13px;
-            font-weight: 500;
-            background: rgba(177, 72, 243, 0.1);
+            font-weight: 600;
             padding: 6px 12px;
             border-radius: 20px;
             display: inline-block;
-        }
-
-        .user-info .expiry.expired {
-            color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.1);
-        }
-
-        .user-info .expiry.no-token {
-            color: #ffa726;
-            background: rgba(255, 167, 38, 0.1);
+            border: 1px solid currentColor;
         }
 
         /* No Users Message */
@@ -217,13 +206,14 @@
 
         .modal-content {
             background: linear-gradient(145deg, #2a2a2a 0%, #1e1e1e 100%);
-            margin: 5% auto;
-            padding: 30px;
+            margin: 8% auto;
+            padding: 25px;
             border: 1px solid #404040;
             border-radius: 16px;
-            width: 90%;
-            max-width: 500px;
+            width: 85%;
+            max-width: 420px;
             position: relative;
+            bottom: 70px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             animation: modalSlideIn 0.3s ease-out;
         }
@@ -265,10 +255,10 @@
         }
 
         .modal-avatar {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
             border: 3px solid #b148f3;
             overflow: hidden;
             background: linear-gradient(135deg, #b148f3 0%, #9a3dd9 100%);
@@ -284,15 +274,15 @@
         }
 
         .modal-info {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding: 12px;
+            margin-bottom: 12px;
+            padding: 10px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
         }
@@ -471,9 +461,10 @@
             }
 
             .modal-content {
-                width: 95%;
-                margin: 10% auto;
-                padding: 20px;
+                width: 90%;
+                margin: 12% auto;
+                padding: 18px;
+                max-width: 350px;
             }
 
             .modal-actions {
@@ -522,12 +513,8 @@
                         <div class="user-info">
                             <h3>{{ user.username }}</h3>
                             <div class="email">{{ user.email }}</div>
-                            <div class="expiry {% if not user.expiry_date %}no-token{% endif %}">
-                                {% if user.expiry_date %}
-                                    Expires: {{ user.expiry_date.strftime('%d.%m.%Y') }}
-                                {% else %}
-                                    No Token
-                                {% endif %}
+                            <div class="expiry" style="color: {{ user.status_color }}; background: {{ user.status_color }}20;">
+                                Status: {{ user.status }}
                             </div>
                         </div>
                     </div>
@@ -593,6 +580,33 @@
                     <button class="btn btn-save" onclick="saveUserChanges()">Save Changes</button>
                     <button class="btn btn-cancel" onclick="cancelEdit()">Cancel</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close" onclick="closeDeleteModal()">&times;</span>
+            <div class="modal-header">
+                <h2>Confirm Delete User</h2>
+            </div>
+            <div class="modal-info">
+                <p style="color: #b3b3b3; margin-bottom: 20px; text-align: center;">
+                    Are you sure you want to delete user <strong id="deleteUsername"></strong>?
+                    <br><br>
+                    <span style="color: #ff6b6b;">This action cannot be undone.</span>
+                </p>
+                <div class="info-row">
+                    <span class="info-label">Admin Password:</span>
+                    <span class="info-value">
+                        <input type="password" id="deleteAdminPassword" class="info-input" placeholder="Enter admin password" style="width: 100%; max-width: none;">
+                    </span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-delete" onclick="confirmDeleteUser()">Confirm Delete</button>
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -763,9 +777,65 @@
         }
 
         function deleteUser() {
-            if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-                window.location.href = '/delete_user/' + currentUserId;
+            // Get current user's username for confirmation
+            const username = document.getElementById('modalUsername').textContent;
+            document.getElementById('deleteUsername').textContent = username;
+            document.getElementById('deleteAdminPassword').value = '';
+
+            // Show delete confirmation modal
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            document.getElementById('deleteAdminPassword').value = '';
+        }
+
+        function confirmDeleteUser() {
+            const adminPassword = document.getElementById('deleteAdminPassword').value.trim();
+
+            if (!adminPassword) {
+                alert('Please enter admin password');
+                return;
             }
+
+            // Show loading state
+            const confirmBtn = document.querySelector('#deleteModal .btn-delete');
+            confirmBtn.classList.add('loading');
+            confirmBtn.disabled = true;
+
+            // Send AJAX request to delete user
+            fetch('/delete_user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: currentUserId,
+                    admin_password: adminPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                confirmBtn.classList.remove('loading');
+                confirmBtn.disabled = false;
+
+                if (data.success) {
+                    alert('Success: ' + data.message);
+                    closeDeleteModal();
+                    closeUserModal();
+                    // Refresh the page to update the user list
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                confirmBtn.classList.remove('loading');
+                confirmBtn.disabled = false;
+                console.error('Error:', error);
+                alert('An error occurred while deleting the user');
+            });
         }
 
         function closeUserModal() {
@@ -775,16 +845,27 @@
 
         // Close modal when clicking outside of it
         window.onclick = function(event) {
-            const modal = document.getElementById('userModal');
-            if (event.target == modal) {
+            const userModal = document.getElementById('userModal');
+            const deleteModal = document.getElementById('deleteModal');
+
+            if (event.target == userModal) {
                 closeUserModal();
+            } else if (event.target == deleteModal) {
+                closeDeleteModal();
             }
         }
 
         // Close modal with Escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
-                closeUserModal();
+                const deleteModal = document.getElementById('deleteModal');
+                const userModal = document.getElementById('userModal');
+
+                if (deleteModal.style.display === 'block') {
+                    closeDeleteModal();
+                } else if (userModal.style.display === 'block') {
+                    closeUserModal();
+                }
             }
         });
     </script>

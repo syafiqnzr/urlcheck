@@ -17,238 +17,536 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* Light theme base styles */
+        /* Dark theme base styles */
         body {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            color: #333333;
+            background: linear-gradient(135deg, #141719 0%, #121212 100%);
+            color: #ffffff;
             min-height: 100vh;
         }
 
-        /* Container */
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            min-height: calc(100vh - 200px);
+        /* Input field styling for dark mode */
+        input[type="text"],
+        input[type="text"]:focus,
+        input[type="text"]:active,
+        input[type="text"]:hover,
+        input[type="password"],
+        input[type="password"]:focus,
+        input[type="email"],
+        input[type="email"]:focus,
+        input[type="file"],
+        input[type="file"]:focus,
+        textarea,
+        textarea:focus,
+        select,
+        select:focus {
+            background-color: #333333 !important;
+            color: #ffffff !important;
+            border: 1px solid #444444;
+            outline-color: #b148f3;
+        }
+
+        /* Override browser autofill styles */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #333333 inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Main container */
+        .content {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
         }
 
         /* Page title */
         .page-title {
             font-family: 'Roboto', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 20px;
             text-align: center;
-            color: #333333;
-            margin-bottom: 30px;
+            letter-spacing: -0.04em;
         }
-
-        /* Main content container */
-        .content {
-            width: 100%;
-            max-width: 500px;
-            background-color: #ffffff;
-            margin: 0 auto;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            padding: 40px 30px;
-            box-sizing: border-box;
-        }
-.div1 {
-    color: #1e3c72;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 28px;
-}
-form label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-    font-size: 16px;
-}
-
-        /* Form styles */
-        form {
-            margin-top: 20px;
-        }
-
-        form label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333333;
-            font-size: 16px;
-        }
-
-        form input[type="text"],
-        form input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid #e9ecef;
+        /* Profile container */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 32px;
+            background-color: #12121200;
             border-radius: 8px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
+        }
+
+        /* Image container */
+        .image-container {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        /* Profile picture */
+        .profile-picture {
+            border-radius: 50%;
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border: 4px solid #b148f3;
+            box-shadow: 0 8px 24px rgba(177, 72, 243, 0.3);
+        }
+
+        /* File input styling */
+        #profile_picture {
+            background-color: transparent;
+            color: #b3b3b3;
+            border: 1px solid #333333;
+            border-radius: 500px;
+            padding: 8px 20px;
+            margin-top: 0px;
+            font-size: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        #profile_picture::-webkit-file-upload-button {
+            background-color: #b148f3;
+            color: #ffffff;
+            border: none;
+            border-radius: 500px;
+            padding: 8px 24px;
+            margin-right: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 8px;
+        }
+
+        #profile_picture:hover {
+            border-color: #b148f3;
+            transform: scale(1.04);
+        }
+
+        /* Form section */
+        .form-section {
+            background-color: #333333;
+            border-radius: 8px;
+            padding: 10px 30px;
+            margin-bottom: 24px;
+        }
+
+        .form-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #282828;
+            padding-bottom: 16px;
+        }
+
+        /* Form group styling */
+        .form-group {
+            margin-bottom: 2px;
+        }
+
+        .form-group.row {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 16px 0;
+            border-bottom: 1px solid #282828;
+        }
+
+        .form-group.row:last-child {
+            border-bottom: none;
+        }
+
+        /* Form label */
+        .form-label {
+            min-width: 140px;
+            font-weight: 400;
+            color: #b3b3b3;
+            font-size: 16px;
+        }
+
+        /* Form info display (read-only fields) */
+        .form-info {
+            flex: 1;
+            font-size: 16px;
+            color: #ffffff;
+            font-weight: 400;
+        }
+
+        .form-info.readonly {
+            color: #b3b3b3;
+            font-style: italic;
+        }
+
+        /* Form input */
+        .form-input {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            background-color: #121212;
+            color: #ffffff;
             transition: border-color 0.3s ease;
         }
 
-        form input[type="text"]:focus,
-        form input[type="file"]:focus {
+        .form-input:focus {
             outline: none;
-            border-color: #5dcef0;
+            border-color: #b148f3;
+            box-shadow: 0 0 0 3px rgba(177, 72, 243, 0.1);
         }
 
-        /* Button styles */
-        button, input[type="submit"] {
-            background-color: #5dcef0;
-            color: #ffffff;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: 500;
-            border: none;
-            border-radius: 8px;
+        .form-input:disabled {
+            background-color: #282828;
+            color: #333333;
+            cursor: not-allowed;
+        }
+
+        /* Edit button */
+        .edit-button {
+            margin-bottom: 2px;
+            background-color: transparent;
+            color: #b148f3;
+            border: 1px solid #b148f3;
+            border-radius: 500px;
+            padding: 8px 24px;
+            font-size: 12px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1.76px;
+            min-width: 80px;
         }
 
-        button:hover, input[type="submit"]:hover {
-            background-color: #4ac3e8;
-            transform: translateY(-1px);
+        .edit-button:hover {
+            background-color: #b148f3;
+            color: #ffffff;
+            transform: scale(1.04);
         }
 
-/* Flash messages */
-.flash-messages {
-    list-style: none;
-    padding: 0;
-}
+        /* Form actions */
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 28px;
+        }
 
-.flash-messages li {
-    color: red;
+        /* Save button */
+        .save-button {
+            background-color: #b148f3;
+            color: #ffffff;
+            border: none;
+            border-radius: 500px;
+            padding: 16px 48px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1.76px;
+        }
 
-    font-size: 12px;
-    text-align: center;
-}
+        .save-button:hover {
+            background-color: #9a3dd9;
+            transform: scale(1.04);
+        }
 
-div1 {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
-}
+        .save-button:disabled {
+            background-color: #333333;
+            color: #b3b3b3;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-.profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
-}
+        /* Flash messages */
+        .flash-messages {
+            position: fixed;
+            top: 85px;
+            right: 20px;
+            z-index: 9999;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
-.image-container {
-    margin-bottom: 15px;
-}
+        .flash-messages li {
+            background-color: rgba(177, 72, 243, 0.9);
+            color: white;
+            padding: 15px 25px;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            font-size: 14px;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideInOut 5s forwards;
+            cursor: pointer;
+            min-width: 250px;
+            border: 1px solid #b148f3;
+        }
 
-.profile-picture {
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #007BFF;
-}
+        @keyframes slideInOut {
+            0% { opacity: 0; transform: translateX(100%); }
+            10% { opacity: 1; transform: translateX(0); }
+            90% { opacity: 1; transform: translateX(0); }
+            100% { opacity: 0; transform: translateX(100%); }
+        }
 
-#profile_picture {
-    display: block;
-    margin: 10px auto;
-}
+        /* Profile container */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 20px;
+        }
 
-/* Responsive - make it more mobile friendly */
-@media (max-width: 600px) {
-    .content {
-        padding: 20px 15px;
-        margin-top: 30px;
-    }
+        .image-container {
+            margin-bottom: 24px;
+            position: relative;
+        }
 
-    .content h1 {
-        font-size: 24px;
-    }
+        .profile-picture {
+            border-radius: 50%;
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border: 4px solid #b148f3;
+            box-shadow: 0 8px 24px rgba(177, 72, 243, 0.3);
+        }
 
-    form input[type="submit"] {
-        padding: 12px;
-        font-size: 15px;
-    }
-}
+        /* File input styling */
+        #profile_picture {
+            background-color: transparent;
+            color: #b3b3b3;
+            border: 1px solid #444444;
+            border-radius: 25px;
+            padding: 8px 20px;
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #profile_picture::-webkit-file-upload-button {
+            background: linear-gradient(135deg, #b148f3 0%, #9a3dd9 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            margin-right: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 10px;
+            transition: all 0.3s ease;
+        }
+
+        #profile_picture:hover {
+            border-color: #b148f3;
+            transform: scale(1.02);
+        }
+
+        #profile_picture::-webkit-file-upload-button:hover {
+            background: linear-gradient(135deg, #9a3dd9 0%, #8a2be2 100%);
+        }
+
+
+
         /* Responsive design */
         @media (max-width: 768px) {
-            .page-title {
-                font-size: 2rem;
-            }
-
             .content {
-                padding: 30px 20px;
+                padding: 24px 16px;
             }
 
-            .container {
-                padding: 20px 15px;
+            .page-title {
+                font-size: 32px;
+                margin-bottom: 32px;
+            }
+
+            .profile-picture {
+                width: 150px;
+                height: 150px;
+            }
+
+            .form-section {
+                padding: 24px 16px;
+            }
+
+            .form-group.row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 16px 0;
+            }
+
+            .form-label {
+                min-width: auto;
+                margin-bottom: 8px;
+            }
+
+            .form-input {
+                width: 100%;
+            }
+
+            .edit-button {
+                align-self: flex-start;
+                margin-top: 8px;
+            }
+
+            .flash-messages {
+                right: 16px;
+                left: 16px;
+            }
+
+            .flash-messages li {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 16px 12px;
+            }
+
+            .page-title {
+                font-size: 28px;
+            }
+
+            .profile-container {
+                padding: 24px 16px;
+            }
+
+            .profile-picture {
+                width: 120px;
+                height: 120px;
+            }
+
+            .form-section {
+                padding: 20px 12px;
+            }
+
+            .save-button {
+                padding: 14px 32px;
+                font-size: 12px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="content">
         <h1 class="page-title">Admin Profile</h1>
 
-        <div class="content">
-            <form action="{{ url_for('admin_profile') }}" method="POST" enctype="multipart/form-data">
-                <div class="profile-container">
-                    <!-- Display Profile Picture -->
-                    <div class="image-container">
-                        {% if profile_picture %}
-                            <img src="data:image/jpeg;base64,{{ profile_picture | b64encode }}" class="profile-picture" alt="Profile Picture" width="150" height="150">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='default_profile.png') }}" class="profile-picture" alt="Default Profile Picture" width="150" height="150">
-                        {% endif %}
+        <form action="{{ url_for('admin_profile') }}" method="POST" enctype="multipart/form-data">
+            <!-- Profile Picture Section -->
+            <div class="profile-container">
+                <div class="image-container">
+                    {% if profile_picture %}
+                        <img src="data:image/jpeg;base64,{{ profile_picture | b64encode }}" class="profile-picture" alt="Profile Picture">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='default_profile.png') }}" class="profile-picture" alt="Default Profile Picture">
+                    {% endif %}
+                </div>
+                <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flash-messages" id="flash-messages">
+                        {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Admin Information Section -->
+            <div class="form-section">
+                <h2 style="margin-bottom: 0px; margin-top: 10px;">Admin Information</h2>
+
+                <div class="form-group row">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="form-info">
+                        <span id="username_display">{{ username }}</span>
+                        <input type="text" id="username_input" name="username" value="{{ username }}" class="form-input" style="display:none;" required>
                     </div>
+                    <button type="button" class="edit-button" onclick="enableEdit('username')">Edit</button>
+                </div>
+            </div>
 
-                    <!-- Upload Profile Picture -->
-                    <label for="profile_picture">Profile Picture</label>
-                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
-
-                    <table style="width: 100%; margin-top: 20px;">
-                        <tr>
-                            <td><label for="username">Username</label></td>
-                            <td>
-                                <span id="username_display">{{ username }}</span>
-                                <input type="text" id="username_input" name="username" value="{{ username }}" style="display:none;" required>
-                                <button type="button" onclick="enableEdit()">Edit</button>
-                            </td>
-                        </tr>
-                    </table>
+            <div class="form-actions">
+                <button type="submit" class="save-button">Save Changes</button>
+            </div>
+        </form>
+    </div>
 
     <script>
-      function enableEdit() {
-        document.getElementById("username_display").style.display = "none";
-        document.getElementById("username_input").style.display = "inline";
-        document.getElementById("username_input").focus();
-      }
+        function enableEdit(fieldName) {
+            const display = document.getElementById(fieldName + "_display");
+            const input = document.getElementById(fieldName + "_input");
+            const button = event.target;
+
+            if (display && input) {
+                display.style.display = "none";
+                input.style.display = "block";
+                input.focus();
+
+                // Change button text to "Cancel" and add cancel functionality
+                button.textContent = "Cancel";
+                button.onclick = function() {
+                    cancelEdit(fieldName);
+                };
+            }
+        }
+
+        function cancelEdit(fieldName) {
+            const display = document.getElementById(fieldName + "_display");
+            const input = document.getElementById(fieldName + "_input");
+            const button = event.target;
+
+            if (display && input) {
+                display.style.display = "block";
+                input.style.display = "none";
+
+                // Reset input value to original
+                if (fieldName === 'username') {
+                    input.value = "{{ username }}";
+                }
+
+                // Change button back to "Edit"
+                button.textContent = "Edit";
+                button.onclick = function() {
+                    enableEdit(fieldName);
+                };
+            }
+        }
+
+        // Auto-hide flash messages after animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.getElementById('flash-messages');
+            if (flashMessages) {
+                setTimeout(function() {
+                    flashMessages.style.display = 'none';
+                }, 5000);
+            }
+        });
     </script>
-
-
-                    <input type="submit" value="Update Profile" />
-
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            <ul class="flash-messages">
-                            {% for category, message in messages %}
-                                <li class="{{ category }}">{{ message }}</li>
-                            {% endfor %}
-                            </ul>
-                        {% endif %}
-                    {% endwith %}
-                </div>
-            </form>
-        </div>
-    </div>
-    <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
+    <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #666666; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
 </body>
 </html>
 
