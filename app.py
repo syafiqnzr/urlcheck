@@ -668,14 +668,33 @@ def send_otp_email(receiver_email, otp):
     import smtplib
     from email.message import EmailMessage
 
-    sender_email = "syafiqnzr01@gmail.com"  # Replace with your email
-    app_password = "difx hply pfbb unpq"  # NOT your Gmail password
+    sender_email = "urlcheckmy@gmail.com"  # Replace with your email
+    app_password = "tevm peam ujqc zarn"  # NOT your Gmail password
 
     message = EmailMessage()
     message['Subject'] = 'Your OTP Code'
     message['From'] = sender_email
     message['To'] = receiver_email
-    message.set_content(f'Your One-Time Password (OTP) is: {otp}')
+    message.set_content("This is a fallback for non-HTML email clients.")
+    message.add_alternative(
+    f"""\
+<html>
+  <body>
+    <p>Dear User,<br><br>
+       Your One-Time Password (OTP) for verifying your account is:<br><br>
+       <strong style="font-size: 16px;">{otp}</strong><br><br>
+       Please enter this code on the website to complete your verification process.<br>
+       This OTP is valid for 1 minute only and should not be shared with anyone.<br><br>
+       If you did not request this OTP, please ignore this email.<br><br>
+       Thank you,<br>
+       <em>URLCHECK Team</em>
+    </p>
+  </body>
+</html>
+""",
+    subtype='html'
+)
+
 
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
@@ -695,12 +714,33 @@ def register():
         token = request.form.get('token', '').strip()
 
         if not username or not email or not password or not confirm_password or not token:
-            return render_template('register.html', error="All fields are required")
+            flash("All fields are required")
+            return render_template('register.html')
 
         if password != confirm_password:
-            return render_template('register.html', error="Passwords do not match")
+            flash("Passwords do not match")
+            return render_template('register.html')
 
         cursor = db.cursor(dictionary=True)
+
+        # Check if email already exists in users table
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            cursor.close()
+            flash("Invalid token or invalid input")
+            return render_template('register.html')
+
+        # Check if email already exists in admin table
+        cursor.execute("SELECT * FROM admin WHERE email = %s", (email,))
+        existing_admin = cursor.fetchone()
+
+        if existing_admin:
+            cursor.close()
+            flash("Invalid token or invalid input")
+            return render_template('register.html')
+
         cursor.execute("SELECT * FROM token WHERE token_number = %s AND start_date IS NULL AND expiry_date IS NULL", (token,))
         token_data = cursor.fetchone()
 
@@ -724,11 +764,14 @@ def register():
             try:
                 send_otp_email(email, otp)
             except Exception as e:
-                return render_template('register.html', error=f"Failed to send OTP email: {e}")
+                flash(f"Failed to send OTP email: {e}")
+                return render_template('register.html')
             flash("OTP sent to your email. Please check and enter it below.")
             return redirect(url_for('otp'))
         else:
-            return render_template('register.html', error="Invalid or used token")
+            cursor.close()
+            flash("Invalid token or invalid input")
+            return render_template('register.html')
 
     return render_template('register.html')
 
@@ -1049,7 +1092,7 @@ def admin_profile():
         db.reconnect()
     cursor = db.cursor(dictionary=True)
     if 'username' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('login_admin'))
 
     username = session['username']
 
@@ -1057,11 +1100,44 @@ def admin_profile():
     cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
     user = cursor.fetchone()
 
+    if not user:
+        flash("Admin user not found.", "error")
+        return redirect(url_for('login_admin'))
 
-    if user:
-        profile_picture = user.get('profile_picture', None)
+    profile_picture = user.get('profile_picture', None)
+    email = user.get('email', None)
 
     if request.method == 'POST':
+        # Handle password change via AJAX
+        if request.form.get('action') == 'change_password':
+            current_password = request.form.get('current_password')
+            new_password = request.form.get('new_password')
+
+            # Verify current password (admin uses plain text password)
+            if current_password != user['password']:
+                return jsonify({'success': False, 'message': 'Current password is incorrect.'})
+
+            # Validate new password
+            import re
+            if len(new_password) < 8:
+                return jsonify({'success': False, 'message': 'Password must be at least 8 characters long.'})
+            if not re.search(r'[A-Z]', new_password):
+                return jsonify({'success': False, 'message': 'Password must contain at least one uppercase letter.'})
+            if not re.search(r'[a-z]', new_password):
+                return jsonify({'success': False, 'message': 'Password must contain at least one lowercase letter.'})
+            if not re.search(r'[0-9]', new_password):
+                return jsonify({'success': False, 'message': 'Password must contain at least one digit.'})
+            if not re.search(r'[!@#$%^&*]', new_password):
+                return jsonify({'success': False, 'message': 'Password must contain at least one special character (!@#$%^&*).'})
+
+            try:
+                # Update password (admin uses plain text)
+                cursor.execute("UPDATE admin SET password = %s WHERE username = %s", (new_password, username))
+                db.commit()
+                return jsonify({'success': True, 'message': 'Password updated successfully!'})
+            except Exception as e:
+                return jsonify({'success': False, 'message': f'Error updating password: {str(e)}'})
+
         # Handle Profile Picture Upload
         if 'profile_picture' in request.files:
             profile_picture_file = request.files['profile_picture']
@@ -1076,15 +1152,28 @@ def admin_profile():
 
         # Handle Username Update
         new_username = request.form.get('username')
-        if new_username:
+        if new_username and new_username != username:
             cursor.execute("UPDATE admin SET username = %s WHERE username = %s", (new_username, username))
             db.commit()
             session['username'] = new_username
             flash("Username updated successfully!", "success")
 
+        # Handle Email Update
+        new_email = request.form.get('email')
+        if new_email is not None and new_email != email:
+            # Basic email validation
+            import re
+            if new_email and not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', new_email):
+                flash("Please enter a valid email address.", "error")
+            else:
+                cursor.execute("UPDATE admin SET email = %s WHERE username = %s", (new_email, username))
+                db.commit()
+                flash("Email updated successfully!", "success")
+
         return redirect(url_for('admin_profile'))
 
-    return render_template('admin_profile.html', username=user['username'], profile_picture=profile_picture)
+    cursor.close()
+    return render_template('admin_profile.html', username=user['username'], email=email, profile_picture=profile_picture)
 
 
 @app.route('/manage_user', methods=['GET'])
@@ -1651,6 +1740,45 @@ def delete_token():
 
     return redirect(url_for('generate_token'))
 
+# Get token owner information
+@app.route('/get_token_owner/<token_number>')
+def get_token_owner(token_number):
+    # Check if admin is logged in
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Access denied. Please log in as admin.'})
+
+    try:
+        ensure_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        # Fetch user information for the given token
+        cursor.execute("""
+            SELECT u.username, u.email
+            FROM users u
+            WHERE u.token = %s
+        """, (token_number,))
+
+        user = cursor.fetchone()
+        cursor.close()
+
+        if user:
+            return jsonify({
+                'success': True,
+                'owner': {
+                    'username': user['username'],
+                    'email': user['email']
+                }
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'owner': None,
+                'message': 'No owner assigned to this token'
+            })
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error fetching token owner: {str(e)}'})
+
 # ADMIN UPDATE SCAN RESULT
 @app.route('/update_scan_result', methods=['POST'])
 def update_scan_result():
@@ -1774,7 +1902,7 @@ def otp():
         from datetime import datetime
         otp_created_time_dt = datetime.fromisoformat(otp_created_time)
         otp_age = datetime.now() - otp_created_time_dt
-        if otp_age > timedelta(minutes=5):
+        if otp_age > timedelta(minutes=1):
             session.pop('registration_data', None)
             flash("OTP expired. Please register again.", "error")
             return redirect(url_for('register'))
@@ -1903,11 +2031,11 @@ def confirmation():
             flash("OTP is required.", "error")
             return render_template('confirmation.html')
 
-        # Check OTP expiration (5 minutes)
+        # Check OTP expiration (1 minute)
         otp_created_time = password_reset.get('otp_created_time')
         if otp_created_time:
             otp_created_time_dt = datetime.fromisoformat(otp_created_time)
-            if datetime.now() - otp_created_time_dt > timedelta(minutes=5):
+            if datetime.now() - otp_created_time_dt > timedelta(minutes=1):
                 session.pop('password_reset', None)
                 flash("OTP expired. Please request a new one.", "error")
                 return redirect(url_for('confirmation'))
@@ -1971,6 +2099,76 @@ def forgotpassword():
             cursor.close()
 
     return render_template('forgotpassword.html')
+
+# Contact Us Routes
+@app.route('/contact_us', methods=['GET', 'POST'])
+def contact_us():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        subject = request.form.get('subject', '').strip()
+        message = request.form.get('message', '').strip()
+
+        # Validation
+        if not all([name, email, subject, message]):
+            flash("All fields are required.", "error")
+            return render_template('contact_us.html')
+
+        # Basic email validation
+        import re
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, email):
+            flash("Please enter a valid email address.", "error")
+            return render_template('contact_us.html')
+
+        try:
+            ensure_db_connection()
+            cursor = db.cursor()
+
+            # Insert contact message into database
+            insert_query = """
+            INSERT INTO contact_us (name, email, subject, message)
+            VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(insert_query, (name, email, subject, message))
+            db.commit()
+            cursor.close()
+
+            flash("Your message has been sent successfully! We'll get back to you soon.", "success")
+            return redirect(url_for('contact_us'))
+
+        except Exception as e:
+            flash("An error occurred while sending your message. Please try again.", "error")
+            return render_template('contact_us.html')
+
+    return render_template('contact_us.html')
+
+@app.route('/manage_contact_us')
+def manage_contact_us():
+    # Check if admin is logged in
+    if 'username' not in session:
+        flash("Access denied. Please log in as admin.", "warning")
+        return redirect(url_for('login_admin'))
+
+    try:
+        ensure_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        # Fetch all contact messages ordered by newest first
+        cursor.execute("""
+            SELECT id, name, email, subject, message,
+                   DATE_FORMAT(created_at, '%d.%m.%Y %H:%i') as formatted_date
+            FROM contact_us
+            ORDER BY id DESC
+        """)
+        messages = cursor.fetchall()
+        cursor.close()
+
+        return render_template('manage_contact_us.html', messages=messages)
+
+    except Exception as e:
+        flash("Error loading contact messages.", "error")
+        return render_template('manage_contact_us.html', messages=[])
 
 if __name__ == '__main__':
     app.run(debug=True)

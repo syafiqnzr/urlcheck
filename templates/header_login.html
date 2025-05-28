@@ -222,6 +222,7 @@ body {
     <div class="nav-links" id="navLinks">
         <a href="/">Home</a>
         <a href="/plan">Plan</a>
+        <a href="/contact_us">Contact Us</a>
 
             {% if 'email' in session or 'username' in session %}
             <div class="profile-dropdown">
@@ -248,8 +249,7 @@ body {
               </div>
 
             {% else %}
-
-            <a href="/login_admin">Admin Login</a>
+            <a href="/login">Login</a>
             <a href="/register">Register</a>
         {% endif %}
     </div>

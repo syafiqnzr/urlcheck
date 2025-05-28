@@ -236,15 +236,50 @@ input:-webkit-autofill:active {
             color: #4aa4c0;
         }
 
-        /* Error message styling */
-        .error {
-            color: #ffffff;
-            background-color: rgba(233, 20, 41, 0.2);
-            padding: 10px;
-            border: 1px solid #ff0019a8;
-            border-radius: 6px;
-            margin-bottom: 15px;
+        /* Flash messages container */
+        .flash-messages {
+            position: fixed;
+            top: 85px;
+            right: -2px;
+            z-index: 9999;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .flash-messages li {
+            background-color: #ff0019a8;
+            color: white;
+            padding: 15px 25px;
+            margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             font-size: 14px;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideInOut 5s forwards;
+            cursor: pointer;
+            min-width: 250px;
+        }
+
+        /* Animation for slide in from right and fade out */
+        @keyframes slideInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            10% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            90% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
         }
     </style>
 </head>
@@ -253,14 +288,14 @@ input:-webkit-autofill:active {
         <h1 class="page-title">Sign Up</h1>
         <p>To complete your registration, a valid token is required.<br>You can obtain it on the Plan page.</p>
 
-        {% with messages = get_flashed_messages(category_filter=["error"]) %}
-          {% if messages %}
-            <div class="error">
-              {% for message in messages %}
-                <p>{{ message }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <ul class="flash-messages" id="flash-messages">
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
         {% endwith %}
 
         <form method="POST" class="register-form" onsubmit="return validateForm()">
@@ -356,10 +391,39 @@ input:-webkit-autofill:active {
                 submitBtn.textContent = 'Registering...';
             }
         });
+
+        // Remove flash message on click
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-messages li');
+            flashMessages.forEach(function(msg) {
+                msg.addEventListener('click', function() {
+                    msg.style.animation = 'slideOut 0.5s forwards';
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 500);
+                });
+            });
+        });
+
+        // Add slideOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                0% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 
 </div>
- <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; bottom: 0px;  margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
+ <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; bottom: 0px;  margin-bottom: 15px; width: 100%;">© URLCHECK 2025.All rights reserved</p>
 </body>
 </html>
 

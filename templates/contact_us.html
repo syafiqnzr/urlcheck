@@ -1,0 +1,326 @@
+{% extends "header.html" %}
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact Us</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        body, h1, h2, p, div {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Dark mode base styles */
+        body {
+            background: linear-gradient(135deg, #141719 0%, #121212 100%);
+            color: #ffffff;
+        }
+
+        /* Input field styling for dark mode */
+        input[type="text"],
+        input[type="text"]:focus,
+        input[type="text"]:active,
+        input[type="text"]:hover,
+        input[type="password"],
+        input[type="password"]:focus,
+        input[type="email"],
+        input[type="email"]:focus,
+        textarea,
+        textarea:focus,
+        select,
+        select:focus {
+            background-color: #333333 !important;
+            color: #ffffff !important;
+            border: 1px solid #444444;
+            outline-color: #1e3c72;
+        }
+
+        /* Override browser autofill styles */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #333333 inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 0px;
+            margin-bottom: 128px;
+        }
+
+        /* Page title */
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: -0.04em;
+        }
+
+        .content p {
+            color: #b3b3b3;
+            font-size: 14px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Contact Form Styles */
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            width: 33%;
+            margin: auto;
+        }
+
+        .contact-form label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #b3b3b3;
+            font-size: 12px;
+        }
+
+        .contact-form input[type="text"],
+        .contact-form input[type="email"],
+        .contact-form textarea {
+            padding: 10px 12px;
+            border: 1px solid #333;
+            background-color: #282828;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #ffffff;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .contact-form textarea {
+            border-radius: 15px;
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 15px;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: #5dcef0;
+            box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.15);
+            outline: none;
+        }
+
+        .contact-form input::placeholder,
+        .contact-form textarea::placeholder {
+            color: #888;
+        }
+
+        .contact-form button {
+            background-color: #4aa4c0;
+            color: rgb(0, 0, 0);
+            border: none;
+            border-radius: 30px;
+            padding: 14px 0;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .contact-form button:disabled {
+            background-color: #333333;
+            cursor: not-allowed;
+        }
+
+        .contact-form button:hover:enabled {
+            background-color: #5dcef0;
+            transform: scale(1.02);
+        }
+
+        /* Flash messages container */
+        .flash-messages {
+            position: fixed;
+            top: 85px;
+            right: -2px;
+            z-index: 9999;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .flash-messages li {
+            background-color: #ff0019a8;
+            color: white;
+            padding: 15px 25px;
+            margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            font-size: 14px;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideInOut 5s forwards;
+            cursor: pointer;
+            min-width: 250px;
+        }
+
+        .flash-messages li.success {
+            background-color: rgba(40, 167, 69, 0.8);
+        }
+
+        .flash-messages li.error {
+            background-color: #ff0019a8;
+        }
+
+        /* Animation for slide in from right and fade out */
+        @keyframes slideInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            10% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            90% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes slideOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        /* Additional link section */
+        .contact-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .contact-link a {
+            color: #b3b3b3;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .contact-link a:hover {
+            color: #4aa4c0;
+        }
+
+        /* Responsive - make it more mobile friendly */
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px 15px;
+                margin-top: 30px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .contact-form {
+                width: 90%;
+            }
+
+            .contact-form button {
+                padding: 12px;
+                font-size: 15px;
+            }
+
+            .flash-messages li {
+                min-width: 200px;
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="content">
+        <h1 class="page-title">Contact Us</h1>
+        <p>Have a question or feedback? We'd love to hear from you.<br>Send us a message and we'll respond as soon as possible.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <ul class="flash-messages" id="flash-messages">
+                {% for category, message in messages %}
+                  <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form method="post" class="contact-form" id="contact-form">
+            <label for="name">Full Name</label>
+            <input type="text" name="name" id="name" placeholder="Enter your full name" required>
+
+            <label for="email">Email Address</label>
+            <input type="email" name="email" id="email" placeholder="Enter your email address" required>
+
+            <label for="subject">Subject</label>
+            <input type="text" name="subject" id="subject" placeholder="Enter the subject of your message" required>
+
+            <label for="message">Message</label>
+            <textarea name="message" id="message" placeholder="Enter your message here..." required></textarea>
+
+            <button type="submit" id="submitBtn">SEND MESSAGE</button>
+        </form>
+
+        <div class="contact-link">
+            <a href="/">Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<!-- Copyright notice -->
+<p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; margin-top: 40px; margin-bottom: 15px; width: 100%;">© URLCHECK 2025.All rights reserved</p>
+
+<script>
+    // Remove flash message on click
+    document.addEventListener('DOMContentLoaded', function() {
+        const flashMessages = document.querySelectorAll('.flash-messages li');
+        flashMessages.forEach(function(msg) {
+            msg.addEventListener('click', function() {
+                msg.style.animation = 'slideOut 0.5s forwards';
+                setTimeout(() => {
+                    msg.remove();
+                }, 500);
+            });
+        });
+
+        // Handle form submission
+        const contactForm = document.getElementById('contact-form');
+        const submitBtn = document.getElementById('submitBtn');
+
+        contactForm.addEventListener('submit', function() {
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
+
+{% endblock %}

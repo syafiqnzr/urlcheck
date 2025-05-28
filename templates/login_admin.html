@@ -211,7 +211,7 @@
         }
 
         .flash-messages li {
-            background-color: #ff0019a8;
+            background-color: #ff0019a8; /* Default red for errors */
             color: white;
             padding: 15px 25px;
             margin-top: 10px;
@@ -223,6 +223,21 @@
             animation: slideInOut 5s forwards;
             cursor: pointer;
             min-width: 250px;
+        }
+
+        /* Success message styling */
+        .flash-messages li.success {
+            background-color: #00b2f880; /* Spotify blue for success */
+        }
+
+        /* Error message styling */
+        .flash-messages li.error {
+            background-color: #ff0019a8; /* Red for errors */
+        }
+
+        /* Warning message styling */
+        .flash-messages li.warning {
+            background-color: #ff0019a8; /* Red for warnings */
         }
 
         /* Animation for slide in from right and fade out */
@@ -299,11 +314,11 @@
     <div class="content">
         <h1 class="page-title">Admin Login</h1>
 
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
               <ul class="flash-messages" id="flash-messages">
-                {% for message in messages %}
-                  <li>{{ message }}</li>
+                {% for category, message in messages %}
+                  <li class="{{ category }}">{{ message }}</li>
                 {% endfor %}
               </ul>
             {% endif %}
@@ -320,7 +335,7 @@
         </form>
     </div>
 
-    <p2 style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px;  margin-bottom: 15px; width: 100%; left: 0px;">Copyright © URLCHECK 2025</p2>
+    <p2 style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px;  margin-bottom: 15px; width: 100%; left: 0px;">© URLCHECK 2025.All rights reserved</p2>
 
     <!-- Pop-up alert -->
     <script>

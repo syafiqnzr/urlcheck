@@ -380,6 +380,128 @@
         .delete-icon {
             font-size: 16px;
         }
+
+        /* Clickable token number styles */
+        .token-number {
+            color: #b3b3b3;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: normal;
+        }
+
+        .token-number:hover {
+            color: #b148f3;
+            text-decoration: underline;
+            text-shadow: 0 0 8px rgba(177, 72, 243, 0.5);
+            font-weight: 600;
+        }
+
+        /* Owner popup modal styles */
+        .owner-modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 10001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .owner-modal-content {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid rgba(177, 72, 243, 0.3);
+            position: relative;
+        }
+
+        .owner-modal-content h2 {
+            color: #b148f3;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .owner-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .owner-info .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .owner-info .info-row:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .owner-info .info-label {
+            color: #b148f3;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .owner-info .info-value {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .no-owner-message {
+            color: #b3b3b3;
+            font-style: italic;
+            font-size: 16px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .owner-modal-buttons {
+            display: flex;
+            justify-content: center;
+        }
+
+        .owner-back-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #b148f3 0%, #9a3dd9 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 120px;
+        }
+
+        .owner-back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(177, 72, 243, 0.4);
+        }
         /* Responsive design - matching admin_archiveurl */
         @media (max-width: 768px) {
             .container {
@@ -488,7 +610,9 @@
                 <tbody>
                     {% for token in tokens %}
                     <tr>
-                        <td data-label="Token Number">{{ token.token_number }}</td>
+                        <td data-label="Token Number">
+                            <span class="token-number" onclick="showOwnerModal('{{ token.token_number }}')">{{ token.token_number }}</span>
+                        </td>
                         <td data-label="Start Date">{{ token.start_date.strftime('%d.%m.%Y %H:%M') if token.start_date else '' }}</td>
                         <td data-label="Expiry Date">{{ token.expiry_date.strftime('%d.%m.%Y %H:%M') if token.expiry_date else '' }}</td>
                         <td data-label="Timestamp">{{ token.timestamp.strftime('%d.%m.%Y %H:%M') if token.timestamp else '' }}</td>
@@ -512,6 +636,19 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Token Owner Modal -->
+    <div class="owner-modal-overlay" id="ownerModal">
+        <div class="owner-modal-content">
+            <h2>Token Owner Information</h2>
+            <div id="ownerContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="owner-modal-buttons">
+                <button class="owner-back-btn" onclick="closeOwnerModal()">Back</button>
+            </div>
         </div>
     </div>
 
@@ -572,16 +709,87 @@
             document.getElementById('deleteModal').style.display = 'none';
         }
 
+        // Show token owner modal
+        function showOwnerModal(tokenNumber) {
+            const modal = document.getElementById('ownerModal');
+            const content = document.getElementById('ownerContent');
+
+            // Show loading state
+            content.innerHTML = '<div style="color: #b3b3b3; font-style: italic; padding: 20px;">Loading owner information...</div>';
+            modal.style.display = 'flex';
+
+            // Fetch owner information
+            fetch(`/get_token_owner/${tokenNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.owner) {
+                            // Token has an owner
+                            content.innerHTML = `
+                                <div class="owner-info">
+                                    <div class="info-row">
+                                        <span class="info-label">Token Number:</span>
+                                        <span class="info-value">${tokenNumber}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Username:</span>
+                                        <span class="info-value">${data.owner.username}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Email:</span>
+                                        <span class="info-value">${data.owner.email}</span>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            // Token has no owner
+                            content.innerHTML = `
+                                <div class="no-owner-message">
+                                    <strong>Token Number:</strong> ${tokenNumber}<br><br>
+                                    This token is not currently assigned to any user.
+                                </div>
+                            `;
+                        }
+                    } else {
+                        // Error occurred
+                        content.innerHTML = `
+                            <div class="no-owner-message" style="color: #ff6b6b;">
+                                <strong>Error:</strong><br>
+                                ${data.message || 'Failed to fetch owner information.'}
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    content.innerHTML = `
+                        <div class="no-owner-message" style="color: #ff6b6b;">
+                            <strong>Error:</strong><br>
+                            Failed to fetch owner information. Please try again.
+                        </div>
+                    `;
+                    console.error('Error fetching owner information:', error);
+                });
+        }
+
+        // Close owner modal
+        function closeOwnerModal() {
+            document.getElementById('ownerModal').style.display = 'none';
+        }
+
         // Close modal when clicking outside
         window.onclick = function(event) {
             const deleteModal = document.getElementById('deleteModal');
+            const ownerModal = document.getElementById('ownerModal');
+
             if (event.target === deleteModal) {
                 closeDeleteModal();
+            } else if (event.target === ownerModal) {
+                closeOwnerModal();
             }
         }
     </script>
 
-    <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #b3b3b3; position: fixed; bottom: 0px; margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
+ <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; bottom: 0px;  margin-bottom: 15px; width: 100%;">© URLCHECK 2025.All rights reserved</p>
 </body>
 </html>
 

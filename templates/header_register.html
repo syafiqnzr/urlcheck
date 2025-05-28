@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LURLCHECK</title>
+  <title>URLCHECK</title>
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
   <style>
 /* Base Styles */
@@ -223,6 +223,7 @@ body {
     <div class="nav-links" id="navLinks">
         <a href="/">Home</a>
         <a href="/plan">Plan</a>
+        <a href="/contact_us">Contact Us</a>
 
             {% if 'email' in session or 'username' in session %}
             <div class="profile-dropdown">

@@ -153,7 +153,7 @@ input:-webkit-autofill:active {
         }
 
         .flash-messages li {
-            background-color: #00b2f880; /* Spotify blue */
+            background-color: #00b2f880; /* Default Spotify blue */
             color: white;
             padding: 15px 25px;
             margin-top: 10px;
@@ -165,6 +165,21 @@ input:-webkit-autofill:active {
             animation: slideInOut 5s forwards;
             cursor: pointer;
             min-width: 250px;
+        }
+
+        /* Success message styling */
+        .flash-messages li.success {
+            background-color: #00b2f880; /* Spotify blue for success */
+        }
+
+        /* Error message styling */
+        .flash-messages li.error {
+            background-color: #ff0019a8; /* Red with transparency for errors */
+        }
+
+        /* Warning message styling */
+        .flash-messages li.warning {
+            background-color: #ff0019a8; /* Red with transparency for warnings */
         }
 
         @keyframes slideInOut {
@@ -278,11 +293,11 @@ input:-webkit-autofill:active {
             </form>
         </div>
 
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           <ul class="flash-messages" id="flash-messages">
-            {% for message in messages %}
-              <li>{{ message }}</li>
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
             {% endfor %}
           </ul>
         {% endif %}
@@ -318,7 +333,7 @@ input:-webkit-autofill:active {
             });
         });
     </script>
-        <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px;  margin-bottom: 15px; width: 100%;">Copyright © URLCHECK 2025</p>
+        <p style="text-align:center; font-family: Arial, serif; font-size: 11px; color: #535151; position: fixed; bottom: 0px;  margin-bottom: 15px; width: 100%;">© URLCHECK 2025.All rights reserved</p>
 </body>
 </html>
 {% endblock %}
