@@ -14,7 +14,8 @@ cgitb.enable()  # For debugging
 
 # Path to the trained model
 trainingmodel_path = "training_model/logistic_regression_model.pkl"
-vectorizer_path = "fatures_extraction/vectorizer.pkl"
+vectorizer_path = 'features_extraction/vectorizer.pkl'
+
 
 
 # Load the trained model
