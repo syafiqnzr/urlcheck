@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+import os
+load_dotenv()
 import mysql.connector
 from flask import Flask, render_template, request
 import random
@@ -103,11 +106,12 @@ def inject_user():
 
 # ---- Database Config ----
 db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="",
-    database="urlscanner"
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
 )
+
 
 cursor = db.cursor(dictionary=True)
 
