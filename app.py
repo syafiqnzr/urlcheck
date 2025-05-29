@@ -59,11 +59,9 @@ def format_date_filter(date_string):
         return date_string
 
 # Paths
-dataset_path = "Dataset"
-trainingmodel_path = "Training Model"
+dataset_path = "dataset"
+trainingmodel_path = "training_model"
 urcheck_script = "urlcheck.py"
-
-trainingmodel_path = 'Training Model/logistic_regression_model.pkl'
 
 
 # Ensure necessary folders exist

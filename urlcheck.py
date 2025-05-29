@@ -9,9 +9,9 @@ import seaborn as sns
 
 
 # Define the folder paths
-dataset_path = "Dataset"
-trainingmodel_path = "Training Model"
-vectorizer_path = "Features Extraction"
+dataset_path = "dataset"
+trainingmodel_path = "training_model"
+vectorizer_path = "features_extraction"
 
 # Automatically detect all CSV files in the folder
 csv_files = [os.path.join(dataset_path, file) for file in os.listdir(dataset_path) if file.endswith('.csv')]
