@@ -60,8 +60,8 @@ def format_date_filter(date_string):
 
 # Paths
 dataset_path = r'/var/www/syafiq/Dataset'
-trainingmodel_path = r'/var/www/syafiq/Training Model'
-urcheck_script = r'/var/www/syafiq/urlcheck.py'
+trainingmodel_path = r"/var/www/syafiq/'Training Model'"
+urcheck_script = r"/var/www/syafiq/'urlcheck.py'"
 
 # Ensure necessary folders exist
 os.makedirs(dataset_path, exist_ok=True)
