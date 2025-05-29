@@ -56,17 +56,13 @@ def format_date_filter(date_string):
         return date_string
 
 # Paths
-dataset_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Dataset'
-trainingmodel_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Training Model'
-urcheck_script = r'C:\xampp\htdocs\urlcheck\urlcheck\urlcheck.py'
+dataset_path = r'/var/www/syafiq/Dataset'
+trainingmodel_path = r'/var/www/syafiq/Training Model'
+urcheck_script = r'/var/www/syafiq/urlcheck.py'
 
 # Ensure necessary folders exist
 os.makedirs(dataset_path, exist_ok=True)
 os.makedirs(trainingmodel_path, exist_ok=True)
-
-app.config['SECRET_KEY'] = 'your_flask_secret_key'
-app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdYRLUqAAAAAD3KAzcvV1YF_YI5DjpNVpAdEbmV'
-app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdYRLUqAAAAABFyAftq5DkoE2CEs9dzchOSCWSj'
 
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

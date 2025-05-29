@@ -9,9 +9,9 @@ import seaborn as sns
 
 
 # Define the folder paths
-dataset_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Dataset'
-trainingmodel_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Training Model'
-vectorizer_path = r'C:\xampp\htdocs\urlcheck\urlcheck\Features Extraction'
+dataset_path = r'/var/www/syafiq/Dataset'
+trainingmodel_path = r'/var/www/syafiq/Training Model'
+vectorizer_path = r'/var/www/syafiq/Features Extraction'
 
 # Automatically detect all CSV files in the folder
 csv_files = [os.path.join(dataset_path, file) for file in os.listdir(dataset_path) if file.endswith('.csv')]
