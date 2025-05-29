@@ -106,12 +106,14 @@ def inject_user():
     return dict(profile_picture=profile_picture, username=username)
 
 # ---- Database Config ----
+
 db = mysql.connector.connect(
     host="localhost",
-    user="syafiq",
-    password="passwordku123",
-    database="nama_database"
+    user="root",
+    password="yourpassword",
+    database="urlscanner"
 )
+
 
 cursor = db.cursor(dictionary=True)
 
