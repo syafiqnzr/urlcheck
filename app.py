@@ -63,6 +63,9 @@ dataset_path = "Dataset"
 trainingmodel_path = "Training Model"
 urcheck_script = "urlcheck.py"
 
+trainingmodel_path = 'Training Model/logistic_regression_model.pkl'
+
+
 # Ensure necessary folders exist
 os.makedirs(dataset_path, exist_ok=True)
 os.makedirs(trainingmodel_path, exist_ok=True)
@@ -2171,4 +2174,4 @@ def manage_contact_us():
         return render_template('manage_contact_us.html', messages=[])
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

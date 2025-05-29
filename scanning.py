@@ -330,6 +330,7 @@ def run_full_scan(original_url):
 
 
 if __name__ == "__main__":
+    
     # Step 1: user input URL
     original_url = input("\nEnter URL to scan: ").strip()  # Store the original URL before modification
 
